@@ -1,0 +1,1641 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Iron Temple">
+<meta name="theme-color" content="#16181b">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="icon" type="image/png" href="icon.png">
+<title>Iron Temple Tycoon</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Barlow:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap">
+<style>
+/* Layout: one phone-width column. Sticky owner bar on top, tab content in the middle,
+   a fixed action dock (Coach / Rest) and tab bar at the bottom where the thumb rests.
+   Rubber-floor dark look with bumper-plate colors, by choice. */
+:root {
+  color-scheme: dark;
+  --floor: #16181b;
+  --speck: #22252a;
+  --panel: #1f2226;
+  --panel-2: #272b30;
+  --line: #353a41;
+  --chalk: #ecebe6;
+  --muted: #9aa1a9;
+  --red: #d8432f;
+  --blue: #2f6fd8;
+  --yellow: #ebbb24;
+  --green: #36a35a;
+  --white: #e4e4e0;
+  --orange: #e27d2c;
+  --purple: #8d62d8;
+  --plumbob: #4fd36f;
+  --up: #4cc274;
+  --down: #ef6a55;
+  --on-yellow: #1a1606;
+  --dock-h: 132px;
+  --f-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --f-body: "Barlow", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --f-num: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+html { -webkit-text-size-adjust: 100%; touch-action: manipulation; }
+body {
+  background-color: var(--floor);
+  background-image:
+    radial-gradient(circle at 20% 30%, var(--speck) 1px, transparent 1.5px),
+    radial-gradient(circle at 70% 80%, var(--speck) 1px, transparent 1.5px);
+  background-size: 14px 14px, 19px 19px;
+  color: var(--chalk); font-family: var(--f-body); font-size: 15px; line-height: 1.4;
+  -webkit-tap-highlight-color: transparent; overscroll-behavior-y: none;
+}
+.app { max-width: 680px; margin: 0 auto; padding-inline: 16px; padding-block: 0 calc(var(--dock-h) + 16px + env(safe-area-inset-bottom, 0px)); display: grid; gap: 14px; }
+button { font: inherit; color: inherit; -webkit-user-select: none; user-select: none; touch-action: manipulation; }
+:focus-visible { outline: 2px solid var(--yellow); outline-offset: 2px; }
+
+/* ---- owner bar ---- */
+.hdr { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 6; background: var(--floor); padding-block: 10px 10px; border-bottom: 1px solid var(--line); display: grid; gap: 7px; }
+.hdr-top { display: flex; justify-content: space-between; align-items: center; gap: 10px; }
+.k { font-family: var(--f-num); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.left { font-family: var(--f-num); font-weight: 700; font-size: 14px; }
+.left .lim { color: var(--muted); font-weight: 500; }
+.hdr-tools { display: flex; gap: 6px; align-items: center; min-width: 0; }
+.gname { font-family: var(--f-display); font-weight: 900; font-size: 17px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); background: none; border: 0; padding: 0 4px; max-width: 12ch; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; min-height: 36px; }
+.icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); display: grid; place-items: center; cursor: pointer; flex: none; }
+.icon-btn svg { width: 18px; height: 18px; }
+.hdr-main { display: flex; justify-content: space-between; align-items: end; gap: 12px; }
+.big { font-family: var(--f-num); font-weight: 700; font-size: clamp(24px, 7vw, 34px); line-height: 1; font-variant-numeric: tabular-nums; }
+.cash { color: var(--yellow); text-align: right; }
+.cash.neg { color: var(--down); }
+.sub-line { display: flex; justify-content: space-between; gap: 6px 10px; font-family: var(--f-num); font-size: 12px; color: var(--muted); flex-wrap: wrap; }
+.sub-line b { color: var(--chalk); font-weight: 500; }
+.ebar { height: 5px; background: var(--panel-2); border-radius: 3px; overflow: hidden; }
+.ebar > i { display: block; height: 100%; background: var(--green); width: 0; transition: width .2s; }
+.ticker { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 7px 10px; font-size: 13.5px; min-width: 0; cursor: pointer; width: 100%; text-align: left; }
+.ticker span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+.ticker .k { flex: none; }
+
+/* ---- generic blocks ---- */
+.card { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 14px; display: grid; gap: 10px; min-width: 0; }
+.sec { display: flex; justify-content: space-between; align-items: end; gap: 10px; margin-top: 6px; }
+.sec h2 { margin: 0; font-family: var(--f-display); font-weight: 900; font-size: 26px; text-transform: uppercase; letter-spacing: .02em; line-height: 1; text-wrap: balance; }
+.sec p { margin: 3px 0 0; color: var(--muted); font-size: 13px; }
+.sec .meta { font-family: var(--f-num); font-size: 11.5px; color: var(--muted); white-space: nowrap; }
+.list { display: grid; gap: 8px; }
+.muted { color: var(--muted); }
+.num { font-family: var(--f-num); font-variant-numeric: tabular-nums; }
+.up-c { color: var(--up); } .down-c { color: var(--down); }
+
+.btn { font-family: var(--f-num); font-weight: 700; font-size: 12px; letter-spacing: .04em; text-transform: uppercase; border-radius: 6px; padding: 0 12px; min-height: 40px; cursor: pointer; border: 1px solid var(--line); background: var(--panel-2); color: var(--chalk); white-space: nowrap; }
+.btn.y { background: var(--yellow); border-color: var(--yellow); color: var(--on-yellow); }
+.btn.g { background: transparent; border-color: var(--up); color: var(--up); }
+.btn.r { background: transparent; border-color: var(--down); color: var(--down); }
+.btn.b { background: var(--blue); border-color: var(--blue); color: #fff; }
+.btn:active:not(:disabled) { transform: translateY(1px); }
+.btn:disabled { background: transparent; border-color: var(--line); color: var(--muted); cursor: not-allowed; opacity: .75; }
+
+.row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 12px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 7px; padding: 10px 12px; }
+.row .nm { font-weight: 700; font-size: 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.row .nt { font-size: 12.5px; color: var(--muted); }
+.row .rs { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; justify-content: flex-end; }
+.row .pr { font-family: var(--f-num); font-weight: 700; font-size: 13.5px; text-align: right; display: grid; }
+.row .pr small { font-weight: 500; font-size: 10.5px; color: var(--muted); }
+.row.dim { opacity: .5; }
+.row.cur { border-color: var(--green); box-shadow: inset 3px 0 0 var(--green); }
+.tag { font-family: var(--f-num); font-size: 10px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 2px 6px; border-radius: 3px; border: 1px solid currentColor; }
+.tag.done { color: var(--up); } .tag.open { color: var(--yellow); } .tag.lock { color: var(--muted); } .tag.study { color: var(--blue); } .tag.cur { color: var(--green); }
+
+/* hustle cards */
+.act { display: grid; grid-template-columns: 46px minmax(0, 1fr) auto; gap: 12px; align-items: center; background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 10px 12px 10px 10px; cursor: pointer; text-align: left; width: 100%; min-height: 68px; }
+.act:active:not(:disabled) { transform: translateY(1px); border-color: var(--muted); }
+.act:disabled { cursor: not-allowed; opacity: .5; }
+.plate { width: 46px; height: 46px; border-radius: 50%; display: grid; place-items: center; box-shadow: inset 0 0 0 3px rgba(0,0,0,.18); }
+.plate i { width: 14px; height: 14px; border-radius: 50%; background: #c9cdd2; box-shadow: inset 0 0 0 3px #8e949b; display: block; }
+.act .nm { font-family: var(--f-display); font-weight: 900; font-size: 22px; text-transform: uppercase; line-height: 1; letter-spacing: .02em; }
+.act .nt { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+.chip { font-family: var(--f-num); font-weight: 700; font-size: 12px; padding: 5px 8px; border-radius: 4px; background: var(--panel-2); color: var(--yellow); white-space: nowrap; text-align: right; }
+.chip small { display: block; font-weight: 500; font-size: 10px; color: var(--muted); }
+
+/* checklist + overhead */
+.warm-h { display: flex; justify-content: space-between; align-items: center; background: none; border: 0; padding: 0; cursor: pointer; width: 100%; text-align: left; min-height: 36px; }
+.step { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 10px; align-items: start; }
+.step .ck { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--line); display: grid; place-items: center; font-size: 12px; color: var(--floor); margin-top: 1px; }
+.step.done .ck { background: var(--up); border-color: var(--up); }
+.step.done .st { text-decoration: line-through; color: var(--muted); }
+.step .st { font-weight: 700; }
+.step .sd { font-size: 12.5px; color: var(--muted); }
+.step .rw { font-family: var(--f-num); font-size: 12px; color: var(--up); white-space: nowrap; }
+.burn { display: flex; justify-content: space-between; align-items: center; gap: 10px; background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--down); border-radius: 6px; padding: 9px 12px; cursor: pointer; width: 100%; text-align: left; min-height: 44px; }
+.burn .num { color: var(--down); font-weight: 700; }
+.burn-list { display: grid; gap: 4px; font-size: 13px; padding: 8px 12px 4px; }
+.burn-list div { display: flex; justify-content: space-between; gap: 10px; }
+
+/* gym scene */
+.scene { position: relative; border-radius: 7px; overflow: hidden; background: var(--panel-2); }
+#gymCanvas { display: block; width: 100%; height: auto; aspect-ratio: 800 / 480; max-width: 100%; touch-action: manipulation; }
+#gymCanvas.editing { touch-action: none; cursor: grab; }
+.scene-cap { display: flex; justify-content: space-between; align-items: center; gap: 6px 12px; flex-wrap: wrap; font-size: 13.5px; }
+.scene-cap b { color: var(--plumbob); }
+.edit-bar { display: grid; gap: 8px; }
+.edit-bar .btns { justify-content: space-between; }
+.store-list { display: flex; flex-wrap: wrap; gap: 6px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button { font-family: var(--f-num); font-size: 12px; background: transparent; color: var(--muted); border: 0; padding: 0 12px; min-height: 34px; cursor: pointer; }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--chalk); color: var(--floor); }
+
+/* supply room */
+.tiles { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.tile { background: var(--panel); border: 1px solid var(--line); border-radius: 7px; padding: 9px 12px; display: flex; justify-content: space-between; align-items: baseline; gap: 8px; flex-wrap: wrap; }
+.idx { display: grid; grid-template-columns: minmax(0, 1fr) 130px; gap: 12px; align-items: center; }
+.idx .big { font-size: 30px; }
+.good { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; display: grid; gap: 8px; }
+.good-h { display: flex; justify-content: space-between; gap: 10px; }
+.good-h .nm { font-weight: 700; font-size: 16px; }
+.spark { width: 100%; height: 44px; display: block; }
+.qty { display: grid; grid-template-columns: auto minmax(0, 1fr) 4ch; gap: 10px; align-items: center; }
+.qty input { width: 100%; accent-color: var(--yellow); height: 32px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+.fin { border-color: var(--blue); }
+.fin dl { display: grid; grid-template-columns: 1fr auto; gap: 4px 12px; margin: 0; font-size: 14px; }
+.fin dt { color: var(--muted); }
+.fin dd { margin: 0; font-family: var(--f-num); text-align: right; }
+.fin .tot { border-top: 1px solid var(--line); padding-top: 4px; font-weight: 700; color: var(--chalk); }
+.pbar { height: 6px; background: var(--panel-2); border-radius: 3px; overflow: hidden; }
+.pbar > i { display: block; height: 100%; background: var(--blue); width: 0; }
+
+.credit { grid-template-columns: 96px minmax(0, 1fr); gap: 16px; align-items: center; }
+.credit svg { width: 96px; height: 96px; }
+.credit .lvl { font-family: var(--f-display); font-weight: 900; font-size: 30px; text-transform: uppercase; line-height: 1; }
+.nw-chart { width: 100%; height: 120px; display: block; }
+.fin-list { gap: 0; }
+.fin-list div { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--line); font-size: 14.5px; }
+.fin-list div:last-child { border-bottom: 0; font-weight: 700; }
+.btns { display: flex; flex-wrap: wrap; gap: 6px; }
+.bigname { font-family: var(--f-display); font-weight: 900; font-size: 30px; text-transform: uppercase; line-height: 1; }
+
+/* action dock + tab bar */
+.bottom { position: fixed; left: 0; right: 0; bottom: 0; z-index: 8; background: var(--panel); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.dock { max-width: 680px; margin: 0 auto; padding: 8px 16px 6px; display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 8px; }
+.dock button { border-radius: 10px; min-height: 58px; cursor: pointer; display: grid; align-content: center; justify-items: start; gap: 1px; padding: 6px 14px; text-align: left; border: 0; }
+.dock .coach { background: var(--yellow); color: var(--on-yellow); }
+.dock .rest { background: var(--panel-2); border: 1px solid var(--line); }
+.dock .t { font-family: var(--f-display); font-weight: 900; font-size: 21px; text-transform: uppercase; line-height: 1; }
+.dock .s { font-family: var(--f-num); font-size: 11px; font-weight: 700; opacity: .8; }
+.dock button:active:not(:disabled) { transform: scale(.98); }
+.dock button:disabled { opacity: .45; cursor: not-allowed; }
+nav.tabs .in { max-width: 680px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
+nav.tabs button { background: none; border: 0; cursor: pointer; display: grid; justify-items: center; gap: 2px; padding: 6px 2px 8px; color: var(--muted); font-size: 10.5px; font-weight: 600; position: relative; min-height: 50px; }
+nav.tabs svg { width: 22px; height: 22px; }
+nav.tabs button[aria-selected="true"] { color: var(--yellow); }
+nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute; top: 0; left: 24%; right: 24%; height: 3px; border-radius: 0 0 3px 3px; background: var(--yellow); }
+
+.floaty { position: fixed; pointer-events: none; font-family: var(--f-num); font-weight: 700; color: var(--yellow); font-size: 18px; animation: floatUp .9s ease-out forwards; text-shadow: 0 2px 0 var(--floor); z-index: 9; }
+@keyframes floatUp { from { opacity: 1; transform: translate(-50%, 0); } to { opacity: 0; transform: translate(-50%, -60px); } }
+
+/* modal + toast */
+.modal-back { position: fixed; inset: 0; background: rgba(8,9,11,.72); z-index: 20; display: grid; place-items: center; padding: 16px; padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+.modal { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; width: 100%; max-width: 420px; padding: 20px; display: grid; gap: 12px; max-height: 80vh; overflow: auto; -webkit-overflow-scrolling: touch; }
+.modal h3 { margin: 0; font-family: var(--f-display); font-weight: 900; font-size: 28px; text-transform: uppercase; line-height: 1.05; color: var(--yellow); text-wrap: balance; }
+.modal p { margin: 0; }
+.modal .btns { justify-content: flex-end; }
+.modal .btns.stack { display: grid; }
+.log-list { display: grid; gap: 6px; font-size: 13.5px; }
+.log-list div { display: grid; grid-template-columns: 64px 1fr; gap: 8px; }
+#toast { position: fixed; left: 50%; bottom: calc(var(--dock-h) + 14px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--chalk); color: var(--floor); font-weight: 600; padding: 9px 14px; border-radius: 8px; max-width: calc(100% - 32px); z-index: 30; box-shadow: 0 6px 24px rgba(0,0,0,.45); text-align: center; }
+@media (max-width: 420px) { .idx { grid-template-columns: 1fr; } .row .nm { font-size: 15px; } }
+@media (prefers-reduced-motion: reduce) { .floaty { animation-duration: .01s; } .ebar > i { transition: none; } }
+</style>
+
+
+<style>
+  /* standalone page: no host wrapper, so handle margins and the notch here */
+  html, body { margin: 0; }
+  *, *::before, *::after { box-sizing: border-box; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+  .hdr { top: 0; padding-top: calc(10px + env(safe-area-inset-top, 0px)); }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="hdr">
+    <div class="hdr-top">
+      <div><div class="k">Life left</div><div class="left"><span id="hLeft">0y 200d</span> <span class="lim">· day <span id="hDay">0</span></span></div></div>
+      <div class="hdr-tools">
+        <button class="gname" id="gymName" type="button" aria-label="Rename your gym">Iron Temple</button>
+        <button class="icon-btn" id="restartBtn" type="button" aria-label="Restart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>
+      </div>
+    </div>
+    <div class="hdr-main">
+      <div><div class="k">Age</div><div class="big" id="hAge">22y 0d</div></div>
+      <div><div class="k" style="text-align:right">Cash</div><div class="big cash" id="hCash">$0.00</div></div>
+    </div>
+    <div class="sub-line"><span>Energy <b id="hEn">100/100</b></span><span>Dues <b id="hRate">$0</b>/day</span><span>Net <b id="hNet">$0</b></span></div>
+    <div class="ebar"><i id="hEnBar"></i></div>
+    <button class="ticker" type="button" id="logBtn"><span id="hTick">Welcome to your gym.</span><span class="k">Log ›</span></button>
+  </header>
+
+  <section id="sceneWrap" class="card" aria-label="Gym floor">
+    <div class="scene" id="scene">
+      <canvas id="gymCanvas" width="800" height="480" aria-label="Your gym floor"></canvas>
+    </div>
+    <div id="sceneCap"></div>
+  </section>
+
+  <div id="view" style="display:grid;gap:14px"></div>
+</div>
+
+<div class="bottom">
+  <div class="dock">
+    <button class="coach" id="coachBtn" type="button"><span class="t">Coach clients</span><span class="s" id="coachSub">+$3.00 · −8 energy · 1 day</span></button>
+    <button class="rest" id="restBtn" type="button"><span class="t">Rest</span><span class="s">+35 energy · 1 day</span></button>
+  </div>
+  <nav class="tabs" aria-label="Sections"><div class="in" id="tabs" role="tablist"></div></nav>
+</div>
+<div id="modalRoot"></div>
+<div id="toast" hidden></div>
+
+<script>
+(function () {
+  const SAVE_KEY = "iron-temple-tycoon-v3";
+  const START_AGE = 22;
+  const BASE_DAYS = 200;      // days to live before any upgrades
+  const COACH_EN = 8, REST_EN = 35;
+
+  // ======================= DATA =======================
+  // rates are dollars per day
+  const GENS = [
+    { id: "mat",   name: "Yoga Mats",         base: 15,     rate: 2,     color: "--green" },
+    { id: "bells", name: "Dumbbell Rack",     base: 100,    rate: 12,    color: "--blue" },
+    { id: "tread", name: "Treadmill",         base: 1100,   rate: 48,    color: "--white" },
+    { id: "rack",  name: "Squat Rack",        base: 12000,  rate: 240,   color: "--red" },
+    { id: "pt",    name: "Personal Trainer",  base: 130000, rate: 1200,  color: "--yellow", cert: "cpt", staff: true },
+    { id: "bar",   name: "Smoothie Bar",      base: 1.4e6,  rate: 6000,  color: "--orange", cert: "nutri" },
+    { id: "sauna", name: "Sauna & Steam",     base: 2e7,    rate: 32000, color: "--purple" },
+    { id: "pool",  name: "Lap Pool",          base: 3.3e8,  rate: 1.8e5, color: "--blue" },
+    { id: "arena", name: "Competition Stage", base: 5.1e9,  rate: 1.04e6,color: "--red", cert: "cscs" },
+    { id: "celeb", name: "Celebrity Coach",   base: 7.5e10, rate: 6.4e6, color: "--yellow", cert: "mba", staff: true }
+  ];
+  const GEN_BY_ID = Object.fromEntries(GENS.map(g => [g.id, g]));
+  const GEN_UP_NAMES = {
+    mat: ["Non-Slip Mats", "Hot Yoga Room"], bells: ["Hex Dumbbells", "Adjustable Bells"], tread: ["Incline Mode", "Curved Treadmills"],
+    rack: ["Calibrated Plates", "Competition Bars"], pt: ["Program Templates", "Group Classes"], bar: ["Whey Upsell", "Protein Bakery"],
+    sauna: ["Cold Plunge", "Infrared Panels"], pool: ["Lane Ropes", "Swim Team"], arena: ["Livestream Deal", "Sponsor Banners"], celeb: ["Viral Clips", "Signature Program"]
+  };
+  const UPGRADES = [];
+  GENS.forEach(g => {
+    UPGRADES.push({ id: "u_" + g.id + "_1", name: GEN_UP_NAMES[g.id][0], desc: g.name + " earn ×2", cost: g.base * 20, need: 10, gen: g.id });
+    UPGRADES.push({ id: "u_" + g.id + "_2", name: GEN_UP_NAMES[g.id][1], desc: g.name + " earn ×2", cost: g.base * 400, need: 25, gen: g.id });
+  });
+  [["g1", "Neon Sign", "All dues ×1.25. Lights up your wall.", 5000, 1.25], ["g2", "Member App", "All dues ×1.5", 5e5, 1.5], ["g3", "24/7 Access", "All dues ×2", 5e7, 2],
+   ["g4", "Branded Merch", "All dues ×2", 5e9, 2], ["g5", "TV Ad Campaign", "All dues ×3", 5e11, 3]]
+    .forEach(([id, name, desc, cost, mult]) => UPGRADES.push({ id, name, desc, cost, mult, global: true }));
+
+  const TIERS = [
+    { at: 0, name: "Garage Gym" }, { at: 1e3, name: "Basement Box" }, { at: 1e5, name: "Strip-Mall Gym" }, { at: 1e7, name: "Fitness Center" },
+    { at: 1e9, name: "Athletic Club" }, { at: 1e11, name: "Mega Gym" }, { at: 1e13, name: "Global Fitness Empire" }
+  ];
+
+  const HUSTLES = [
+    { id: "flyers",  name: "Hand Out Flyers",    note: "Outside the grocery store",  max: 7,     en: 6,  color: "--red" },
+    { id: "mirrors", name: "Clean Mirrors",      note: "Cash job at the chain gym",  max: 16,    en: 12, color: "--blue" },
+    { id: "boot",    name: "Park Bootcamp",      note: "Run a class on the grass",   max: 45,    en: 16, color: "--yellow", gear: "whistle" },
+    { id: "online",  name: "Online Coaching",    note: "Video check-ins",            max: 160,   en: 12, color: "--green",  gear: "phone", cert: "cpt" },
+    { id: "oneone",  name: "1-on-1 Session",     note: "A private client hour",      max: 400,   en: 20, color: "--white",  cert: "cpt" },
+    { id: "shoot",   name: "Fitness Photoshoot", note: "Sponsored content",          max: 3000,  en: 30, color: "--orange", gear: "light", phys: 60 },
+    { id: "seminar", name: "Seminar Tour",       note: "Sold-out workshops",         max: 30000, en: 45, color: "--purple", gear: "van", cert: "kin" }
+  ];
+  const GEAR = [
+    { id: "whistle", name: "Coach's Whistle",   note: "Unlocks park bootcamps",  cost: 30 },
+    { id: "dog",     name: "Gym Dog",           note: "+50% on flyers",          cost: 60, burn: 1 },
+    { id: "clip",    name: "Clipboard & Cones", note: "+30% on bootcamps",       cost: 150 },
+    { id: "phone",   name: "Smartphone",        note: "Unlocks online coaching", cost: 300, burn: 1 },
+    { id: "tees",    name: "Branded Tees",      note: "+25% on every hustle",    cost: 900 },
+    { id: "light",   name: "Ring Light",        note: "Unlocks photoshoots",     cost: 2000 },
+    { id: "van",     name: "Tour Van",          note: "Unlocks seminar tours",   cost: 60000, burn: 25 }
+  ];
+
+  // life values are in days
+  const CERTS = [
+    { id: "cpr",   name: "CPR & First Aid",            cost: 40,     days: 4,   life: 30,  req: [],       perk: "Pass health inspections" },
+    { id: "cpt",   name: "Personal Trainer Cert",      cost: 700,    days: 30,  life: 60,  req: ["cpr"],  perk: "Hire trainers, take clients, coaching ×2" },
+    { id: "nutri", name: "Nutrition Coach",            cost: 2000,   days: 45,  life: 150, req: ["cpt"],  perk: "Unlocks the smoothie bar" },
+    { id: "biz",   name: "Small Business Course",      cost: 9000,   days: 60,  life: 45,  req: ["cpr"],  perk: "All dues ×1.5, +40 credit" },
+    { id: "cscs",  name: "Strength & Conditioning",    cost: 30000,  days: 120, life: 150, req: ["cpt"],  perk: "Unlocks the stage, squat racks ×2" },
+    { id: "kin",   name: "Kinesiology Degree",         cost: 90000,  days: 365, life: 365, req: ["cscs"], perk: "Seminar tours, coaching ×3" },
+    { id: "mba",   name: "MBA",                        cost: 250000, days: 240, life: 120, req: ["biz"],  perk: "All dues ×2, celebrity coach" },
+    { id: "dpt",   name: "Doctor of Physical Therapy", cost: 1.2e6,  days: 540, life: 700, req: ["kin"],  perk: "All dues ×2" }
+  ];
+  const CERT_BY_ID = Object.fromEntries(CERTS.map(c => [c.id, c]));
+
+  const HOMES = [
+    { id: "couch",  name: "Office Couch",       cost: 0,      burn: 0,    life: 0,    max: 100 },
+    { id: "room",   name: "Rented Room",        cost: 150,    burn: 4,    life: 45,   max: 110 },
+    { id: "studio", name: "Studio Apartment",   cost: 1200,   burn: 15,   life: 120,  max: 120 },
+    { id: "loft",   name: "Loft Near the Gym",  cost: 15000,  burn: 90,   life: 300,  max: 140 },
+    { id: "house",  name: "House + Garage Gym", cost: 250000, burn: 600,  life: 900,  max: 170 },
+    { id: "estate", name: "Estate with Spa",    cost: 5e6,    burn: 9000, life: 2200, max: 220 }
+  ];
+  const FOODS = [
+    { id: "ramen", name: "Instant Ramen",     burn: 2,    life: 0,   regen: 5 },
+    { id: "groc",  name: "Groceries",         burn: 8,    life: 40,  regen: 8 },
+    { id: "prep",  name: "Meal Prep Service", burn: 40,   life: 120, regen: 11 },
+    { id: "diet",  name: "Sports Dietitian",  burn: 400,  life: 365, regen: 15 },
+    { id: "chef",  name: "Private Chef",      burn: 5000, life: 800, regen: 20 }
+  ];
+  const GOODS = [
+    { id: "bands",  name: "Resistance Bands",   base: 14,  vol: .05, tier: 0 },
+    { id: "bars",   name: "Protein Bar Boxes",  base: 18,  vol: .06, tier: 0 },
+    { id: "crea",   name: "Creatine Tubs",      base: 22,  vol: .05, tier: 0 },
+    { id: "whey",   name: "Whey Protein 2 kg",  base: 45,  vol: .07, tier: 0 },
+    { id: "pre",    name: "Pre-Workout",        base: 34,  vol: .12, tier: 1 },
+    { id: "kb",     name: "Kettlebells 16 kg",  base: 65,  vol: .06, tier: 1 },
+    { id: "plates", name: "Used Bumper Plates", base: 85,  vol: .09, tier: 2 },
+    { id: "rower",  name: "Refurbished Rowers", base: 600, vol: .1,  tier: 3 }
+  ];
+  const SHELVES = [{ add: 50, cost: 250, name: "Wire Shelving" }, { add: 150, cost: 3000, name: "Back Storage Room" }, { add: 600, cost: 45000, name: "Rented Warehouse" }];
+
+  // ======================= STATE =======================
+  function fresh() {
+    return {
+      cash: 25, energy: 100, physique: 0, day: 0, bonusDays: 0,
+      owned: {}, ups: {}, spentEquip: 0, gear: {}, certs: {}, study: null,
+      layout: [], nextKey: 1,
+      home: "couch", homesOwned: { couch: true }, food: "ramen",
+      bankOpen: false, savings: 0, credit: 520, loans: [],
+      fund: { units: 0, price: 100, hist: [100] },
+      goods: null, store: 50, shelves: 0,
+      runEarned: 0, lifetime: 0, hustled: 0, reps: 0,
+      legacy: 0, lives: 1, bestNet: 0, nwHist: [], log: [], warm: {}, warmOpen: true,
+      cd: {}, nextEvent: 18, name: "Iron Temple", dead: false
+    };
+  }
+  let S = fresh();
+  let tab = "floor", buyMode = "1";
+
+  // ======================= MATH =======================
+  const SUF = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
+  function fmt(n) {
+    if (!isFinite(n)) return "∞";
+    if (n < 1000) return n < 100 && n % 1 ? n.toFixed(1) : Math.floor(n).toLocaleString("en-US");
+    const e = Math.min(Math.floor(Math.log10(n) / 3), SUF.length - 1);
+    const v = n / Math.pow(1000, e);
+    return (v >= 100 ? v.toFixed(1) : v.toFixed(2)) + SUF[e];
+  }
+  function money(n) {
+    const s = n < 0 ? "-" : ""; n = Math.abs(n);
+    if (n < 1e4) return s + "$" + n.toFixed(2);
+    if (n < 1e6) return s + "$" + Math.floor(n).toLocaleString("en-US");
+    return s + "$" + fmt(n);
+  }
+  const ydays = d => { d = Math.max(0, Math.floor(d)); return Math.floor(d / 365) + "y " + (d % 365) + "d"; };
+  const lifeTxt = d => d >= 365 ? (Math.round(d / 365 * 10) / 10) + "y" : d + "d";
+  const rnd = (a, b) => a + Math.random() * (b - a);
+  const pick = a => a[Math.floor(Math.random() * a.length)];
+  const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
+
+  const legacyMult = () => 1 + 0.1 * S.legacy;
+  function genMult(id) {
+    let m = 1;
+    if (S.ups["u_" + id + "_1"]) m *= 2;
+    if (S.ups["u_" + id + "_2"]) m *= 2;
+    if (id === "rack" && S.certs.cscs) m *= 2;
+    return m;
+  }
+  function globalMult() {
+    let m = legacyMult();
+    UPGRADES.forEach(u => { if (u.global && S.ups[u.id]) m *= u.mult; });
+    if (S.certs.biz) m *= 1.5;
+    if (S.certs.mba) m *= 2;
+    if (S.certs.dpt) m *= 2;
+    return m;
+  }
+  const genRate = g => g.rate * genMult(g.id) * globalMult();
+  function income() { let t = 0; GENS.forEach(g => { t += (S.owned[g.id] || 0) * genRate(g); }); return t; }
+  const coachMult = () => (S.certs.cpt ? 2 : 1) * (S.certs.kin ? 3 : 1) * legacyMult();
+  const coachValue = () => (3 + income() * 0.5) * coachMult();
+  function hustleMult(h) {
+    let m = legacyMult() * (S.gear.tees ? 1.25 : 1);
+    if (h.id === "flyers" && S.gear.dog) m *= 1.5;
+    if (h.id === "boot" && S.gear.clip) m *= 1.3;
+    return m;
+  }
+  const unitCost = (g, n) => g.base * Math.pow(1.15, n);
+  const bulkCost = (g, n, k) => unitCost(g, n) * (Math.pow(1.15, k) - 1) / 0.15;
+  const maxAfford = (g, n, m) => Math.max(0, Math.floor(Math.log(Math.max(0, m) * 0.15 / unitCost(g, n) + 1) / Math.log(1.15)));
+  function tierIndex() { let i = 0; TIERS.forEach((t, j) => { if (S.runEarned >= t.at) i = j; }); return i; }
+
+  const home = () => HOMES.find(h => h.id === S.home) || HOMES[0];
+  const food = () => FOODS.find(f => f.id === S.food) || FOODS[0];
+  const maxEnergy = () => home().max;
+  const certLife = () => CERTS.reduce((a, c) => a + (S.certs[c.id] ? c.life : 0), 0);
+  const lifespanDays = () => BASE_DAYS + home().life + food().life + certLife() + S.physique * 1.5 + S.bonusDays;
+  const ageDays = () => START_AGE * 365 + S.day;
+  const daysLeft = () => lifespanDays() - S.day;
+
+  function burnItems() {
+    const items = [];
+    if (home().burn) items.push(["Rent · " + home().name, home().burn]);
+    items.push(["Meals · " + food().name, food().burn]);
+    const oh = income() * 0.1;
+    if (oh > 0) items.push(["Gym lease & utilities", oh]);
+    GEAR.forEach(g => { if (S.gear[g.id] && g.burn) items.push([g.name + " upkeep", g.burn]); });
+    S.loans.forEach(l => items.push([l.kind + " loan payment", Math.min(l.pay, l.bal)]));
+    return items;
+  }
+  const burn = () => burnItems().reduce((a, b) => a + b[1], 0);
+
+  function goodsValue() { if (!S.goods) return 0; let v = 0; GOODS.forEach(g => { const q = S.goods[g.id]; v += q.own * q.price; }); return v; }
+  function storeUsed() { if (!S.goods) return 0; let n = 0; GOODS.forEach(g => { n += S.goods[g.id].own; }); return n; }
+  const loanTotal = () => S.loans.reduce((a, l) => a + l.bal, 0);
+  const equipValue = () => S.spentEquip * 0.5;
+  const fundValue = () => S.fund.units * S.fund.price;
+  const netWorth = () => S.cash + S.savings + fundValue() + goodsValue() + equipValue() - loanTotal();
+  const bizApr = () => Math.max(0.04, 0.24 - (S.credit - 500) / 350 * 0.2);
+  const STUDENT_APR = 0.065;
+  function bizLimit() {
+    const cur = S.loans.filter(l => l.kind === "Business").reduce((a, l) => a + l.bal, 0);
+    return Math.max(0, Math.floor((S.credit - 520) * 40 + Math.max(0, netWorth()) * 0.4 - cur));
+  }
+  function makeLoan(kind, amount, apr, years) {
+    const total = amount * (1 + apr * years * 0.55);
+    return { kind, bal: total, pay: total / (years * 365), apr };
+  }
+  const creditLabel = c => c < 580 ? "Poor" : c < 670 ? "Fair" : c < 740 ? "Good" : c < 800 ? "Very good" : "Excellent";
+
+  function earn(v) { S.cash += v; S.runEarned += v; S.lifetime += v; }
+  function logMsg(m) { S.log.unshift({ d: S.day, m }); if (S.log.length > 80) S.log.length = 80; }
+
+  // ======================= MARKETS =======================
+  function ensureGoods() {
+    if (S.goods) return;
+    S.goods = {};
+    GOODS.forEach(g => { const p = g.base * rnd(0.85, 1.15); S.goods[g.id] = { price: p, hist: [p], own: 0, cost: 0 }; });
+  }
+  function walkMarkets() {
+    GOODS.forEach(g => {
+      const q = S.goods[g.id];
+      let p = q.price * Math.exp(g.vol * gauss());
+      p += (g.base - p) * 0.06;
+      p = Math.min(g.base * 2.6, Math.max(g.base * 0.35, p));
+      q.price = p; q.hist.push(p); if (q.hist.length > 30) q.hist.shift();
+    });
+    const f = S.fund;
+    f.price = Math.max(5, f.price * Math.exp(0.09 / 365 + 0.014 * gauss()));
+    f.hist.push(f.price); if (f.hist.length > 60) f.hist.shift();
+  }
+  const prevOf = h => h.length > 1 ? h[h.length - 2] : h[0];
+  function marketIndex(prev) {
+    let s = 0; GOODS.forEach(g => { const q = S.goods[g.id]; s += (prev ? prevOf(q.hist) : q.price) / g.base; });
+    return s / GOODS.length * 100;
+  }
+
+  // ======================= A DAY PASSES =======================
+  // Every action that takes time (coach, rest, hustle, train) calls this once.
+  function passDay(what) {
+    if (S.dead) return;
+    S.day++;
+    const dues = income();
+    if (dues > 0) earn(dues);
+    S.energy = Math.min(maxEnergy(), S.energy + food().regen);
+    let bills = home().burn + food().burn + dues * 0.1;
+    GEAR.forEach(g => { if (S.gear[g.id] && g.burn) bills += g.burn; });
+    S.loans.forEach(l => { const p = Math.min(l.pay, l.bal); l.bal -= p; bills += p; });
+    const paid = S.loans.filter(l => l.bal <= 0.005);
+    if (paid.length) { paid.forEach(l => logMsg("Paid off your " + l.kind.toLowerCase() + " loan.")); S.loans = S.loans.filter(l => l.bal > 0.005); S.credit += 15; }
+    S.cash -= bills;
+    let stress = "";
+    if (S.cash < 0) {
+      S.cash *= 1.01; S.credit -= 4;
+      S.bonusDays -= 2; stress = " Broke: stress cost you 2 extra days.";
+    } else if (S.loans.length) S.credit += 0.4;
+    else S.credit += 0.08;
+    S.credit = Math.max(300, Math.min(850, S.credit));
+    if (S.bankOpen && S.savings > 0) S.savings *= 1 + 0.04 / 365;
+    ensureGoods(); walkMarkets();
+    if (S.study) {
+      S.study.left--;
+      if (S.study.left <= 0) {
+        const c = CERT_BY_ID[S.study.id]; S.certs[c.id] = true; S.study = null;
+        if (c.id === "biz") S.credit = Math.min(850, S.credit + 40);
+        logMsg("You earned your " + c.name + "! +" + lifeTxt(c.life) + " life."); toast("Certified: " + c.name);
+        sceneDirty = true;
+      }
+    }
+    const nw = netWorth();
+    S.nwHist.push(nw); if (S.nwHist.length > 60) S.nwHist.shift();
+    S.bestNet = Math.max(S.bestNet, nw);
+    logMsg((what ? what + " · " : "") + (dues > 0 ? "dues +" + money(dues) + " · " : "") + "bills −" + money(bills) + "." + stress);
+    if (S.day % 365 === 0) logMsg("Happy birthday! You turned " + Math.floor(ageDays() / 365) + ".");
+    checkWarm();
+    const left = daysLeft();
+    if (left <= 0) { die(); return; }
+    if (left === 30 || left === 7) toast(left + " days left. Upgrade your home, meals or certs to live longer.");
+    if (S.day >= S.nextEvent) { S.nextEvent = S.day + Math.floor(rnd(14, 32)); fireEvent(); }
+  }
+  function afterAction() { refresh(); save(); }
+
+  // ---- day actions ----
+  function floaty(text, anchor) {
+    const r = anchor.getBoundingClientRect();
+    const f = document.createElement("div"); f.className = "floaty"; f.textContent = text;
+    f.style.left = (r.left + r.width / 2) + "px"; f.style.top = (r.top - 6) + "px";
+    document.body.appendChild(f); setTimeout(() => f.remove(), 900);
+  }
+  function doCoach() {
+    if (S.dead || modalOpen || S.energy < COACH_EN) return;
+    S.energy -= COACH_EN;
+    const v = coachValue(); earn(v); S.reps++;
+    const m = people.filter(p => p.role === "member" && !p.hidden);
+    if (m.length) { selected = pick(m); selectedUntil = performance.now() + 3500; }
+    floaty("+" + money(v), el("coachBtn"));
+    passDay("Coached clients for " + money(v));
+    afterAction();
+  }
+  function doRest() {
+    if (S.dead || modalOpen) return;
+    S.energy = Math.min(maxEnergy(), S.energy + REST_EN);
+    passDay("Rest day");
+    afterAction();
+  }
+  function doHustle(h, btn) {
+    if (S.dead || modalOpen || S.energy < h.en) return;
+    S.energy -= h.en;
+    const pay = h.max * rnd(0.4, 1) * hustleMult(h);
+    earn(pay); S.hustled += pay;
+    floaty("+" + money(pay), btn);
+    passDay(h.name + " paid " + money(pay));
+    afterAction();
+  }
+  function doTrain() {
+    if (S.dead || modalOpen || S.energy < 20 || S.physique >= 100) return;
+    S.energy -= 20; S.physique++;
+    passDay("Trained yourself (physique " + S.physique + ")");
+    afterAction();
+  }
+
+  // ======================= WARM-UP =======================
+  const WARM = [
+    { id: "w1", t: "Earn your first $10", d: "Tap Coach clients below, or try a hustle.", r: "+$10", ok: () => S.hustled + S.reps * 3 >= 10, give: () => earn(10) },
+    { id: "w2", t: "Put equipment on the floor", d: "Buy yoga mats below. They pay dues every day.", r: "+$15", ok: () => Object.keys(S.owned).length > 0, give: () => earn(15) },
+    { id: "w3", t: "Get off the office couch", d: "Home tab. Better housing adds days to your life.", r: "+20d life", ok: () => S.home !== "couch", give: () => { S.bonusDays += 20; } },
+    { id: "w4", t: "Earn your CPR card", d: "Certs tab. Certifications unlock jobs and add life.", r: "+20d life", ok: () => !!S.certs.cpr, give: () => { S.bonusDays += 20; } },
+    { id: "w5", t: "Open a bank account", d: "Bank tab. Keeps cash safe and builds credit.", r: "+$100", ok: () => S.bankOpen, give: () => earn(100) }
+  ];
+  function checkWarm() {
+    WARM.forEach(w => { if (!S.warm[w.id] && w.ok()) { S.warm[w.id] = true; w.give(); logMsg("Warm-up done: " + w.t + " (" + w.r + ")"); toast("Warm-up done · " + w.r); } });
+  }
+
+  // ======================= EVENTS =======================
+  const big = () => Math.max(30, income() * 8);
+  const EVENTS = [
+    () => { const c = big() * 0.5; return { t: "Cracked floor tile", x: "A member dropped a 40 kg dumbbell from overhead. The repair costs " + money(c) + ".", b: [["Pay for it", () => { S.cash -= c; logMsg("Paid " + money(c) + " to fix the floor."); }]] }; },
+    () => { const c = big(); return { t: "Influencer visit", x: "A fitness influencer filmed a workout at your gym. New sign-ups bring in " + money(c) + ".", b: [["Nice", () => { earn(c); logMsg("Influencer visit brought " + money(c) + "."); }]] }; },
+    () => { const c = big() * 0.8; return { t: "Burst pipe", x: "The locker room is flooded. Plumber and cleanup: " + money(c) + ".", b: [["Call the plumber", () => { S.cash -= c; logMsg("Burst pipe cost " + money(c) + "."); }]] }; },
+    () => { if (S.certs.cpr) return { t: "Health inspection", x: "The inspector checks your first aid kit and your CPR card. You pass.", b: [["Good", () => logMsg("Passed the health inspection.")]] };
+      const c = 60 + big() * 0.3; return { t: "Health inspection", x: "Nobody on staff is CPR certified. That is a fine of " + money(c) + ".", b: [["Pay the fine", () => { S.cash -= c; logMsg("Inspection fine " + money(c) + "."); }]] }; },
+    () => { const c = big() * 1.5; return { t: "Resolution rush", x: "Sign-ups spike and you collect " + money(c) + " in joining fees.", b: [["Let them in", () => { earn(c); logMsg("Resolution rush: " + money(c) + "."); }]] }; },
+    () => { if (S.certs.cpr) return { t: "Slip in the shower", x: "A member slipped. Your CPR training kicks in and everyone is fine.", b: [["Phew", () => logMsg("Handled a shower slip calmly.")]] };
+      const c = big() * 1.2; return { t: "Slip in the shower", x: "A member slipped and nobody knew first aid. Settlement: " + money(c) + ".", b: [["Settle", () => { S.cash -= c; logMsg("Shower slip settlement " + money(c) + "."); }]] }; },
+    () => { if (S.bankOpen || S.cash < 80) return null; const c = S.cash * 0.25; return { t: "Wallet stolen", x: "Someone lifted your wallet at the bus stop. You lose " + money(c) + ". A bank account would have kept it safe.", b: [["Ugh", () => { S.cash -= c; logMsg("Wallet stolen: " + money(c) + "."); }]] }; },
+    () => { const g = pick(GOODS.filter(x => x.tier <= tierIndex())); return { t: "Supplier clearance", x: g.name + " just dropped to half price in the supply room.", b: [["Go look", () => { S.goods[g.id].price *= 0.5; setTab("supply"); }], ["Later", () => { S.goods[g.id].price *= 0.5; }]] }; },
+    () => ({ t: "Pulled hamstring", x: "You skipped your warm-up. Lose 40 energy and 6 days of life.", b: [["Ice it", () => { S.energy = Math.max(0, S.energy - 40); S.bonusDays -= 6; logMsg("Pulled a hamstring (−6 days)."); }]] }),
+    () => S.food === "ramen" ? { t: "Food poisoning", x: "That gas-station ramen was a mistake. You lose 10 days of life. Better meals would help.", b: [["Never again", () => { S.bonusDays -= 10; S.energy = Math.max(0, S.energy - 30); logMsg("Food poisoning (−10 days)."); }]] } : null,
+    () => S.physique < 20 ? { t: "Back tweak", x: "You lifted a box of plates with a rounded back. Lose 8 days of life. Training yourself makes you sturdier.", b: [["Ouch", () => { S.bonusDays -= 8; logMsg("Tweaked your back (−8 days)."); }]] } : null,
+    () => { const c = big() * 0.6; return { t: "Local news story", x: "The evening news ran a piece on your gym. Walk-ins pay " + money(c) + ".", b: [["Nice", () => { earn(c); logMsg("News story brought " + money(c) + "."); }]] }; },
+    () => { const c = big() * 0.4; return { t: "Power outage", x: "The block lost power for an afternoon. Refunds cost " + money(c) + ".", b: [["Refund them", () => { S.cash -= c; logMsg("Power outage refunds " + money(c) + "."); }]] }; },
+    () => { const c = Math.round(rnd(15, 80) * (tierIndex() + 1)); return { t: "Tip jar", x: "Regulars filled the front desk tip jar: " + money(c) + ".", b: [["Thanks, everyone", () => { earn(c); logMsg("Tip jar: " + money(c) + "."); }]] }; },
+    () => { const c = Math.max(20, S.cash * 0.05); return { t: "Charity 5K", x: "The neighborhood is running a charity 5K. Sponsor it for " + money(c) + "? Giving back adds 10 days to your life.", b: [["Sponsor", () => { S.cash -= c; S.bonusDays += 10; logMsg("Sponsored the charity 5K (+10 days)."); }], ["Pass", () => {}]] }; },
+    () => { if (!(S.owned.rack > 0)) return null; const c = unitCost(GEN_BY_ID.rack, S.owned.rack - 1) * 0.9; return { t: "Rival's offer", x: "The gym across the street offers " + money(c) + " for one of your squat racks.", b: [["Sell one", () => { S.owned.rack--; S.cash += c; syncLayout(); logMsg("Sold a squat rack for " + money(c) + "."); }], ["Keep it", () => {}]] }; },
+    () => S.fund.units > 0 ? { t: "Market dip", x: "Stocks slid today. The IRON 500 fund dropped 12%.", b: [["Hold", () => { S.fund.price *= 0.88; logMsg("IRON 500 dropped 12%."); }]] } : null,
+    () => { const c = big() * 0.4; return { t: "Referral week", x: "Members brought friends. " + money(c) + " in new dues.", b: [["Nice", () => { earn(c); logMsg("Referral week: " + money(c) + "."); }]] }; }
+  ];
+  function fireEvent() { for (let i = 0; i < 10; i++) { const e = pick(EVENTS)(); if (e) { openModal(e.t, e.x, e.b); return; } } }
+
+  // ======================= DEATH / RESTART =======================
+  const starsFor = nw => Math.floor(Math.sqrt(Math.max(0, nw) / 2e4));
+  function die() {
+    S.dead = true; save();
+    const stars = Math.max(S.legacy, starsFor(S.bestNet));
+    openModal("Final whistle",
+      "You passed away at " + ydays(ageDays()) + " after running " + S.name + " for " + S.day + " days. Final net worth: " + money(netWorth()) + ". Your legacy is " + stars + " ★. Each star adds 10% to everything you earn next life.",
+      [["Start a new life", () => newLife(stars)]], true);
+  }
+  function newLife(stars) {
+    const keep = { legacy: stars, lives: S.lives + 1, name: S.name, lifetime: S.lifetime };
+    S = Object.assign(fresh(), keep);
+    ensureGoods();
+    logMsg("Life #" + S.lives + " begins. Legacy " + stars + " ★.");
+    resetScene(); lastTier = -1; buildTab(); save();
+  }
+  function restartMenu() {
+    const box = E("div");
+    box.append(E("p", null, "Start over from day one. A new life keeps your legacy stars and gym name. Erasing wipes everything."));
+    openModal("Restart?", box, [
+      ["New life (keep legacy)", () => newLife(S.legacy)],
+      ["Erase everything", () => { S = fresh(); ensureGoods(); logMsg("Fresh start."); resetScene(); lastTier = -1; buildTab(); save(); }],
+      ["Cancel", () => {}]
+    ], false, true);
+  }
+
+  // ======================= SAVE =======================
+  function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }
+  function load() { try { const r = localStorage.getItem(SAVE_KEY); if (r) return Object.assign(fresh(), JSON.parse(r)); } catch (e) {} return null; }
+
+  // =====================================================================
+  // GYM FLOOR: a grid you can rearrange. Each owned item gets placed
+  // automatically; drag to move it in Rearrange mode.
+  // =====================================================================
+  const W = 800, H = 480, WALL = 92, CELL = 40, COLS = 20, ROWS = 9;
+  const FP = {
+    mat:   { w: 2, h: 1, anchor: [0, 8] },
+    bells: { w: 2, h: 2, anchor: [3, 0] },
+    tread: { w: 1, h: 2, anchor: [19, 0] },
+    rack:  { w: 2, h: 2, anchor: [9, 3] },
+    bar:   { w: 2, h: 3, anchor: [18, 4] },
+    sauna: { w: 3, h: 4, anchor: [0, 0] },
+    pool:  { w: 7, h: 2, anchor: [13, 7] },
+    arena: { w: 4, h: 2, anchor: [8, 6] }
+  };
+  const SPOTS = {
+    mat: [{ x: 40, y: 28, act: "mat" }],
+    bells: [{ x: 26, y: 74, act: "curl" }, { x: 54, y: 74, act: "curl" }],
+    tread: [{ x: 20, y: 66, act: "run" }],
+    rack: [{ x: 40, y: 70, act: "squat" }],
+    bar: [{ x: 20, y: 34, act: "drink" }, { x: 20, y: 74, act: "drink" }, { x: 20, y: 114, act: "drink" }],
+    sauna: [{ x: 60, y: 156, act: "sauna" }, { x: 60, y: 156, act: "sauna" }],
+    pool: [{ x: 20, y: 22, act: "swim" }, { x: 20, y: 42, act: "swim" }, { x: 20, y: 62, act: "swim" }],
+    arena: [{ x: 56, y: 54, act: "flex" }, { x: 104, y: 54, act: "flex" }]
+  };
+  function occupied(skipKey) {
+    const g = Array.from({ length: ROWS }, () => new Array(COLS).fill(false));
+    S.layout.forEach(it => { if (it.c == null || it.k === skipKey) return; const fp = FP[it.t]; for (let r = it.r; r < it.r + fp.h; r++) for (let c = it.c; c < it.c + fp.w; c++) if (g[r]) g[r][c] = true; });
+    return g;
+  }
+  function fits(t, c, r, grid) {
+    const fp = FP[t];
+    if (c < 0 || r < 0 || c + fp.w > COLS || r + fp.h > ROWS) return false;
+    for (let y = r; y < r + fp.h; y++) for (let x = c; x < c + fp.w; x++) if (grid[y][x]) return false;
+    return true;
+  }
+  function autoPlace(it) {
+    const fp = FP[it.t], grid = occupied(it.k);
+    let best = null, bd = 1e9;
+    for (let r = 0; r <= ROWS - fp.h; r++) for (let c = 0; c <= COLS - fp.w; c++) {
+      if (!fits(it.t, c, r, grid)) continue;
+      const d = Math.hypot(c - fp.anchor[0], (r - fp.anchor[1]) * 1.3);
+      if (d < bd) { bd = d; best = [c, r]; }
+    }
+    if (best) { it.c = best[0]; it.r = best[1]; return true; }
+    it.c = null; it.r = null; return false;
+  }
+  // make the layout match what you own: add new items, drop sold ones
+  function syncLayout() {
+    let stored = 0;
+    Object.keys(FP).forEach(t => {
+      const own = S.owned[t] || 0;
+      let items = S.layout.filter(i => i.t === t);
+      while (items.length > own) { const drop = items.find(i => i.c == null) || items[items.length - 1]; S.layout.splice(S.layout.indexOf(drop), 1); items = S.layout.filter(i => i.t === t); }
+      for (let n = items.length; n < own; n++) { const it = { k: S.nextKey++, t, c: null, r: null }; S.layout.push(it); if (!autoPlace(it)) stored++; }
+    });
+    sceneDirty = true;
+    return stored;
+  }
+  const storedOf = t => S.layout.filter(i => i.t === t && i.c == null).length;
+
+  const cv = document.getElementById("gymCanvas");
+  const ctx = cv.getContext("2d");
+  let C = {};
+  function readColors() {
+    const cs = getComputedStyle(document.documentElement);
+    ["--red", "--blue", "--yellow", "--green", "--white", "--orange", "--purple", "--plumbob", "--chalk", "--down"].forEach(k => { C[k] = cs.getPropertyValue(k).trim(); });
+  }
+  const SKIN = ["#f1c7a5", "#e0a77f", "#c68658", "#8d5a3b", "#5e3b28", "#f5d6bd"];
+  const HAIR = ["#2a1c14", "#5a3a22", "#b58a4b", "#1b1b1b", "#8c2f1d", "#d9c08a", "#6b6b6b"];
+  const SHIRTS = ["--blue", "--green", "--purple", "--orange", "--white", "--chalk"];
+  const PANTS = ["#2b2f38", "#3b4252", "#1d1f24", "#4a3b5c", "#2f4a3a"];
+  const NAMES = ["Dana", "Marcus", "Priya", "Theo", "Lena", "Kofi", "Rosa", "Jin", "Ava", "Omar", "Sky", "Nina", "Ravi", "Tess", "Leo", "Mia", "Yusuf", "Ivy", "Cal", "Zoe", "Ben", "Hana", "Eli", "Noor"];
+  const MOODS = ["Pumped", "Sore from leg day", "Chasing a PR", "Hydrated", "Focused", "Here for the vibes", "Counting macros", "New member", "Regular since day one"];
+  const ACT_LABEL = { walk: "is walking over", idle: "is catching their breath", run: "is running on a treadmill", curl: "is curling dumbbells", squat: "is squatting", mat: "is doing sit-ups", sauna: "is in the sauna", drink: "is drinking a smoothie", swim: "is swimming laps", flex: "is posing on stage", coach: "is coaching a member", leave: "is heading home", enter: "just walked in" };
+  const DOOR = { x: 34, y: 466 };
+  let fixtures = [], people = [], pops = [];
+  let selected = null, selectedUntil = 0, sceneDirty = true, nextId = 1, spawnTimer = 0;
+  let editMode = false, drag = null, selItem = null;
+
+  function buildFixtures() {
+    fixtures = S.layout.filter(it => it.c != null).map(it => {
+      const fp = FP[it.t];
+      const x = it.c * CELL, y = WALL + it.r * CELL;
+      const flat = it.t === "mat" || it.t === "pool" || it.t === "arena";
+      const sortY = { bells: y + 40, tread: y + 10, rack: y + 60, bar: y, sauna: y + 146 }[it.t] ?? y;
+      return { k: it.k, type: it.t, x, y, w: fp.w * CELL, h: fp.h * CELL, flat, sortY, spots: SPOTS[it.t].map(s => ({ x: x + s.x, y: y + s.y, act: s.act })) };
+    });
+    people.forEach(p => {
+      if (!p.spot) return;
+      const f = fixtures.find(f => f.k === p.spotK);
+      const s = f && f.spots[p.spotIdx];
+      if (s && !s.taken) { s.taken = p.id; p.spot = s; if (p.state === "use" && p.act !== "swim") { p.x = s.x; p.y = s.y; } }
+      else { p.spot = null; p.hidden = false; goWander(p); }
+    });
+    const wantPT = Math.min(S.owned.pt || 0, 4), wantCeleb = Math.min(S.owned.celeb || 0, 1);
+    let pts = people.filter(p => p.role === "pt");
+    for (let i = pts.length; i < wantPT; i++) spawn("pt");
+    if (!people.some(p => p.role === "celeb") && wantCeleb) spawn("celeb");
+    pts = people.filter(p => p.role === "pt");
+    people = people.filter(p => (p.role !== "pt" || pts.indexOf(p) < wantPT) && (p.role !== "celeb" || wantCeleb));
+  }
+  const totalSpots = () => fixtures.reduce((a, f) => a + f.spots.length, 0);
+  const memberTarget = () => Math.min(28, 2 + Math.round(totalSpots() * 0.85));
+
+  function spawn(role) {
+    const p = { id: nextId++, role: role || "member", x: DOOR.x, y: DOOR.y, tx: DOOR.x, ty: DOOR.y, facing: 1, phase: Math.random() * 6,
+      skin: pick(SKIN), hair: pick(HAIR), pants: pick(PANTS),
+      shirt: role === "pt" ? "--red" : role === "celeb" ? "--yellow" : pick(SHIRTS),
+      name: role === "pt" ? "Trainer " + pick(NAMES) : role === "celeb" ? "Coach Blaze" : pick(NAMES),
+      mood: role === "celeb" ? "Filming content" : pick(MOODS),
+      state: "go", act: "enter", timer: 0, spot: null, hidden: false, seed: Math.random() * 100, speed: role === "celeb" ? 34 : rnd(38, 52) };
+    people.push(p); nextTask(p); p.act = "enter";
+    return p;
+  }
+  function moveTo(p, x, y, act) { p.tx = x; p.ty = y; p.state = "go"; p.act = act || "walk"; }
+  function goWander(p) {
+    const grid = occupied();
+    for (let i = 0; i < 20; i++) { const c = Math.floor(rnd(0, COLS)), r = Math.floor(rnd(0, ROWS)); if (!grid[r][c]) { moveTo(p, c * CELL + 20 + rnd(-8, 8), WALL + r * CELL + 30, "walk"); p.after = "idle"; return; } }
+    moveTo(p, rnd(80, 300), rnd(400, 450), "walk"); p.after = "idle";
+  }
+  function nextTask(p) {
+    if (p.role === "pt") {
+      const busy = people.filter(q => q.role === "member" && q.state === "use" && !q.hidden && q.act !== "swim");
+      if (busy.length && Math.random() < 0.8) { const m = pick(busy); p.coachee = m.id; moveTo(p, Math.min(W - 10, m.x + 18), m.y + 4, "walk"); p.after = "coach"; }
+      else goWander(p);
+      return;
+    }
+    if (p.role === "celeb") { goWander(p); p.after = Math.random() < 0.6 ? "flex" : "idle"; return; }
+    const free = [];
+    fixtures.forEach(f => f.spots.forEach((s, i) => { if (!s.taken) free.push([f, s, i]); }));
+    if (free.length && Math.random() < 0.85) {
+      const [f, s, i] = pick(free);
+      s.taken = p.id; p.spot = s; p.spotK = f.k; p.spotIdx = i;
+      moveTo(p, s.x, s.y, "walk"); p.after = "use";
+    } else goWander(p);
+  }
+  function release(p) { if (p.spot) { p.spot.taken = null; p.spot = null; } p.hidden = false; }
+  function updatePerson(p, dt, t) {
+    if (p.state === "go") {
+      const dx = p.tx - p.x, dy = p.ty - p.y, d = Math.hypot(dx, dy);
+      if (Math.abs(dx) > 0.5) p.facing = dx > 0 ? 1 : -1;
+      const step = p.speed * dt; p.phase += dt * 10;
+      if (d <= step) {
+        p.x = p.tx; p.y = p.ty;
+        if (p.act === "leave") { p.gone = true; return; }
+        if (p.after === "use" && p.spot) { p.state = "use"; p.act = p.spot.act; p.timer = rnd(5, 11); if (p.act === "sauna") p.hidden = true; if (p.act === "drink") p.facing = 1; }
+        else if (p.after === "coach") { p.state = "use"; p.act = "coach"; p.timer = rnd(4, 7); const m = people.find(q => q.id === p.coachee); if (m) p.facing = m.x > p.x ? 1 : -1; }
+        else if (p.after === "flex") { p.state = "use"; p.act = "flex"; p.timer = rnd(3, 5); }
+        else { p.state = "use"; p.act = "idle"; p.timer = rnd(1.5, 4); }
+      } else { p.x += dx / d * step; p.y += dy / d * step; }
+      return;
+    }
+    p.timer -= dt; p.phase += dt * (p.act === "run" ? 16 : 6);
+    if (p.act === "swim" && p.spot) {
+      const pool = fixtures.find(f => f.k === p.spotK);
+      if (pool) { const u = (Math.sin(t * 0.5 + p.seed) + 1) / 2; const nx = pool.x + 18 + u * (pool.w - 36); p.facing = nx >= p.x ? 1 : -1; p.x = nx; }
+    }
+    if (p.timer <= 0) {
+      if (p.act !== "idle" && p.act !== "coach" && p.act !== "flex" && p.role === "member") pops.push({ x: p.x, y: p.y - 40, life: 1 });
+      const wasHidden = p.hidden; release(p); if (wasHidden) p.y += 4;
+      const members = people.filter(q => q.role === "member").length;
+      if (p.role === "member" && Math.random() < (members > memberTarget() ? 0.7 : 0.12)) moveTo(p, DOOR.x, DOOR.y + 20, "leave");
+      else nextTask(p);
+    }
+  }
+
+  function rr(x, y, w, h, r) { ctx.beginPath(); ctx.roundRect ? ctx.roundRect(x, y, w, h, r) : ctx.rect(x, y, w, h); }
+  function drawRoom(ti, t) {
+    const wall = ti < 2 ? "#5d6167" : ti < 4 ? "#33404d" : "#d9d2c4";
+    const wallLine = ti < 2 ? "#53575c" : ti < 4 ? "#2c3743" : "#cbc3b3";
+    ctx.fillStyle = wall; ctx.fillRect(0, 0, W, WALL);
+    ctx.strokeStyle = wallLine; ctx.lineWidth = 1;
+    if (ti < 2) for (let y = 0; y < WALL; y += 16) { ctx.beginPath(); ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); ctx.stroke(); for (let x = (y / 16) % 2 ? 0 : 24; x < W; x += 48) { ctx.beginPath(); ctx.moveTo(x + .5, y); ctx.lineTo(x + .5, y + 16); ctx.stroke(); } }
+    for (let i = 0; i < 4; i++) {
+      const x = 430 + i * 88;
+      ctx.fillStyle = "#1c2a3a"; ctx.fillRect(x, 14, 72, 46);
+      const sky = ctx.createLinearGradient(0, 16, 0, 58); sky.addColorStop(0, "#7fb4dc"); sky.addColorStop(1, "#c7e0ef");
+      ctx.fillStyle = sky; ctx.fillRect(x + 3, 17, 66, 40);
+      ctx.fillStyle = "#1c2a3a"; ctx.fillRect(x + 35, 17, 2, 40);
+    }
+    const neon = S.ups.g1;
+    ctx.fillStyle = neon ? "#141619" : (ti < 4 ? "#24272c" : "#2a2d33");
+    rr(176, 12, 232, 50, 4); ctx.fill();
+    ctx.font = "900 28px 'Big Shoulders Display', Impact, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    if (neon) { ctx.shadowColor = C["--red"]; ctx.shadowBlur = 10 + Math.sin(t * 3) * 3; ctx.fillStyle = "#ff8a7a"; } else ctx.fillStyle = C["--chalk"];
+    ctx.fillText((S.name || "Iron Temple").toUpperCase(), 292, 34, 216);
+    ctx.shadowBlur = 0;
+    ctx.font = "600 10px Barlow, sans-serif"; ctx.fillStyle = "#9aa1a9"; ctx.fillText(TIERS[ti].name.toUpperCase(), 292, 53);
+    if (S.ups.g2) { ctx.fillStyle = "#1b1d21"; rr(64, 20, 52, 40, 4); ctx.fill(); ctx.fillStyle = C["--blue"]; ctx.fillRect(84, 26, 12, 22); ctx.fillStyle = "#fff"; ctx.font = "700 8px Barlow, sans-serif"; ctx.fillText("APP", 90, 54); }
+    if (S.ups.g3) { ctx.fillStyle = C["--green"]; ctx.font = "900 14px 'Big Shoulders Display', Impact, sans-serif"; ctx.fillText("OPEN 24/7", 132, 76); }
+    ctx.fillStyle = "#1b1d21"; ctx.fillRect(0, WALL - 4, W, 4);
+    const floorC = ti < 2 ? "#8b8d90" : ti < 4 ? "#2c2f34" : "#a57447";
+    const floorL = ti < 2 ? "#7f8184" : ti < 4 ? "#363a40" : "#986a3f";
+    ctx.fillStyle = floorC; ctx.fillRect(0, WALL, W, H - WALL); ctx.strokeStyle = floorL;
+    if (ti >= 4) { for (let y = WALL; y < H; y += 14) { ctx.beginPath(); ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); ctx.stroke(); const off = ((y - WALL) / 14 * 97) % 140; for (let x = off; x < W; x += 140) { ctx.beginPath(); ctx.moveTo(x + .5, y); ctx.lineTo(x + .5, y + 14); ctx.stroke(); } } }
+    else { for (let x = 0; x <= W; x += 40) { ctx.beginPath(); ctx.moveTo(x + .5, WALL); ctx.lineTo(x + .5, H); ctx.stroke(); } for (let y = WALL; y <= H; y += 40) { ctx.beginPath(); ctx.moveTo(0, y + .5); ctx.lineTo(W, y + .5); ctx.stroke(); } }
+    ctx.fillStyle = "#3a2a20"; rr(6, 456, 58, 22, 3); ctx.fill();
+    ctx.fillStyle = "#c9b79c"; ctx.font = "700 10px Barlow, sans-serif"; ctx.fillText("WELCOME", 35, 467);
+  }
+  function drawFixture(f, t) {
+    const x = f.x, y = f.y;
+    switch (f.type) {
+      case "mat": ctx.fillStyle = C["--green"]; rr(x + 6, y + 12, 68, 22, 3); ctx.fill(); ctx.fillStyle = "rgba(0,0,0,.15)"; ctx.fillRect(x + 6, y + 30, 68, 4); break;
+      case "bells":
+        ctx.fillStyle = "#2a2d33"; ctx.fillRect(x + 6, y + 6, 68, 32); ctx.fillStyle = "#1b1d21"; ctx.fillRect(x + 4, y + 36, 72, 6);
+        for (let r = 0; r < 2; r++) for (let i = 0; i < 5; i++) { const bx = x + 12 + i * 12, by = y + 11 + r * 13; ctx.fillStyle = "#111"; ctx.fillRect(bx, by, 3, 8); ctx.fillRect(bx + 7, by, 3, 8); ctx.fillStyle = "#9aa1a9"; ctx.fillRect(bx + 2, by + 3, 6, 2); }
+        break;
+      case "tread": {
+        const cx = x + 20;
+        ctx.fillStyle = "#26292e"; rr(cx - 17, y + 12, 34, 64, 4); ctx.fill(); ctx.fillStyle = "#14161a"; ctx.fillRect(cx - 12, y + 18, 24, 54);
+        const used = f.spots[0].taken; ctx.fillStyle = "#30343a"; const off = used ? (t * 60) % 10 : 0;
+        for (let yy = y + 18 + off; yy < y + 72; yy += 10) ctx.fillRect(cx - 12, yy, 24, 2);
+        ctx.fillStyle = "#3a3f46"; ctx.fillRect(cx - 3, y + 2, 2, 14); ctx.fillRect(cx + 1, y + 2, 2, 14);
+        ctx.fillStyle = "#1b1d21"; rr(cx - 15, y - 4, 30, 11, 2); ctx.fill(); ctx.fillStyle = used ? "#53e07a" : "#2f5a3a"; ctx.fillRect(cx - 9, y - 1, 18, 5);
+        break;
+      }
+      case "rack": {
+        const cx = x + 40;
+        ctx.fillStyle = "#1d2024"; ctx.fillRect(cx - 30, y + 66, 60, 10); ctx.fillStyle = "#3d4249";
+        ctx.fillRect(cx - 28, y + 2, 4, 70); ctx.fillRect(cx + 24, y + 2, 4, 70); ctx.fillRect(cx - 28, y, 56, 4);
+        if (!f.spots[0].taken) { ctx.fillStyle = "#b9bec4"; ctx.fillRect(cx - 36, y + 30, 72, 3); ctx.fillStyle = C["--red"]; ctx.fillRect(cx - 34, y + 20, 5, 22); ctx.fillRect(cx + 29, y + 20, 5, 22); }
+        break;
+      }
+      case "sauna": {
+        ctx.fillStyle = "#8a5a35"; ctx.fillRect(x + 4, y + 4, 112, 142); ctx.strokeStyle = "#6f4627"; ctx.lineWidth = 1;
+        for (let xx = x + 14; xx < x + 116; xx += 12) { ctx.beginPath(); ctx.moveTo(xx + .5, y + 4); ctx.lineTo(xx + .5, y + 146); ctx.stroke(); }
+        ctx.fillStyle = "#5a3a22"; ctx.fillRect(x + 4, y + 4, 112, 10); ctx.fillStyle = "#3b2616"; rr(x + 44, y + 84, 32, 62, 2); ctx.fill();
+        ctx.fillStyle = "#e9c49a"; ctx.fillRect(x + 50, y + 92, 20, 14);
+        ctx.fillStyle = "#f0e6d6"; ctx.font = "700 11px Barlow, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("SAUNA", x + 60, y + 32);
+        const inside = f.spots.filter(s => s.taken).length;
+        for (let i = 0; i < inside * 3; i++) { const k = ((t * 0.4 + i * 0.37) % 1); ctx.fillStyle = "rgba(240,240,240," + (0.35 * (1 - k)) + ")"; ctx.beginPath(); ctx.arc(x + 30 + i * 14 % 70, y + 4 - k * 26, 5 + k * 6, 0, 7); ctx.fill(); }
+        break;
+      }
+      case "bar":
+        ctx.fillStyle = "#3a2b20"; ctx.fillRect(x + 38, y + 4, 14, 112); ctx.fillStyle = C["--orange"]; ctx.fillRect(x + 36, y + 4, 4, 112); ctx.fillStyle = "#e9e1d4"; ctx.fillRect(x + 52, y + 4, 26, 112);
+        for (let i = 0; i < 3; i++) { ctx.fillStyle = "#cfd6dc"; ctx.fillRect(x + 58, y + 14 + i * 38, 12, 18); ctx.fillStyle = [C["--purple"], C["--green"], C["--orange"]][i]; ctx.fillRect(x + 59, y + 22 + i * 38, 10, 9); }
+        f.spots.forEach(s => { ctx.fillStyle = "#1b1d21"; ctx.beginPath(); ctx.ellipse(s.x + 8, s.y - 2, 6, 3, 0, 0, 7); ctx.fill(); });
+        break;
+      case "arena": {
+        ctx.fillStyle = "#14161a"; rr(x + 4, y + 14, 152, 56, 4); ctx.fill(); ctx.fillStyle = "#3a1e1a"; rr(x + 8, y + 16, 144, 46, 3); ctx.fill();
+        ctx.fillStyle = C["--yellow"]; ctx.fillRect(x + 8, y + 62, 144, 3);
+        const g = ctx.createRadialGradient(x + 80, y + 40, 4, x + 80, y + 40, 70); g.addColorStop(0, "rgba(255,240,190,.28)"); g.addColorStop(1, "rgba(255,240,190,0)");
+        ctx.fillStyle = g; ctx.fillRect(x + 4, y, 152, 80);
+        break;
+      }
+      case "pool": {
+        ctx.fillStyle = "#e5e9ec"; rr(x + 2, y + 4, f.w - 4, f.h - 6, 4); ctx.fill();
+        const water = ctx.createLinearGradient(0, y + 10, 0, y + 72); water.addColorStop(0, "#3d9fd6"); water.addColorStop(1, "#2a7fbf");
+        ctx.fillStyle = water; ctx.fillRect(x + 8, y + 10, f.w - 16, f.h - 18); ctx.strokeStyle = "rgba(255,255,255,.18)"; ctx.lineWidth = 1.5;
+        for (let i = 0; i < 5; i++) { ctx.beginPath(); const yy = y + 16 + i * 12; for (let xx = x + 8; xx <= x + f.w - 8; xx += 10) ctx.lineTo(xx, yy + Math.sin(xx * 0.08 + t * 2 + i) * 1.5); ctx.stroke(); }
+        ctx.fillStyle = "#e9eef2"; for (let i = 1; i < 3; i++) for (let xx = x + 10; xx < x + f.w - 10; xx += 8) ctx.fillRect(xx, y + 12 + i * 20, 4, 2);
+        break;
+      }
+    }
+  }
+  function limbs(x1, y1, x2, y2, x3, y3) { ctx.beginPath(); ctx.moveTo(x1, y1); ctx.lineTo(x2, y2); if (x3 !== undefined) ctx.lineTo(x3, y3); ctx.stroke(); }
+  const PS = 1.25;
+  function drawPerson(p, t) {
+    if (p.hidden) return;
+    ctx.save(); ctx.translate(p.x, p.y); ctx.scale(PS, PS);
+    const shirt = C[p.shirt] || "#888";
+    ctx.lineCap = "round"; ctx.lineJoin = "round";
+    if (p.act === "swim") {
+      ctx.strokeStyle = "rgba(255,255,255,.55)"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.ellipse(0, -2, 11, 4, 0, 0, 7); ctx.stroke();
+      ctx.scale(p.facing, 1); const a = Math.sin(t * 6 + p.seed);
+      ctx.strokeStyle = p.skin; ctx.lineWidth = 3; limbs(-2, -4, 4 + a * 6, -9 - Math.abs(a) * 3);
+      ctx.fillStyle = shirt; ctx.beginPath(); ctx.arc(0, -6, 5, Math.PI, 0); ctx.fill();
+      ctx.fillStyle = p.skin; ctx.beginPath(); ctx.arc(0, -5, 4.2, 0, Math.PI); ctx.fill();
+      ctx.restore(); return drawTags(p, t, -16 * PS);
+    }
+    ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.beginPath(); ctx.ellipse(0, 0, 9, 3, 0, 0, 7); ctx.fill();
+    ctx.scale(p.facing, 1);
+    if (p.act === "mat") {
+      const a = (Math.sin(p.phase * 0.6) + 1) / 2;
+      ctx.strokeStyle = p.pants; ctx.lineWidth = 4; limbs(2, -3, 8, -10, 14, -2);
+      ctx.save(); ctx.translate(2, -3); ctx.rotate(-a * 1.1);
+      ctx.fillStyle = shirt; rr(-14, -4, 14, 8, 3); ctx.fill();
+      ctx.fillStyle = p.skin; ctx.beginPath(); ctx.arc(-18, 0, 5, 0, 7); ctx.fill();
+      ctx.fillStyle = p.hair; ctx.beginPath(); ctx.arc(-19, 0, 5, Math.PI * 0.5, Math.PI * 1.5); ctx.fill();
+      ctx.restore(); ctx.restore(); return drawTags(p, t, -24 * PS);
+    }
+    let bob = 0, legSwing = 0, knee = 0;
+    if (p.state === "go") { legSwing = Math.sin(p.phase) * 4; bob = Math.abs(Math.sin(p.phase)) * -1.2; }
+    if (p.act === "run") { legSwing = Math.sin(p.phase) * 5; bob = Math.abs(Math.sin(p.phase)) * -2; }
+    if (p.act === "squat") { knee = (Math.sin(p.phase * 0.5) + 1) / 2; bob = knee * 8; }
+    if (p.act === "flex") bob = Math.max(0, Math.sin(p.phase * 0.8)) * -4;
+    ctx.strokeStyle = p.pants; ctx.lineWidth = 3.5;
+    const hipY = -11 + bob;
+    if (knee > 0) { limbs(-2, hipY, -2 + knee * 7, hipY + 5.5 - knee, -3, 0); limbs(2, hipY, 2 + knee * 7, hipY + 5.5 - knee, 2, 0); }
+    else { limbs(-2, hipY, -2 + legSwing, 0); limbs(2, hipY, 2 - legSwing, 0); }
+    ctx.fillStyle = "#111"; ctx.fillRect(-5 + (knee ? -1 : legSwing), -2, 5, 2.5); ctx.fillRect(knee ? 0 : -legSwing, -2, 5, 2.5);
+    ctx.fillStyle = shirt; rr(-5, hipY - 12, 10, 13, 3); ctx.fill();
+    if (p.role === "pt") { ctx.fillStyle = "#fff"; ctx.font = "700 6px Barlow, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("PT", 0, hipY - 6); }
+    if (p.role === "celeb") { ctx.fillStyle = "#1a1606"; ctx.font = "700 7px Barlow, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("★", 0, hipY - 6); }
+    const sh = hipY - 10;
+    ctx.strokeStyle = p.skin; ctx.lineWidth = 2.5;
+    if (p.act === "curl") { const c = (Math.sin(p.phase * 0.9) + 1) / 2; limbs(3, sh, 4, sh + 6, 8, sh + 9 - c * 9); ctx.fillStyle = "#222"; ctx.fillRect(6, sh + 6 - c * 9, 6, 3); limbs(-3, sh, -3, sh + 11); }
+    else if (p.act === "squat") { limbs(3, sh + 1, 9, sh - 1); limbs(-3, sh + 1, -9, sh - 1); ctx.fillStyle = "#b9bec4"; ctx.fillRect(-20, sh - 2, 40, 2.5); ctx.fillStyle = C["--red"]; ctx.fillRect(-20, sh - 9, 4, 16); ctx.fillRect(16, sh - 9, 4, 16); }
+    else if (p.act === "flex") { limbs(4, sh, 10, sh - 3, 9, sh - 10); limbs(-4, sh, -10, sh - 3, -9, sh - 10); }
+    else if (p.act === "run") { const s = Math.sin(p.phase) * 4; limbs(3, sh, 5 + s, sh + 6, 8 + s, sh + 3); limbs(-3, sh, -5 - s, sh + 6, -2 - s, sh + 3); }
+    else if (p.act === "drink") { limbs(3, sh, 6, sh + 6, 4, sh - 1); ctx.fillStyle = C["--purple"]; ctx.fillRect(3, sh - 6, 4, 7); limbs(-3, sh, -3, sh + 11); }
+    else if (p.act === "coach") { const w = Math.sin(t * 5) * 2; limbs(3, sh, 10, sh - 4 + w); limbs(-3, sh, -3, sh + 11); }
+    else { const s = p.state === "go" ? Math.sin(p.phase) * 3 : 0; limbs(3, sh, 3 - s, sh + 11); limbs(-3, sh, -3 + s, sh + 11); }
+    const hy = hipY - 18;
+    ctx.fillStyle = p.skin; ctx.beginPath(); ctx.arc(0, hy, 5, 0, 7); ctx.fill();
+    ctx.fillStyle = p.hair; ctx.beginPath(); ctx.arc(0, hy - 1, 5.2, Math.PI * 1.05, Math.PI * 1.95); ctx.fill(); ctx.fillRect(-5.2, hy - 2, 2.5, 3);
+    if (p.role === "pt") { ctx.fillStyle = C["--red"]; ctx.fillRect(-5, hy - 5, 10, 3); ctx.fillRect(0, hy - 3, 7, 1.5); }
+    if (p.role === "celeb") { ctx.fillStyle = "#111"; ctx.fillRect(0, hy - 1, 5, 2); }
+    ctx.fillStyle = "#1a1a1a"; ctx.fillRect(2.5, hy - 0.5, 1.2, 1.2);
+    ctx.restore();
+    drawTags(p, t, (hy - 6) * PS);
+  }
+  function drawTags(p, t, topY) {
+    if (selected === p && performance.now() < selectedUntil) {
+      const y = p.y + topY - 10 + Math.sin(t * 3) * 2;
+      ctx.save(); ctx.translate(p.x, y); ctx.scale(Math.cos(t * 2), 1);
+      ctx.fillStyle = C["--plumbob"]; ctx.beginPath(); ctx.moveTo(0, -9); ctx.lineTo(5, 0); ctx.lineTo(0, 9); ctx.lineTo(-5, 0); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = "rgba(255,255,255,.45)"; ctx.beginPath(); ctx.moveTo(0, -9); ctx.lineTo(5, 0); ctx.lineTo(0, 0); ctx.closePath(); ctx.fill();
+      ctx.restore();
+    }
+    if (p.role === "celeb" && Math.sin(t * 4 + p.seed) > 0.6) { ctx.fillStyle = C["--yellow"]; ctx.font = "700 9px Barlow, sans-serif"; ctx.textAlign = "center"; ctx.fillText("✦", p.x + 12, p.y - 34); ctx.fillText("✦", p.x - 13, p.y - 20); }
+  }
+  function drawPops(dt) {
+    ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.font = "700 13px 'JetBrains Mono', monospace";
+    pops.forEach(o => { o.life -= dt * 0.8; o.y -= dt * 22; ctx.globalAlpha = Math.max(0, o.life); ctx.fillStyle = "#1a1606"; ctx.fillText("$", o.x + 1, o.y + 1); ctx.fillStyle = C["--yellow"]; ctx.fillText("$", o.x, o.y); });
+    ctx.globalAlpha = 1; pops = pops.filter(o => o.life > 0);
+  }
+  function drawEditOverlay() {
+    ctx.strokeStyle = "rgba(235,187,36,.25)"; ctx.lineWidth = 1;
+    for (let c = 0; c <= COLS; c++) { ctx.beginPath(); ctx.moveTo(c * CELL + .5, WALL); ctx.lineTo(c * CELL + .5, WALL + ROWS * CELL); ctx.stroke(); }
+    for (let r = 0; r <= ROWS; r++) { ctx.beginPath(); ctx.moveTo(0, WALL + r * CELL + .5); ctx.lineTo(W, WALL + r * CELL + .5); ctx.stroke(); }
+    const it = drag ? drag.item : selItem;
+    if (it) {
+      const fp = FP[it.t];
+      const c = drag ? drag.c : it.c, r = drag ? drag.r : it.r;
+      if (c != null) {
+        const ok = drag ? drag.valid : true;
+        ctx.fillStyle = ok ? "rgba(235,187,36,.18)" : "rgba(239,106,85,.25)";
+        ctx.fillRect(c * CELL, WALL + r * CELL, fp.w * CELL, fp.h * CELL);
+        ctx.strokeStyle = ok ? C["--yellow"] : C["--down"]; ctx.lineWidth = 3;
+        ctx.strokeRect(c * CELL + 1.5, WALL + r * CELL + 1.5, fp.w * CELL - 3, fp.h * CELL - 3);
+      }
+    }
+  }
+  let lastFrame = performance.now();
+  function fitCanvas() {
+    const dpr = Math.min(window.devicePixelRatio || 1, 2), w = cv.clientWidth || 800;
+    const pw = Math.round(w * dpr), ph = Math.round(w * dpr * H / W);
+    if (cv.width !== pw || cv.height !== ph) { cv.width = pw; cv.height = ph; }
+  }
+  function frame(now) {
+    const dt = Math.min(0.1, (now - lastFrame) / 1000); lastFrame = now; const t = now / 1000;
+    if (sceneDirty) { sceneDirty = false; buildFixtures(); }
+    if (!editMode) {
+      spawnTimer -= dt;
+      if (people.filter(p => p.role === "member").length < memberTarget() && spawnTimer <= 0) { spawn("member"); spawnTimer = rnd(0.8, 2.2); }
+      people.forEach(p => updatePerson(p, dt, t));
+      people = people.filter(p => !p.gone);
+    }
+    if (selected && (selected.gone || performance.now() > selectedUntil)) selected = null;
+    if (tab === "floor" && !document.hidden) {
+      fitCanvas(); ctx.setTransform(cv.width / W, 0, 0, cv.height / H, 0, 0);
+      const ti = tierIndex(); drawRoom(ti, t);
+      // while dragging, draw the item at its ghost position
+      const shown = fixtures.map(f => {
+        if (drag && f.k === drag.item.k) return Object.assign({}, f, { x: drag.c * CELL, y: WALL + drag.r * CELL });
+        return f;
+      });
+      shown.filter(f => f.flat).forEach(f => drawFixture(f, t));
+      const items = [];
+      shown.filter(f => !f.flat).forEach(f => items.push({ y: f.sortY + (f.y - (fixtures.find(x => x.k === f.k) || f).y), d: () => drawFixture(f, t) }));
+      if (!editMode) people.forEach(p => items.push({ y: p.y, d: () => drawPerson(p, t), swim: p.act === "swim" }));
+      items.filter(i => i.swim).forEach(i => i.d());
+      items.filter(i => !i.swim).sort((a, b) => a.y - b.y).forEach(i => i.d());
+      if (editMode) drawEditOverlay(); else drawPops(dt);
+      updateWho();
+    }
+    requestAnimationFrame(frame);
+  }
+  function updateWho() {
+    const who = el("who"); if (!who) return;
+    let html;
+    if (editMode) html = selItem ? "Selected: <b>" + GEN_BY_ID[selItem.t].name + "</b>. Drag it to a new spot." : "Drag any item to move it.";
+    else html = selected ? "<b>" + selected.name + "</b> " + (ACT_LABEL[selected.act] || "is hanging out") + " · " + selected.mood : people.filter(p => p.role === "member").length + " members inside. Tap someone to see what they're doing.";
+    if (who._h !== html) { who._h = html; who.innerHTML = html; }
+  }
+  function toLogical(ev) {
+    const rect = cv.getBoundingClientRect();
+    return { x: (ev.clientX - rect.left) / rect.width * W, y: (ev.clientY - rect.top) / rect.height * H };
+  }
+  function itemAt(x, y) {
+    const c = Math.floor(x / CELL), r = Math.floor((y - WALL) / CELL);
+    return S.layout.find(it => it.c != null && c >= it.c && c < it.c + FP[it.t].w && r >= it.r && r < it.r + FP[it.t].h) || null;
+  }
+  cv.addEventListener("pointerdown", ev => {
+    const p = toLogical(ev);
+    if (!editMode) {
+      let best = null, bd = 30;
+      people.forEach(q => { if (q.hidden) return; const d = Math.hypot(q.x - p.x, (q.y - 18) - p.y); if (d < bd) { bd = d; best = q; } });
+      if (best) { selected = best; selectedUntil = performance.now() + 5000; }
+      return;
+    }
+    const it = itemAt(p.x, p.y);
+    selItem = it; refresh();
+    if (!it) return;
+    ev.preventDefault();
+    cv.setPointerCapture(ev.pointerId);
+    drag = { item: it, offC: Math.floor(p.x / CELL) - it.c, offR: Math.floor((p.y - WALL) / CELL) - it.r, c: it.c, r: it.r, valid: true };
+  });
+  cv.addEventListener("pointermove", ev => {
+    if (!drag) return;
+    const p = toLogical(ev);
+    const fp = FP[drag.item.t];
+    const c = Math.max(0, Math.min(COLS - fp.w, Math.floor(p.x / CELL) - drag.offC));
+    const r = Math.max(0, Math.min(ROWS - fp.h, Math.floor((p.y - WALL) / CELL) - drag.offR));
+    drag.c = c; drag.r = r; drag.valid = fits(drag.item.t, c, r, occupied(drag.item.k));
+  });
+  const endDrag = () => {
+    if (!drag) return;
+    if (drag.valid && (drag.c !== drag.item.c || drag.r !== drag.item.r)) { drag.item.c = drag.c; drag.item.r = drag.r; sceneDirty = true; save(); }
+    else if (!drag.valid) toast("That spot is taken.");
+    drag = null;
+  };
+  cv.addEventListener("pointerup", endDrag);
+  cv.addEventListener("pointercancel", () => { drag = null; });
+  function resetScene() { people = []; fixtures = []; selected = null; selItem = null; drag = null; editMode = false; sceneDirty = true; }
+  function setEdit(on) {
+    editMode = on; selItem = null; drag = null;
+    cv.classList.toggle("editing", on);
+    if (!on) { people.forEach(p => { release(p); p.state = "go"; goWander(p); }); sceneDirty = true; }
+    buildSceneCap(); refresh();
+  }
+  function buildSceneCap() {
+    const cap = el("sceneCap"); cap.innerHTML = "";
+    if (!editMode) {
+      const row = E("div", "scene-cap");
+      const who = E("span"); who.id = "who"; row.append(who);
+      const b = E("button", "btn", "Rearrange"); b.type = "button"; b.addEventListener("click", () => setEdit(true));
+      row.append(b); cap.append(row);
+      return;
+    }
+    const bar = E("div", "edit-bar");
+    const top = E("div", "scene-cap"); const who = E("span"); who.id = "who"; top.append(who);
+    const done = E("button", "btn y", "Done"); done.type = "button"; done.addEventListener("click", () => setEdit(false)); top.append(done);
+    bar.append(top);
+    const acts = E("div", "btns");
+    const store = E("button", "btn r", "Put in storage"); store.type = "button"; store.id = "storeBtn";
+    store.addEventListener("click", () => { if (!selItem) return; selItem.c = null; selItem.r = null; selItem = null; sceneDirty = true; save(); buildSceneCap(); });
+    acts.append(store);
+    const tidy = E("button", "btn", "Auto-arrange"); tidy.type = "button";
+    tidy.addEventListener("click", () => { S.layout.forEach(i => { i.c = null; i.r = null; }); S.layout.slice().sort((a, b) => FP[b.t].w * FP[b.t].h - FP[a.t].w * FP[a.t].h).forEach(autoPlace); selItem = null; sceneDirty = true; save(); buildSceneCap(); });
+    acts.append(tidy);
+    bar.append(acts);
+    const types = Object.keys(FP).filter(t => storedOf(t) > 0);
+    if (types.length) {
+      bar.append(E("div", "k", "In storage (still earning)"));
+      const sl = E("div", "store-list");
+      types.forEach(t => {
+        const b = E("button", "btn g"); b.type = "button"; b.textContent = "Place " + GEN_BY_ID[t].name + " · " + storedOf(t);
+        b.addEventListener("click", () => { const it = S.layout.find(i => i.t === t && i.c == null); if (it && autoPlace(it)) { selItem = it; sceneDirty = true; save(); } else toast("No room. Move or store something first."); buildSceneCap(); });
+        sl.append(b);
+      });
+      bar.append(sl);
+    }
+    cap.append(bar);
+    on(() => { const s = el("storeBtn"); if (s) s.disabled = !selItem; });
+  }
+
+  // =====================================================================
+  // UI HELPERS
+  // =====================================================================
+  const el = id => document.getElementById(id);
+  let U = [];
+  const on = f => U.push(f);
+  function E(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
+  function T(e, f) { if (typeof f === "function") on(() => { const v = f(); if (e._t !== v) { e._t = v; e.textContent = v; } }); else e.textContent = f; return e; }
+  function B(label, cls, click, dis) {
+    const b = E("button", "btn " + (cls || "")); b.type = "button"; T(b, label);
+    b.addEventListener("click", () => { if (b.disabled || S.dead || modalOpen) return; click(); afterAction(); });
+    if (dis) on(() => { b.disabled = !!dis(); });
+    return b;
+  }
+  function sec(title, sub, meta) {
+    const s = E("div", "sec"); const l = E("div"); const h = E("h2"); h.textContent = title; l.append(h); if (sub) l.append(T(E("p"), sub)); s.append(l);
+    if (meta) s.append(meta.nodeType ? meta : T(E("span", "meta"), meta));
+    return s;
+  }
+  function row(o) {
+    const r = E("div", "row" + (o.cls ? " " + o.cls : ""));
+    const l = E("div"); const nm = E("div", "nm"); nm.append(T(E("span"), o.name)); if (o.tag) nm.append(o.tag); l.append(nm);
+    if (o.note != null) l.append(T(E("div", "nt"), o.note));
+    r.append(l);
+    const rs = E("div", "rs");
+    if (o.price != null) { const p = E("div", "pr"); p.append(T(E("span"), o.price)); if (o.small) p.append(T(E("small"), o.small)); rs.append(p); }
+    (o.btns || []).forEach(b => rs.append(b));
+    r.append(rs);
+    return r;
+  }
+  const mkTag = (text, cls) => E("span", "tag " + cls, text);
+  function chartSVG(cls, w, h) {
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 " + w + " " + h); svg.setAttribute("preserveAspectRatio", "none"); svg.setAttribute("class", cls); svg.setAttribute("aria-hidden", "true");
+    svg.innerHTML = '<path class="a" stroke="none"/><path class="l" fill="none" stroke-width="1.6" vector-effect="non-scaling-stroke"/>';
+    svg._w = w; svg._h = h; return svg;
+  }
+  function drawChart(svg, data, labelFn, holder) {
+    const w = svg._w, h = svg._h;
+    if (!data || !data.length) data = [0];
+    if (data.length < 2) data = [data[0], data[0]];
+    const key = data.length + ":" + data[data.length - 1] + ":" + data[0];
+    if (svg._k === key) return; svg._k = key;
+    const mn = Math.min(...data), mx = Math.max(...data), span = mx - mn || Math.abs(mx) * 0.1 || 1;
+    const pts = data.map((v, i) => [i / (data.length - 1) * w, 4 + (1 - (v - mn) / span) * (h - 8)]);
+    const d = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join("");
+    const col = data[data.length - 1] >= data[0] ? "var(--up)" : "var(--down)";
+    const l = svg.querySelector(".l"), a = svg.querySelector(".a");
+    l.setAttribute("d", d); l.setAttribute("stroke", col);
+    a.setAttribute("d", d + "L" + w + " " + h + "L0 " + h + "Z"); a.setAttribute("fill", col); a.setAttribute("fill-opacity", ".14");
+    if (holder && labelFn) holder.textContent = "High " + labelFn(mx) + " · Low " + labelFn(mn);
+  }
+
+  // ======================= TABS =======================
+  const ICON = {
+    floor: '<path d="M2 12h2M20 12h2M6 7v10M18 7v10M4 9v6M20 9v6M6 12h12"/>',
+    hustle: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
+    supply: '<path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/>',
+    certs: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/>',
+    bank: '<path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/>',
+    home: '<path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/>'
+  };
+  const TABS = [["floor", "Floor"], ["hustle", "Hustle"], ["supply", "Supply"], ["certs", "Certs"], ["bank", "Bank"], ["home", "Home"]];
+  function buildTabBar() {
+    const t = el("tabs");
+    TABS.forEach(([id, label]) => {
+      const b = E("button", null, '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + ICON[id] + "</svg><span>" + label + "</span>");
+      b.type = "button"; b.setAttribute("role", "tab"); b.dataset.tab = id;
+      b.addEventListener("click", () => setTab(id));
+      t.append(b);
+    });
+  }
+  function setTab(id) {
+    if (editMode && id !== "floor") setEdit(false);
+    tab = id; try { localStorage.setItem(SAVE_KEY + ":tab", id); } catch (e) {}
+    document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === id)));
+    el("sceneWrap").hidden = id !== "floor";
+    buildTab(); window.scrollTo({ top: 0 });
+  }
+  let curKey = "", burnOpen = false, finSel = "";
+  function revealedIdx() { let r = 0; GENS.forEach((g, i) => { if ((S.owned[g.id] || 0) > 0 || S.runEarned >= g.base * 0.5) r = i; }); return r; }
+  function tabKey() {
+    const c = Object.keys(S.certs).join();
+    switch (tab) {
+      case "floor": return "f" + revealedIdx() + c + "|" + availableUps().map(u => u.id).join() + "|" + Object.keys(S.warm).length + S.warmOpen + burnOpen;
+      case "hustle": return "h" + c + Object.keys(S.gear).join() + (S.physique >= 60);
+      case "supply": return "s" + tierIndex() + S.shelves;
+      case "certs": return "c" + c + (S.study ? S.study.id : "") + finSel;
+      case "bank": return "b" + S.bankOpen + S.loans.length;
+      case "home": return "o" + S.home + S.food + Object.keys(S.homesOwned).join() + S.legacy;
+    }
+    return tab;
+  }
+  function buildTab() {
+    U = []; const v = el("view"); v.innerHTML = "";
+    const f = { floor: tabFloor, hustle: tabHustle, supply: tabSupply, certs: tabCerts, bank: tabBank, home: tabHome }[tab];
+    v.append(f());
+    if (tab === "floor") buildSceneCap();
+    curKey = tabKey(); refresh();
+  }
+
+  // ---- FLOOR ----
+  function availableUps() { return UPGRADES.filter(u => !S.ups[u.id] && (u.global ? S.runEarned >= u.cost * 0.3 : (S.owned[u.gen] || 0) >= u.need)).sort((a, b) => a.cost - b.cost); }
+  function warmBlock() {
+    const done = WARM.filter(w => S.warm[w.id]).length;
+    if (done === WARM.length) return null;
+    const c = E("div", "card");
+    const h = E("button", "warm-h"); h.type = "button";
+    h.innerHTML = '<span><span class="k">Warm-up ' + done + "/" + WARM.length + '</span><br><span class="muted" style="font-size:13px">Each step pays out. Your clock is short.</span></span><span class="k">' + (S.warmOpen ? "Hide" : "Show") + "</span>";
+    h.addEventListener("click", () => { S.warmOpen = !S.warmOpen; refresh(); });
+    c.append(h);
+    if (S.warmOpen) WARM.forEach(w => {
+      const s = E("div", "step" + (S.warm[w.id] ? " done" : ""));
+      s.innerHTML = '<span class="ck">' + (S.warm[w.id] ? "✓" : "") + '</span><div><div class="st"></div><div class="sd"></div></div><span class="rw"></span>';
+      s.querySelector(".st").textContent = w.t; s.querySelector(".sd").textContent = w.d; s.querySelector(".rw").textContent = w.r;
+      c.append(s);
+    });
+    return c;
+  }
+  function burnBlock() {
+    const wrap = E("div");
+    const b = E("button", "burn"); b.type = "button";
+    b.innerHTML = '<span class="k" style="color:var(--chalk)">Daily bills</span><span><span class="num"></span> <span class="muted">' + (burnOpen ? "▴" : "▾") + "</span></span>";
+    T(b.querySelector(".num"), () => "−" + money(burn()) + "/day");
+    b.addEventListener("click", () => { burnOpen = !burnOpen; refresh(); });
+    wrap.append(b);
+    if (burnOpen) {
+      const l = E("div", "burn-list");
+      on(() => { const html = burnItems().map(([n, a]) => "<div><span class='muted'>" + n + "</span><span class='num'>−" + money(a) + "</span></div>").join("") + "<div class='muted' style='font-size:12px'>A day passes each time you coach, rest, hustle or train. Going below $0 costs you extra days of life.</div>"; if (l._h !== html) { l._h = html; l.innerHTML = html; } });
+      wrap.append(l);
+    }
+    return wrap;
+  }
+  function tabFloor() {
+    const f = document.createDocumentFragment();
+    const w = warmBlock(); if (w) f.append(w);
+    f.append(burnBlock());
+    const seg = E("div", "seg"); seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "Buy amount");
+    [["1", "×1"], ["10", "×10"], ["max", "Max"]].forEach(([m, l]) => {
+      const b = E("button", null, l); b.type = "button"; b.setAttribute("aria-pressed", String(buyMode === m));
+      b.addEventListener("click", () => { buyMode = m; seg.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); refresh(); });
+      seg.append(b);
+    });
+    f.append(sec("Equipment", "Pays dues every day. Shows up on your floor.", seg));
+    const list = E("div", "list");
+    const rev = revealedIdx();
+    GENS.forEach((g, i) => {
+      if (i > rev + 1) return;
+      const locked = i > rev, needCert = g.cert && !S.certs[g.cert];
+      const qty = () => buyMode === "max" ? Math.max(1, maxAfford(g, S.owned[g.id] || 0, S.cash)) : Number(buyMode);
+      const cost = () => bulkCost(g, S.owned[g.id] || 0, qty());
+      const dot = E("span"); dot.style.cssText = "width:10px;height:10px;border-radius:50%;background:var(" + g.color + ")";
+      list.append(row({
+        name: locked ? "???" : g.name, tag: locked ? null : dot,
+        note: locked ? "Earn " + money(g.base * 0.5) + " at this gym to reveal" : needCert ? "Needs " + CERT_BY_ID[g.cert].name + " (Certs tab)" :
+          () => "+" + money(genRate(g)) + "/day each · own " + (S.owned[g.id] || 0) + (FP[g.id] && storedOf(g.id) ? " · " + storedOf(g.id) + " in storage" : ""),
+        price: () => money(cost()), small: () => "buy " + qty(),
+        cls: locked || needCert ? "dim" : "",
+        btns: [B("Buy", "y", () => buyGen(g), () => locked || needCert || cost() > S.cash)]
+      }));
+    });
+    f.append(list);
+    const ups = availableUps();
+    if (ups.length) {
+      f.append(sec("Upgrades", "One-time boosts"));
+      const ul = E("div", "list");
+      ups.forEach(u => ul.append(row({ name: u.name, note: u.desc, price: money(u.cost), btns: [B("Buy", "y", () => { if (S.cash < u.cost) return; S.cash -= u.cost; S.ups[u.id] = true; logMsg("Installed " + u.name + "."); }, () => S.cash < u.cost)] })));
+      f.append(ul);
+    }
+    return f;
+  }
+  function buyGen(g) {
+    const n = S.owned[g.id] || 0;
+    const k = buyMode === "max" ? maxAfford(g, n, S.cash) : Number(buyMode);
+    if (k < 1) return;
+    const c = bulkCost(g, n, k); if (c > S.cash) return;
+    S.cash -= c; S.spentEquip += c; S.owned[g.id] = n + k;
+    const stored = FP[g.id] ? syncLayout() : (sceneDirty = true, 0);
+    logMsg("Bought " + k + " × " + g.name + " for " + money(c) + "." + (stored ? " " + stored + " went to storage (no floor space)." : ""));
+    if (stored) toast("No floor space. Tap Rearrange to make room.");
+    checkWarm();
+  }
+
+  // ---- HUSTLE ----
+  function hustleBlock(h) {
+    const missing = [];
+    if (h.gear && !S.gear[h.gear]) missing.push(GEAR.find(x => x.id === h.gear).name);
+    if (h.cert && !S.certs[h.cert]) missing.push(CERT_BY_ID[h.cert].name);
+    if (h.phys && S.physique < h.phys) missing.push("physique " + h.phys + " (Home tab)");
+    const b = E("button", "act"); b.type = "button";
+    b.innerHTML = '<span class="plate" style="background:var(' + h.color + ')"><i></i></span><span><div class="nm"></div><div class="nt"></div></span><span class="chip"><span class="pay"></span><small class="en"></small></span>';
+    b.querySelector(".nm").textContent = h.name;
+    b.querySelector(".nt").textContent = missing.length ? "Needs " + missing.join(" + ") : h.note + " · 1 day";
+    T(b.querySelector(".pay"), () => "up to " + money(h.max * hustleMult(h)));
+    b.querySelector(".en").textContent = "−" + h.en + " energy";
+    if (missing.length) b.disabled = true;
+    else on(() => { b.disabled = S.energy < h.en || S.dead; });
+    b.addEventListener("click", () => { if (!b.disabled) doHustle(h, b); });
+    return b;
+  }
+  function tabHustle() {
+    const f = document.createDocumentFragment();
+    f.append(sec("Hustles", "Each one takes a day and costs energy", () => Math.floor(S.energy) + "/" + maxEnergy() + " energy"));
+    const l = E("div", "list"); HUSTLES.forEach(h => l.append(hustleBlock(h))); f.append(l);
+    f.append(sec("Gear", "Unlocks and boosts your hustles"));
+    const g = E("div", "list");
+    GEAR.forEach(x => g.append(row({
+      name: x.name, note: x.note + (x.burn ? " · " + money(x.burn) + "/day upkeep" : ""), price: S.gear[x.id] ? "Owned" : money(x.cost),
+      cls: S.gear[x.id] ? "cur" : "",
+      btns: S.gear[x.id] ? [] : [B("Buy", "y", () => { if (S.cash < x.cost) return; S.cash -= x.cost; S.gear[x.id] = true; logMsg("Bought a " + x.name.toLowerCase() + "."); }, () => S.cash < x.cost)]
+    })));
+    f.append(g);
+    return f;
+  }
+
+  // ---- SUPPLY ROOM ----
+  function tabSupply() {
+    ensureGoods();
+    const f = document.createDocumentFragment();
+    const idx = E("div", "card");
+    const ig = E("div", "idx");
+    const left = E("div"); left.append(E("div", "k", "Supply price index"));
+    left.append(T(E("div", "big num"), () => marketIndex().toFixed(2)));
+    const ich = T(E("div", "num"), () => { const d = marketIndex() - marketIndex(true); return (d >= 0 ? "▲ +" : "▼ ") + d.toFixed(2) + " today"; });
+    on(() => { ich.className = "num " + (marketIndex() >= marketIndex(true) ? "up-c" : "down-c"); });
+    left.append(ich);
+    const sp = chartSVG("spark", 130, 44);
+    on(() => { const n = S.goods[GOODS[0].id].hist.length; const series = []; for (let i = 0; i < n; i++) { let s = 0; GOODS.forEach(g => { const h = S.goods[g.id].hist; s += (h[i] ?? h[h.length - 1]) / g.base; }); series.push(s / GOODS.length * 100); } drawChart(sp, series); });
+    ig.append(left, sp); idx.append(ig); f.append(idx);
+    const tiles = E("div", "tiles");
+    const t1 = E("div", "tile"); t1.append(E("span", "k", "Storage"), T(E("span", "num"), () => storeUsed() + "/" + S.store));
+    const t2 = E("div", "tile"); t2.append(E("span", "k", "Stock value"), T(E("span", "num up-c"), () => money(goodsValue())));
+    tiles.append(t1, t2); f.append(tiles);
+    const stocked = GOODS.filter(g => g.tier <= tierIndex());
+    f.append(sec("Supply room", "Prices change every day. Buying and selling is free.", stocked.length + " stocked"));
+    const list = E("div", "list");
+    stocked.forEach(g => {
+      const q = S.goods[g.id];
+      const c = E("div", "good");
+      const h = E("div", "good-h");
+      const l = E("div"); l.append(E("div", "nm", g.name)); l.append(T(E("div", "muted num"), () => "Own " + q.own + (q.own ? " · avg " + money(q.cost / q.own) : "")));
+      const r = E("div"); r.style.textAlign = "right";
+      r.append(T(E("div", "num"), () => money(q.price)));
+      const ch = T(E("div", "num"), () => { const d = q.price - prevOf(q.hist); return (d >= 0 ? "▲ " : "▼ ") + money(Math.abs(d)); });
+      on(() => { ch.className = "num " + (q.price >= prevOf(q.hist) ? "up-c" : "down-c"); });
+      r.append(ch); h.append(l, r); c.append(h);
+      const spk = chartSVG("spark", 300, 44); on(() => drawChart(spk, q.hist)); c.append(spk);
+      const qrow = E("div", "qty"); const inp = E("input"); inp.type = "range"; inp.min = 1; inp.value = 1; inp.id = "qty-" + g.id; inp.setAttribute("aria-label", g.name + " quantity");
+      const qv = E("span", "num"); qv.style.textAlign = "right";
+      const maxBuy = () => Math.max(0, Math.min(Math.floor(Math.max(0, S.cash) / q.price), S.store - storeUsed()));
+      on(() => { const mx = Math.max(1, maxBuy(), q.own); if (+inp.max !== mx) inp.max = mx; if (+inp.value > mx) inp.value = mx; qv.textContent = inp.value; });
+      inp.addEventListener("input", () => refresh());
+      qrow.append(E("span", "k", "Qty"), inp, qv); c.append(qrow);
+      const two = E("div", "two");
+      two.append(
+        B(() => "Sell " + Math.min(+inp.value, q.own), "r", () => { const n = Math.min(+inp.value, q.own); if (!n) return; const avg = q.cost / q.own; q.own -= n; q.cost -= avg * n; S.cash += n * q.price; logMsg("Sold " + n + " " + g.name.toLowerCase() + " for " + money(n * q.price) + "."); }, () => q.own < 1),
+        B(() => "Buy " + inp.value, "g", () => { const n = +inp.value; const cost = n * q.price; if (cost > S.cash || storeUsed() + n > S.store) return; S.cash -= cost; q.own += n; q.cost += cost; logMsg("Bought " + n + " " + g.name.toLowerCase() + " for " + money(cost) + "."); }, () => +inp.value * q.price > S.cash || storeUsed() + +inp.value > S.store)
+      );
+      c.append(two); list.append(c);
+    });
+    f.append(list);
+    if (S.shelves < SHELVES.length) {
+      const sh = SHELVES[S.shelves];
+      f.append(sec("Storage", "More room for stock"));
+      f.append(row({ name: sh.name, note: "+" + sh.add + " storage", price: money(sh.cost), btns: [B("Buy", "y", () => { if (S.cash < sh.cost) return; S.cash -= sh.cost; S.store += sh.add; S.shelves++; logMsg("Added " + sh.name.toLowerCase() + "."); }, () => S.cash < sh.cost)] }));
+    }
+    return f;
+  }
+
+  // ---- CERTS ----
+  function certState(c) {
+    if (S.certs[c.id]) return "done";
+    if (S.study && S.study.id === c.id) return "study";
+    if (c.req.every(r => S.certs[r])) return "open";
+    return "lock";
+  }
+  function enroll(c, loan) {
+    if (S.study || S.certs[c.id]) return;
+    if (loan) { S.loans.push(makeLoan("Student", c.cost, STUDENT_APR, 5)); logMsg("Took a student loan for " + c.name + "."); }
+    else { if (S.cash < c.cost) return; S.cash -= c.cost; }
+    S.study = { id: c.id, left: c.days, total: c.days };
+    logMsg("Enrolled in " + c.name + ". " + c.days + " days to go.");
+    finSel = "";
+  }
+  function tabCerts() {
+    const f = document.createDocumentFragment();
+    if (S.study) {
+      const c = CERT_BY_ID[S.study.id];
+      const card = E("div", "card");
+      card.append(E("div", "k", "Now studying"));
+      const nm = E("div", "bigname"); nm.style.fontSize = "26px"; nm.textContent = c.name; card.append(nm);
+      const pb = E("div", "pbar"); const pi = E("i"); pb.append(pi); card.append(pb);
+      on(() => { if (S.study) pi.style.width = (1 - S.study.left / S.study.total) * 100 + "%"; });
+      card.append(T(E("div", "muted num"), () => S.study ? S.study.left + " days left. Days pass as you coach, rest or hustle." : ""));
+      f.append(card);
+    }
+    if (finSel && !S.study) {
+      const c = CERT_BY_ID[finSel];
+      const total = c.cost * (1 + STUDENT_APR * 5 * 0.55), daily = total / (5 * 365);
+      const card = E("div", "card fin");
+      card.innerHTML = '<div class="sec" style="margin:0"><div><span class="k">Enroll · student loan option</span><h2 style="font-size:24px;margin-top:4px"></h2></div><span class="meta" style="color:var(--down)">' + (STUDENT_APR * 100).toFixed(1) + '% APR · 5 yr</span></div>';
+      card.querySelector("h2").textContent = c.name;
+      const dl = E("dl");
+      dl.innerHTML = "<dt>Tuition</dt><dd>" + money(c.cost) + "</dd><dt>Loan interest</dt><dd>+" + money(total - c.cost) + '</dd><dt class="tot">Repay with a loan</dt><dd class="tot">' + money(total) + "</dd><dt>Daily payment</dt><dd>" + money(daily) + "/day</dd><dt>Study time</dt><dd>" + c.days + " days</dd>";
+      card.append(dl);
+      const btns = E("div", "two");
+      btns.append(B("Pay " + money(c.cost), "y", () => enroll(c, false), () => S.cash < c.cost), B("Take the loan", "b", () => enroll(c, true)));
+      card.append(btns, B("Cancel", "", () => { finSel = ""; }));
+      f.append(card);
+    }
+    f.append(sec("Certifications", "Each one adds life and unlocks something", Object.keys(S.certs).length + "/" + CERTS.length + " earned"));
+    const list = E("div", "list");
+    CERTS.forEach(c => {
+      const st = certState(c);
+      const tg = mkTag({ done: "Done", study: "Studying", open: "Open", lock: "Locked" }[st], st);
+      const note = c.perk + " · +" + lifeTxt(c.life) + " life · " + c.days + " days" + (st === "lock" ? " · needs " + c.req.map(r => CERT_BY_ID[r].name).join(", ") : "");
+      list.append(row({
+        name: c.name, tag: tg, note, price: money(c.cost), cls: st === "lock" ? "dim" : st === "done" ? "cur" : "",
+        btns: st === "open" ? [B("Enroll", "b", () => { finSel = c.id; window.scrollTo({ top: 0 }); }, () => !!S.study)] : []
+      }));
+    });
+    f.append(list);
+    return f;
+  }
+
+  // ---- BANK ----
+  function tabBank() {
+    const f = document.createDocumentFragment();
+    const cc = E("div", "card credit");
+    cc.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--panel-2)" stroke-width="10"/><circle class="arc" cx="50" cy="50" r="42" fill="none" stroke-width="10" stroke-linecap="round" transform="rotate(-90 50 50)" stroke-dasharray="264"/><text class="sc" x="50" y="54" text-anchor="middle" font-size="24" font-weight="700" fill="var(--chalk)" font-family="JetBrains Mono, monospace"></text><text x="50" y="70" text-anchor="middle" font-size="8.5" fill="var(--muted)" letter-spacing="1.5">CREDIT</text></svg><div><div class="k">Credit score</div><div class="lvl"></div><div class="muted" style="font-size:13px">Pay loans on time to raise it. Dropping below $0 cash hurts it.</div></div>';
+    on(() => {
+      const s = Math.round(S.credit), frac = (s - 300) / 550;
+      const col = s < 580 ? "var(--down)" : s < 670 ? "var(--orange)" : s < 740 ? "var(--yellow)" : "var(--up)";
+      const arc = cc.querySelector(".arc"); arc.setAttribute("stroke", col); arc.setAttribute("stroke-dashoffset", String(264 * (1 - frac)));
+      cc.querySelector(".sc").textContent = s; const lv = cc.querySelector(".lvl"); lv.textContent = creditLabel(s); lv.style.color = col;
+    });
+    f.append(cc);
+    const nw = E("div", "card");
+    nw.append(E("div", "k", "Net worth · last 60 days"));
+    nw.append(T(E("div", "big num"), () => money(netWorth())));
+    const tch = T(E("div", "num"), () => { const h = S.nwHist; if (h.length < 2) return "Tracking starts tomorrow"; const d = netWorth() - h[0]; return (d >= 0 ? "▲ +" : "▼ ") + money(Math.abs(d)) + " in " + h.length + " days"; });
+    on(() => { const h = S.nwHist; tch.className = "num " + (h.length < 2 || netWorth() >= h[0] ? "up-c" : "down-c"); });
+    nw.append(tch);
+    const ch = chartSVG("nw-chart", 600, 120); const lbl = E("div", "muted num"); lbl.style.fontSize = "11.5px";
+    on(() => drawChart(ch, S.nwHist.length ? S.nwHist : [netWorth()], money, lbl)); nw.append(ch, lbl);
+    f.append(nw);
+    f.append(sec("Financials", "Where your money sits"));
+    const fl = E("div", "card fin-list");
+    const sign = v => v > 0.004 ? "up-c" : v < -0.004 ? "down-c" : "muted";
+    const line = (label, fn) => { const d = E("div"); d.append(E("span", null, label)); const v = T(E("span", "num"), () => money(fn())); on(() => { v.className = "num " + sign(fn()); }); d.append(v); return d; };
+    fl.append(line("Cash", () => S.cash), line("Savings", () => S.savings), line("IRON 500 fund", fundValue), line("Supply stock", goodsValue), line("Equipment (resale)", equipValue), line("Loans", () => -loanTotal()), line("Net worth", netWorth));
+    f.append(fl);
+    f.append(sec("Accounts", "Savings pay 4% a year"));
+    const al = E("div", "list");
+    if (!S.bankOpen) al.append(row({ name: "Open a bank account", note: "Needs $250 cash. Keeps your money safe from theft.", price: "Free", btns: [B("Open", "y", () => { if (S.cash < 250) return; S.bankOpen = true; S.credit = Math.min(850, S.credit + 20); logMsg("Opened a bank account."); checkWarm(); }, () => S.cash < 250)] }));
+    else {
+      al.append(row({ name: "Savings", note: "4% a year, paid daily", price: () => money(S.savings), btns: [
+        B("+ Half", "g", () => { const a = Math.max(0, S.cash) / 2; S.cash -= a; S.savings += a; }, () => S.cash <= 0),
+        B("+ All", "g", () => { const a = Math.max(0, S.cash); S.cash -= a; S.savings += a; }, () => S.cash <= 0),
+        B("Take out", "r", () => { S.cash += S.savings; S.savings = 0; }, () => S.savings <= 0)] }));
+      const fc = E("div", "good");
+      const fh = E("div", "good-h"); const fl2 = E("div"); fl2.append(E("div", "nm", "IRON 500 Index Fund")); fl2.append(T(E("div", "muted num"), () => S.fund.units ? "Own " + S.fund.units.toFixed(3) + " units · " + money(fundValue()) : "Tracks fitness company stocks"));
+      const fr = E("div"); fr.style.textAlign = "right"; fr.append(T(E("div", "num"), () => money(S.fund.price)));
+      const fd = T(E("div", "num"), () => { const d = (S.fund.price / prevOf(S.fund.hist) - 1) * 100; return (d >= 0 ? "▲ " : "▼ ") + Math.abs(d).toFixed(2) + "%"; });
+      on(() => { fd.className = "num " + (S.fund.price >= prevOf(S.fund.hist) ? "up-c" : "down-c"); });
+      fr.append(fd); fh.append(fl2, fr); fc.append(fh);
+      const fsp = chartSVG("spark", 300, 44); on(() => drawChart(fsp, S.fund.hist)); fc.append(fsp);
+      const buyF = p => { const a = Math.max(0, S.cash) * p; if (a <= 0) return; S.cash -= a; S.fund.units += a / S.fund.price; logMsg("Invested " + money(a) + " in IRON 500."); };
+      const sellF = p => { const u = S.fund.units * p; if (u <= 0) return; S.fund.units -= u; S.cash += u * S.fund.price; logMsg("Sold " + money(u * S.fund.price) + " of IRON 500."); };
+      const bb = E("div", "btns"); bb.append(B("Buy 10%", "g", () => buyF(0.1), () => S.cash <= 0), B("Buy 50%", "g", () => buyF(0.5), () => S.cash <= 0), B("Sell half", "r", () => sellF(0.5), () => S.fund.units <= 0), B("Sell all", "r", () => sellF(1), () => S.fund.units <= 0));
+      fc.append(bb); al.append(fc);
+    }
+    f.append(al);
+    f.append(sec("Loans", "Business loans run 3 years. Better credit, lower rate.", () => (bizApr() * 100).toFixed(1) + "% APR"));
+    const ll = E("div", "list");
+    S.loans.forEach(l => ll.append(row({ name: l.kind + " loan", note: () => money(l.pay) + "/day · " + (l.apr * 100).toFixed(1) + "% APR", price: () => money(l.bal), btns: [B("Pay off", "r", () => { if (S.cash < l.bal) return; S.cash -= l.bal; S.loans = S.loans.filter(x => x !== l); S.credit = Math.min(850, S.credit + 10); logMsg("Paid off a " + l.kind.toLowerCase() + " loan."); }, () => S.cash < l.bal)] })));
+    const borrow = p => { const a = Math.floor(bizLimit() * p); if (a < 50) return; S.loans.push(makeLoan("Business", a, bizApr(), 3)); S.cash += a; logMsg("Borrowed " + money(a) + "."); };
+    ll.append(row({ name: "Business loan", note: () => bizLimit() >= 50 ? "You can borrow up to " + money(bizLimit()) : "Build credit or net worth to qualify", btns: [B("25%", "g", () => borrow(0.25), () => bizLimit() < 200), B("Max", "g", () => borrow(1), () => bizLimit() < 50)] }));
+    f.append(ll);
+    return f;
+  }
+
+  // ---- HOME ----
+  function tabHome() {
+    const f = document.createDocumentFragment();
+    const cur = E("div", "card");
+    cur.append(E("div", "k", "Living in"));
+    const nm = E("div", "bigname"); nm.textContent = home().name; cur.append(nm);
+    cur.append(T(E("div", "num"), () => "Lifespan " + ydays(lifespanDays()) + " from day one · " + ydays(daysLeft()) + " left"));
+    cur.append(T(E("div", "muted"), () => "Base " + BASE_DAYS + "d · home +" + home().life + "d · meals +" + food().life + "d · certs +" + certLife() + "d · physique +" + Math.round(S.physique * 1.5) + "d · extras " + (S.bonusDays >= 0 ? "+" : "") + S.bonusDays + "d"));
+    f.append(cur);
+
+    f.append(sec("Housing", "Better housing, longer life, more energy", HOMES.length + " levels"));
+    const hl = E("div", "list");
+    HOMES.forEach((h, i) => {
+      const isCur = S.home === h.id, owned = S.homesOwned[h.id], prevOk = i === 0 || S.homesOwned[HOMES[i - 1].id];
+      const note = (h.life ? "+" + lifeTxt(h.life) + " life" : "No life bonus") + " · " + h.max + " max energy" + (h.burn ? " · −" + money(h.burn) + "/day" : "");
+      const btn = isCur ? B("Home", "", () => {}, () => true)
+        : owned ? B("Move back", "", () => { S.home = h.id; logMsg("Moved into " + h.name + "."); })
+        : prevOk ? B("Move in", "y", () => { if (S.cash < h.cost) return; S.cash -= h.cost; S.homesOwned[h.id] = true; S.home = h.id; logMsg("Moved into " + h.name + "."); checkWarm(); }, () => S.cash < h.cost)
+        : B("Locked", "", () => {}, () => true);
+      hl.append(row({ name: h.name, tag: isCur ? mkTag("Current", "cur") : null, note, price: h.cost ? money(h.cost) : "Free", small: h.cost ? "move-in" : null, cls: isCur ? "cur" : (!owned && !prevOk ? "dim" : ""), btns: [btn] }));
+    });
+    f.append(hl);
+
+    f.append(sec("Meal plan", "Food sets daily energy and adds life"));
+    const fl = E("div", "list");
+    FOODS.forEach(x => {
+      const isCur = S.food === x.id;
+      fl.append(row({ name: x.name, tag: isCur ? mkTag("Current", "cur") : null, note: "+" + x.regen + " energy/day" + (x.life ? " · +" + lifeTxt(x.life) + " life" : ""), price: money(x.burn), small: "per day", cls: isCur ? "cur" : "",
+        btns: [isCur ? B("Eating", "", () => {}, () => true) : B("Switch", "y", () => { S.food = x.id; logMsg("Switched to " + x.name.toLowerCase() + "."); })] }));
+    });
+    f.append(fl);
+
+    f.append(sec("Self-care", "Train, rest, recover", () => "Physique " + S.physique + "/100"));
+    const sl = E("div", "list");
+    const cdOk = (id, days) => S.cd[id] == null || S.day - S.cd[id] >= days;
+    const train = E("button", "btn y", "Lift"); train.type = "button"; train.addEventListener("click", () => doTrain());
+    on(() => { train.disabled = S.energy < 20 || S.physique >= 100; });
+    sl.append(row({ name: "Train yourself", note: "1 day · −20 energy · +1 physique · each point adds 1.5 days of life", price: "Free", btns: [train] }));
+    const care = (id, name, note, cost, days, fx) => sl.append(row({ name, note: () => cdOk(id, days) ? note : note + " · ready in " + (days - (S.day - S.cd[id])) + "d", price: money(cost),
+      btns: [B("Book", "y", () => { if (S.cash < cost || !cdOk(id, days)) return; S.cash -= cost; S.cd[id] = S.day; fx(); logMsg(name + " booked."); }, () => S.cash < cost || !cdOk(id, days))] }));
+    care("check", "Doctor checkup", "+20 days life · every 90 days", 250, 90, () => { S.bonusDays += 20; });
+    care("massage", "Sports massage", "Full energy · every 20 days", 120, 20, () => { S.energy = maxEnergy(); });
+    care("trip", "Weekend getaway", "+15 days life, full energy · every 60 days", 1500, 60, () => { S.bonusDays += 15; S.energy = maxEnergy(); });
+    care("vac", "Two-week vacation", "+60 days life · once a year", 40000, 365, () => { S.bonusDays += 60; });
+    f.append(sl);
+
+    f.append(sec("Legacy", "Carries over when a life ends"));
+    f.append(row({ name: S.legacy + " ★ · life #" + S.lives, note: "Each star adds 10% to everything you earn. Stars come from your best net worth in a life. Restart from the ↻ button up top.", btns: [] }));
+    return f;
+  }
+
+  // ======================= HEADER + REFRESH =======================
+  let lastTier = -1;
+  function refresh() {
+    const dl = daysLeft();
+    const hl = el("hLeft"); hl.textContent = ydays(dl); hl.style.color = dl < 30 ? "var(--down)" : dl < 120 ? "var(--orange)" : "var(--up)";
+    el("hDay").textContent = S.day;
+    el("hAge").textContent = ydays(ageDays());
+    const hc = el("hCash"); hc.textContent = money(S.cash); hc.classList.toggle("neg", S.cash < 0);
+    el("hEn").textContent = Math.floor(S.energy) + "/" + maxEnergy();
+    el("hEnBar").style.width = Math.min(100, S.energy / maxEnergy() * 100) + "%";
+    el("hRate").textContent = money(income());
+    el("hNet").textContent = money(netWorth());
+    el("hTick").textContent = S.log[0] ? S.log[0].m : "Welcome to " + S.name + ".";
+    el("gymName").textContent = S.name;
+    const cb = el("coachBtn");
+    cb.disabled = S.dead || S.energy < COACH_EN;
+    el("coachSub").textContent = S.energy < COACH_EN ? "Too tired. Rest first." : "+" + money(coachValue()) + " · −" + COACH_EN + " energy · 1 day";
+    el("restBtn").disabled = S.dead;
+    const ti = tierIndex();
+    if (ti !== lastTier) { if (lastTier !== -1 && ti > lastTier) { logMsg("Your gym is now a " + TIERS[ti].name + "."); toast("Promoted: " + TIERS[ti].name); } lastTier = ti; }
+    if (tabKey() !== curKey) { buildTab(); return; }
+    U.forEach(f => f());
+  }
+
+  // ======================= MODAL / TOAST =======================
+  let modalOpen = false;
+  function openModal(title, body, buttons, sticky, stack) {
+    modalOpen = true;
+    const back = E("div", "modal-back"); const m = E("div", "modal"); m.setAttribute("role", "dialog"); m.setAttribute("aria-modal", "true");
+    const h = E("h3"); h.textContent = title; m.append(h);
+    if (typeof body === "string") { const p = E("p"); p.textContent = body; m.append(p); } else m.append(body);
+    const bs = E("div", "btns" + (stack ? " stack" : ""));
+    buttons.forEach(([label, fn], i) => { const b = E("button", "btn " + (i === 0 ? "y" : "")); b.type = "button"; b.textContent = label; b.addEventListener("click", () => { closeModal(); fn(); refresh(); save(); }); bs.append(b); });
+    m.append(bs); back.append(m);
+    if (!sticky && buttons.length === 1) back.addEventListener("click", e => { if (e.target === back) { closeModal(); buttons[0][1](); refresh(); } });
+    el("modalRoot").innerHTML = ""; el("modalRoot").append(back);
+  }
+  function closeModal() { modalOpen = false; el("modalRoot").innerHTML = ""; }
+  let toastT = 0;
+  function toast(msg) { const t = el("toast"); t.textContent = msg; t.hidden = false; clearTimeout(toastT); toastT = setTimeout(() => { t.hidden = true; }, 3000); }
+  function showLog() {
+    const l = E("div", "log-list");
+    if (!S.log.length) l.append(E("div", "muted", "Nothing yet."));
+    S.log.slice(0, 50).forEach(x => { const d = E("div"); d.append(E("span", "muted num", "Day " + x.d)); const s = E("span"); s.textContent = x.m; d.append(s); l.append(d); });
+    openModal("Front desk log", l, [["Close", () => {}]]);
+  }
+  function renameGym() {
+    const wrap = E("div"); const inp = E("input"); inp.id = "nameInput"; inp.maxLength = 24; inp.value = S.name;
+    inp.style.cssText = "width:100%;padding:10px;border-radius:6px;border:1px solid var(--line);background:var(--panel-2);color:var(--chalk);font:600 16px var(--f-body);box-sizing:border-box";
+    inp.setAttribute("aria-label", "Gym name"); inp.setAttribute("autocomplete", "off"); wrap.append(inp);
+    const saveName = () => { S.name = inp.value.trim() || "Iron Temple"; };
+    openModal("Rename your gym", wrap, [["Save", saveName], ["Cancel", () => {}]]);
+    inp.addEventListener("keydown", e => { if (e.key === "Enter") { saveName(); closeModal(); refresh(); save(); } });
+  }
+
+  // ======================= BOOT =======================
+  function start(data) {
+    readColors();
+    const fromHot = data && data.state;
+    const loaded = fromHot ? Object.assign(fresh(), data.state) : load();
+    if (loaded) S = loaded;
+    else logMsg("You open " + S.name + " with $25, a couch in the back office and about 200 days to make it.");
+    ensureGoods(); syncLayout();
+    try { const t = localStorage.getItem(SAVE_KEY + ":tab"); if (t && TABS.some(x => x[0] === t)) tab = t; } catch (e) {}
+    buildTabBar(); setTab(tab);
+    if (S.dead) die();
+
+    el("coachBtn").addEventListener("click", doCoach);
+    el("restBtn").addEventListener("click", doRest);
+    el("logBtn").addEventListener("click", showLog);
+    el("gymName").addEventListener("click", renameGym);
+    el("restartBtn").addEventListener("click", restartMenu);
+    document.addEventListener("visibilitychange", () => { if (document.hidden) save(); });
+    window.addEventListener("pagehide", save);
+
+    buildFixtures(); sceneDirty = false;
+    for (let i = 0, n = Math.min(memberTarget(), 8); i < n; i++) { const p = spawn("member"); p.x = rnd(120, 640); p.y = rnd(180, 380); p.act = "walk"; }
+    requestAnimationFrame(frame);
+
+    if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => ({ state: S }));
+  }
+
+  window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+
+</body>
+</html>
