@@ -25,6 +25,7 @@ const G = (() => {
       proteinUpgrades: [],
       goldenUpgradeLevels: {},
       gyms: [], // "cityId:locationId:focusId"
+      gear: {}, // "cityId:locationId" → { stationId: units }
       schedule: { unlocked: [], classes: {} }, // classes: slotId → stationId
       seasonEndsAt: now + SEASON.lengthDays * DAY,
       seasonRackLevel: 0,
@@ -50,6 +51,7 @@ const G = (() => {
         ...parsed,
         settings: { ...fresh.settings, ...(parsed.settings || {}) },
         stats: { ...fresh.stats, ...(parsed.stats || {}) },
+        gear: parsed.gear || {},
         schedule: { ...fresh.schedule, ...(parsed.schedule || {}) },
       };
     } catch {
@@ -182,8 +184,12 @@ const G = (() => {
       for (const u of CFG.proteinUpgrades) if (u.effect.kind === 'global' && has(this.s.proteinUpgrades, u.id)) m *= u.effect.value;
       return m;
     },
-    /** Applies to station income: Home Gym × Signature Pump × upgrades. */
-    get globalMult() { return this.homeGymIncomeMult * this.pumpMult * this.effectProduct('global'); },
+    /** Gym Size bonus: every few total station levels lifts all station income. */
+    get sizeSteps() { return Math.floor(this.totalLevels / CFG.sizeBonus.every); },
+    get sizeMult() { return Math.pow(CFG.sizeBonus.mult, this.sizeSteps); },
+    get nextSizeAt() { return (this.sizeSteps + 1) * CFG.sizeBonus.every; },
+    /** Applies to station income: Home Gym × Signature Pump × upgrades × Gym Size. */
+    get globalMult() { return this.homeGymIncomeMult * this.pumpMult * this.effectProduct('global') * this.sizeMult; },
     get milestoneFactor() { return CFG.milestoneMultiplier * this.effectProduct('milestone'); },
     /** Station-specific multipliers, broken out so the UI can explain them. */
     stationBoosts(st) {
@@ -219,9 +225,65 @@ const G = (() => {
     location(id) { return CFG.locations.find((l) => l.id === id); },
     gymCost(city, loc) { return CFG.mapBaseCost * Math.pow(CFG.mapCostGrowth, city.tier - 1) * loc.costMult; },
     trendMult(city, focusId) { return focusId === city.trend ? CFG.trendMultiplier * this.effectProduct('trend') : 1; },
-    gymIncome(city, loc, focusId) {
+    gymBase(city, loc, focusId) {
       return CFG.mapBaseIncome * Math.pow(CFG.mapIncomeGrowth, city.tier - 1) * loc.incomeMult
         * this.trendMult(city, focusId) * this.pumpMult * this.proteinGlobalMult;
+    },
+    /** Income of a map gym. Without a key, previews a new gym with its starter equipment. */
+    gymIncome(city, loc, focusId, key) {
+      const gear = key ? this.gearOf(key) : this.starterGear(focusId);
+      return this.gymBase(city, loc, focusId) * this.gearMult(gear, focusId);
+    },
+
+    // ───────── Map gym equipment ─────────
+    gearSize(type) { return CFG.gear.size[type] || 1; },
+    gearMax(type) { return CFG.gear.size[type] ? CFG.gear.maxBig : CFG.gear.maxPerType; },
+    starterGear(focusId) { const f = this.focus(focusId); return f ? { [f.signature]: CFG.gear.starterUnits } : {}; },
+    gearOf(key) { return this.s.gear[key] || {}; },
+    gearValue(type, focusId) {
+      const st = this.station(type);
+      return CFG.gear.unitIncome * this.gearSize(type) * (st.focus === focusId ? CFG.gear.focusBonus : 1);
+    },
+    gearMult(gear, focusId) {
+      return 1 + Object.entries(gear).reduce((sum, [type, n]) => sum + n * this.gearValue(type, focusId), 0);
+    },
+    gearSpaceUsed(key) { return Object.entries(this.gearOf(key)).reduce((n, [type, c]) => n + c * this.gearSize(type), 0); },
+    gearUnitCount(key) { return Object.values(this.gearOf(key)).reduce((a, b) => a + b, 0); },
+    mapGym(key) {
+      const g = this.s.gyms.find((x) => x.startsWith(key + ':'));
+      if (!g) return null;
+      const [c, l, f] = g.split(':');
+      return { key, city: this.city(c), loc: this.location(l), focus: f || this.city(c).trend };
+    },
+    get mapGyms() { return this.s.gyms.map((g) => this.mapGym(g.split(':').slice(0, 2).join(':'))); },
+    gearCost(key, type) {
+      const g = this.mapGym(key);
+      return this.gymCost(g.city, g.loc) * CFG.gear.costFactor * this.gearSize(type) * Math.pow(CFG.gear.costGrowth, this.gearUnitCount(key));
+    },
+    /** null if the unit can be added, otherwise why not. */
+    gearBlocked(key, type) {
+      if ((this.gearOf(key)[type] || 0) >= this.gearMax(type)) return 'max';
+      if (this.gearSpaceUsed(key) + this.gearSize(type) > CFG.gear.capacity) return 'full';
+      return null;
+    },
+    buyGear(key, type) {
+      const g = this.mapGym(key);
+      if (!g || this.gearBlocked(key, type) || !this.spend(this.gearCost(key, type))) return false;
+      const gear = (this.s.gear[key] ||= {});
+      gear[type] = (gear[type] || 0) + 1;
+      this.s.stats.gear = (this.s.stats.gear || 0) + 1;
+      FX.haptic('purchase');
+      FX.sound('buy');
+      this.emit('gear', key);
+      return true;
+    },
+    /** Every unopened location, cheapest first. */
+    cheapestGyms(limit = 12) {
+      const list = [];
+      for (const city of CFG.cities) for (const loc of CFG.locations) {
+        if (!this.hasGym(city.id, loc.id)) list.push({ city, loc, cost: this.gymCost(city, loc) });
+      }
+      return list.sort((a, b) => a.cost - b.cost).slice(0, limit);
     },
     gymAt(cityId, locId) {
       const g = this.s.gyms.find((x) => x.startsWith(`${cityId}:${locId}`));
@@ -234,7 +296,7 @@ const G = (() => {
     get chainIncome() {
       return this.s.gyms.reduce((sum, g) => {
         const [c, l, f] = g.split(':');
-        return sum + this.gymIncome(this.city(c), this.location(l), f);
+        return sum + this.gymIncome(this.city(c), this.location(l), f || this.city(c).trend, `${c}:${l}`);
       }, 0);
     },
 
@@ -254,7 +316,7 @@ const G = (() => {
     previousStation(st) { return CFG.stations[CFG.stations.indexOf(st) - 1]; },
 
     quote(st, amount = this.buyAmount) {
-      const g = CFG.stationCostGrowth;
+      const g = st.growth;
       const base = st.baseCost * this.homeGymCostMult * Math.pow(g, this.level(st));
       const costOf = (n) => (n === 1 ? base : (base * (Math.pow(g, n) - 1)) / (g - 1));
       let n = amount === 'x10' ? 10 : 1;
@@ -296,13 +358,13 @@ const G = (() => {
 
       const gained = milestoneCount(after) - milestoneCount(before);
       if (before === 0 && !st.seasonal) {
-        this.emit('milestone', { emoji: st.emoji, title: `${st.name} is open!`, subtitle: 'New station on your gym floor', celebrate: false });
+        this.emit('milestone', { icon: Art.station(st.id, 36), title: `${st.name} is open!`, subtitle: 'New equipment on your gym floor', celebrate: false });
         this.emit('structure');
       } else if (gained > 0) {
         const protein = gained * CFG.milestoneProtein;
         this.s.protein += protein;
         this.emit('milestone', {
-          emoji: st.emoji,
+          icon: Art.station(st.id, 36),
           title: `${st.name} income x${+Math.pow(this.milestoneFactor, gained).toFixed(2)}!`,
           subtitle: `Level ${previousMilestone(after)} milestone · +${protein} Protein`,
           celebrate: true,
@@ -357,13 +419,14 @@ const G = (() => {
     openGym(city, loc, focusId) {
       if (this.hasGym(city.id, loc.id) || !this.focus(focusId) || !this.spend(this.gymCost(city, loc))) return false;
       this.s.gyms.push(`${city.id}:${loc.id}:${focusId}`);
+      this.s.gear[`${city.id}:${loc.id}`] = this.starterGear(focusId);
       this.s.stats.gyms++;
       FX.haptic('milestone');
       const f = this.focus(focusId);
       const trend = focusId === city.trend ? ' · on trend!' : '';
       this.emit('milestone', {
-        emoji: loc.emoji,
-        title: `${f.emoji} ${city.name} ${loc.name} is open!`,
+        icon: Pics.get(loc.icon, 30),
+        title: `${city.name} ${loc.name} is open!`,
         subtitle: `+${Fmt.rate(this.gymIncome(city, loc, focusId))}${trend} · home ${f.name} +${Math.round(CFG.focusBonusPerGym * 100)}%`,
         celebrate: true,
       });
@@ -562,7 +625,7 @@ const G = (() => {
       if (slot !== this.lastSlotId) {
         if (this.lastSlotId) {
           const live = this.liveClass;
-          if (live) this.emit('milestone', { emoji: '🎵', title: `${CFG.classes[live.station.id]} is starting`, subtitle: `${live.slot.name} · ${live.station.name} x${+live.mult.toFixed(1)}` });
+          if (live) this.emit('milestone', { icon: Pics.get('music', 28), title: `${CFG.classes[live.station.id]} is starting`, subtitle: `${live.slot.name} · ${live.station.name} x${+live.mult.toFixed(1)}` });
         }
         this.lastSlotId = slot;
         this.emit('structure');
@@ -619,6 +682,14 @@ const G = (() => {
   ['premiumUpgrades', 'seasonClaimedFree', 'seasonClaimedPremium', 'hasSeasonPremium', 'freeRushEndsAt', 'freeRushReadyAt', 'preWorkoutEndsAt', 'restBoostEndsAt', 'totalTaps', 'workouts']
     .forEach((k) => delete G.s[k]);
   if (!Array.isArray(G.s.seasonClaimed)) G.s.seasonClaimed = [];
+
+  // v1.3: map gyms got their own equipment. Older gyms start with the starter set.
+  G.s.gyms = G.s.gyms.map((g) => {
+    const [c, l, f] = g.split(':');
+    const focus = f || G.city(c).trend;
+    if (!G.s.gear[`${c}:${l}`]) G.s.gear[`${c}:${l}`] = G.starterGear(focus);
+    return `${c}:${l}:${focus}`;
+  });
 
   // Tapping was removed in v1.1: refund what was spent on tap upgrades.
   // v1.2 removed real-life workouts: Habit Coach is refunded too.

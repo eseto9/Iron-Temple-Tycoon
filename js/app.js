@@ -86,21 +86,32 @@ const App = (() => {
     },
     'pick-class': (el) => openClassPicker(el.dataset.id),
     'pick-focus': (el) => MapScreen.pickFocus(el.dataset.id),
+    'view-gym': (el) => GymScreen.show(el.dataset.id),
+    'visit-gym': (el) => { Sheet.close(); if (current !== 'gym') showTab('gym'); GymScreen.show(el.dataset.id); window.scrollTo(0, 0); },
+    'buy-gear': (el) => {
+      const st = G.station(el.dataset.id);
+      if (st && G.buyGear(GymScreen.view, st.id)) Toast.show({ icon: Art.station(st.id, 36), title: `New ${st.name.replace(/s$/, '')} delivered`, subtitle: `+${Fmt.rate(G.gymBase(G.mapGym(GymScreen.view).city, G.mapGym(GymScreen.view).loc, G.mapGym(GymScreen.view).focus) * G.gearValue(st.id, G.mapGym(GymScreen.view).focus))} for this gym` });
+    },
+    'cheapest-gyms': () => MapScreen.openCheapest(),
+    'open-gym-trend': (el) => {
+      const [c, l] = el.dataset.id.split(':');
+      G.openGym(G.city(c), G.location(l), G.city(c).trend);
+    },
     'coin-upgrade': (el) => {
       const u = CFG.coinUpgrades.find((x) => x.id === el.dataset.id);
-      if (u && G.buyCoinUpgrade(u)) Toast.show({ emoji: u.emoji, title: u.name, subtitle: G.upgradeEffectText(u) });
+      if (u && G.buyCoinUpgrade(u)) Toast.show({ icon: UI.upgradePic(u, 32), title: u.name, subtitle: G.upgradeEffectText(u) });
     },
     'protein-upgrade': (el) => {
       const u = CFG.proteinUpgrades.find((x) => x.id === el.dataset.id);
-      if (u && G.buyProteinUpgrade(u)) Toast.show({ emoji: u.emoji, title: u.name, subtitle: `${u.detail} · forever`, celebrate: true });
+      if (u && G.buyProteinUpgrade(u)) Toast.show({ icon: UI.upgradePic(u, 30), title: u.name, subtitle: `${u.detail} · forever`, celebrate: true });
     },
     hire: (el) => {
       const st = G.station(el.dataset.id);
-      if (st && G.hireTrainer(st)) Toast.show({ emoji: '🧑‍🏫', title: `${st.trainer} hired`, subtitle: `${st.name} income x2` });
+      if (st && G.hireTrainer(st)) Toast.show({ icon: Art.coach(st.id, 40), title: `${st.trainer} hired`, subtitle: `${st.name} income x2` });
     },
     'golden-upgrade': (el) => {
       const u = CFG.goldenUpgrades.find((x) => x.id === el.dataset.id);
-      if (u && G.buyGoldenUpgrade(u)) Toast.show({ emoji: u.emoji, title: `${u.name} Lv ${G.golden(u.id)}`, subtitle: u.detail });
+      if (u && G.buyGoldenUpgrade(u)) Toast.show({ icon: Pics.get(u.icon, 30), title: `${u.name} Lv ${G.golden(u.id)}`, subtitle: u.detail });
     },
     franchise: () => Sheets.franchise(),
     records: () => Sheets.records(),
@@ -136,6 +147,7 @@ const App = (() => {
     G.on('season', () => GymScreen.renderSeason());
     G.on('golden', () => Floor.renderGolden());
     G.on('purchase', () => { if (current === 'gym') Floor.refresh(); });
+    G.on('gear', (key) => { if (current === 'gym') GymScreen.onGear(key); });
     G.on('milestone', (m) => Toast.show(m));
     G.on('welcome', (report) => Sheets.welcome(report));
 

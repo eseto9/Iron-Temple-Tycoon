@@ -17,7 +17,7 @@ const Sheets = (() => {
   function welcome(report) {
     const body = Sheet.open(`
       <div class="welcome">
-        <div class="welcome-emoji" aria-hidden="true">🌙</div>
+        <div class="welcome-pic" aria-hidden="true">${Pics.get('moon', 56)}</div>
         <h2>Welcome back!</h2>
         <p class="muted">Your gym kept lifting while you were away.</p>
         <div class="welcome-amount">${Icons.reps(40)}<span class="num" data-count>0</span></div>
@@ -67,7 +67,7 @@ const Sheets = (() => {
         rowsHtml += `<div class="tier-row ${t <= tier ? 'reached' : ''}"><span class="tier-num num">${t}</span>${cell(t)}</div>`;
       }
       return `
-        ${head(`${CFG.season.emoji} ${esc(CFG.season.name)}`, `${G.seasonDaysLeft} days left · level the Resolution Rack to earn points`)}
+        ${head(`${esc(CFG.season.name)}`, `${G.seasonDaysLeft} days left · level the Resolution Rack to earn points`)}
         <div class="card season-hero">
           <div class="row gap-8"><strong class="num">Tier ${tier}/${CFG.season.tiers}</strong><span class="muted small num">${G.seasonPoints} pts</span></div>
           ${UI.progress(tier >= CFG.season.tiers ? 1 : (G.seasonPoints % per) / per, 'linear-gradient(90deg,#F0A15F,var(--clay))')}
@@ -102,7 +102,7 @@ const Sheets = (() => {
       const fmt = (n) => (def.metric === 'reps' ? Fmt.short(n) : Fmt.whole(n));
       return `
         <div class="card task ${claimed ? 'is-claimed' : ''}">
-          ${UI.badge(def.emoji, done ? '#D9EEDD' : '#EFE7DC', 44)}
+          ${UI.iconBadge(def.icon, done ? '#D9EEDD' : '#EFE7DC', 44)}
           <div class="grow">
             <h3>${esc(def.label(task.target))}</h3>
             <div class="ms-row">${UI.progress(progress / task.target, done ? 'var(--sage1)' : 'var(--aqua2)')}<span class="tiny muted num">${fmt(progress)}/${fmt(task.target)}</span></div>
@@ -132,7 +132,7 @@ const Sheets = (() => {
       if (!btn) return;
       const reward = G.claimTask(btn.dataset.period, btn.dataset.task);
       if (reward) {
-        Toast.show({ emoji: '💎', title: `+${reward} Protein`, subtitle: 'Task complete. Nice work!' });
+        Toast.show({ icon: Icons.protein(28), title: `+${reward} Protein`, subtitle: 'Task complete. Nice work!' });
         rerender(body, render());
       }
     });
@@ -195,15 +195,15 @@ const Sheets = (() => {
       const action = e.target.closest('[data-settings-action]')?.dataset.settingsAction;
       if (action === 'reset') confirmReset();
       else if (action === 'debug') debug();
-      else if (action === 'privacy') Toast.show({ emoji: '🔒', title: 'Private by design', subtitle: 'Everything stays on this device' });
-      else if (action === 'version' && ++versionTaps === 5) { Toast.show({ emoji: '🛠️', title: 'Debug menu unlocked' }); settings(); }
+      else if (action === 'privacy') Toast.show({ icon: Pics.get('lock', 28), title: 'Private by design', subtitle: 'Everything stays on this device' });
+      else if (action === 'version' && ++versionTaps === 5) { Toast.show({ icon: Pics.get('wrench', 28), title: 'Debug menu unlocked' }); settings(); }
     });
   }
 
   function confirmReset() {
     const body = Sheet.open(`
       <div class="welcome">
-        <div class="welcome-emoji" aria-hidden="true">🧹</div>
+        <div class="welcome-pic" aria-hidden="true">${Pics.get('broom', 56)}</div>
         <h2>Reset all progress?</h2>
         <p class="muted">Every currency, station, gym and upgrade goes back to the start. This can't be undone.</p>
         <button class="btn btn-danger big" data-confirm-reset>Reset everything</button>
@@ -213,7 +213,7 @@ const Sheets = (() => {
       G.resetProgress();
       Sheet.close();
       App.showTab('gym');
-      Toast.show({ emoji: '🌱', title: 'Fresh start', subtitle: 'Your garage gym awaits' });
+      Toast.show({ icon: Pics.get('seedling', 28), title: 'Fresh start', subtitle: 'Your garage gym awaits' });
     });
   }
 
@@ -241,7 +241,7 @@ const Sheets = (() => {
       Sheet.close();
       if (got) {
         App.showTab('gym');
-        setTimeout(() => Toast.show({ emoji: '⭐️', title: `+${got} Golden Plates banked`, subtitle: `Welcome to Home Gym Level ${G.homeGymLevel}`, celebrate: true }), 350);
+        setTimeout(() => Toast.show({ icon: Icons.plates(30), title: `+${got} Golden Plates banked`, subtitle: `Welcome to Home Gym Level ${G.homeGymLevel}`, celebrate: true }), 350);
       }
     });
   }
@@ -249,18 +249,18 @@ const Sheets = (() => {
   // ───────── Records (personal stats) ─────────
   function records() {
     const s = G.s, st = s.stats;
-    const item = (emoji, label, value) => `<div class="record"><span class="record-emoji">${emoji}</span><span class="grow muted small">${label}</span><strong class="num">${value}</strong></div>`;
+    const item = (emoji, label, value) => `<div class="record"><span class="record-pic">${Pics.get(emoji, 24)}</span><span class="grow muted small">${label}</span><strong class="num">${value}</strong></div>`;
     Sheet.open(`
       ${head('Your records', 'Personal bests across every franchise')}
       <div class="card records">
-        ${item('🪙', 'Lifetime Reps', Fmt.whole(s.lifetimeReps))}
-        ${item('📈', 'Best income', Fmt.rate(s.bestIncome))}
-        ${item('🗓️', 'Classes scheduled', Fmt.whole(st.classes))}
-        ${item('🏋️', 'Station levels bought', Fmt.whole(st.levels))}
-        ${item('🤩', 'Golden members welcomed', Fmt.whole(st.golden))}
-        ${item('🧑‍🏫', 'Trainers hired', Fmt.whole(st.trainers))}
-        ${item('🗺️', 'Gyms in your chain', `${G.gymCount} in ${G.cityCount} cities`)}
-        ${item('⭐️', 'Franchises opened', Fmt.whole(s.franchiseCount))}
+        ${item('coin', 'Lifetime Reps', Fmt.whole(s.lifetimeReps))}
+        ${item('chart', 'Best income', Fmt.rate(s.bestIncome))}
+        ${item('calendar', 'Classes scheduled', Fmt.whole(st.classes))}
+        ${item('strength', 'Station levels bought', Fmt.whole(st.levels))}
+        ${item('golden', 'Golden members welcomed', Fmt.whole(st.golden))}
+        ${item('whistle', 'Trainers hired', Fmt.whole(st.trainers))}
+        ${item('map', 'Gyms in your chain', `${G.gymCount} in ${G.cityCount} cities`)}
+        ${item('star', 'Franchises opened', Fmt.whole(s.franchiseCount))}
       </div>`);
   }
 
@@ -294,16 +294,16 @@ const Sheets = (() => {
   // ───────── First-launch onboarding ─────────
   function onboarding(done) {
     const cards = [
-      { emoji: '🏋️', title: 'Welcome to your Home Gym', text: 'A garage, a few dumbbells and a big dream. Open stations and watch members fill your floor.' },
-      { emoji: '🗓️', title: 'Run it on real time', text: 'Schedule classes into your actual day and watch members crowd in when they start.' },
-      { emoji: '✨', title: 'Grow into an empire', text: 'Open on-trend gyms across the map, then franchise for Golden Plates and permanent bonuses.' },
+      { pic: () => Art.station('freeWeights', 120), title: 'Welcome to your Home Gym', text: 'A garage, a few dumbbells and a big dream. Open stations and watch members fill your floor.' },
+      { pic: () => Pics.get('calendar', 104), title: 'Run it on real time', text: 'Schedule classes into your actual day and watch members crowd in when they start.' },
+      { pic: () => Pics.get('map', 104), title: 'Grow into an empire', text: 'Open on-trend gyms across the map, then franchise for Golden Plates and permanent bonuses.' },
     ];
     const el = document.createElement('div');
     el.className = 'onboarding';
     el.innerHTML = `
       <div class="ob-track">${cards.map((c) => `
         <section class="ob-card">
-          <div class="ob-art" aria-hidden="true">${c.emoji}</div>
+          <div class="ob-art" aria-hidden="true">${c.pic()}</div>
           <h2>${c.title}</h2>
           <p class="muted">${c.text}</p>
         </section>`).join('')}</div>

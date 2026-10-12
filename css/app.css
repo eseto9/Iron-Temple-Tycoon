@@ -665,3 +665,94 @@ body.on-map { overflow: hidden; }
 .slot-emoji { font-size: 24px; }
 .slot-class .ico { display: inline-block; vertical-align: -2px; }
 button.pick-row { width: 100%; text-align: left; }
+
+/* ═════════ v1.3: drawn art, gym switcher, map gym equipment, cheapest gyms ═════════ */
+.pic, .art { display: inline-block; flex: none; vertical-align: middle; }
+.art { image-rendering: auto; -webkit-user-drag: none; }
+.badge { position: relative; overflow: visible; }
+.badge .art, .badge .pic { display: block; }
+.badge-x {
+  position: absolute; right: -4px; bottom: -3px;
+  padding: 1px 5px; border-radius: 999px;
+  background: var(--sage2); color: #fff; font-size: 10px; font-weight: 900;
+  box-shadow: 0 0 0 2px var(--card);
+}
+.btn .pic, .pill-btn .pic, .chip .pic, .floor-class .pic { margin-right: 2px; }
+.chip .pic, .chip .art { vertical-align: -3px; }
+.ink { color: var(--text); }
+
+/* Gym switcher */
+.gym-switch {
+  display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;
+  margin: -4px calc(-1 * var(--margin)); padding: 4px var(--margin);
+  scroll-snap-type: x proximity;
+}
+.gym-switch::-webkit-scrollbar { display: none; }
+.gym-chip {
+  flex: none; display: inline-flex; align-items: center; gap: 6px;
+  min-height: 40px; padding: 0 14px 0 10px; border-radius: 999px;
+  background: var(--card); box-shadow: var(--shadow);
+  font-size: 13px; font-weight: 800; color: var(--text2); white-space: nowrap;
+  scroll-snap-align: start;
+  transition: transform .35s var(--spring), background .2s, color .2s;
+}
+.gym-chip:active { transform: scale(.95); }
+.gym-chip.on { background: linear-gradient(135deg, var(--sage1), var(--sage2)); color: #fff; }
+
+/* Map gym view */
+.gym-head .chips-line { margin-top: 6px; }
+.focus-chip { background: color-mix(in srgb, var(--tint) var(--badge-mix), var(--card-inset)); color: var(--text); }
+.match-tag {
+  display: inline-flex; align-items: center; gap: 3px;
+  padding: 2px 7px; border-radius: 7px;
+  background: color-mix(in srgb, var(--sage1) 16%, transparent); color: var(--sage2);
+  font-size: 11px; font-weight: 900;
+}
+.muted-chip { background: var(--card-inset); color: var(--text2); }
+.gear-row.bump, .gym-head.bump { animation: bump .45s var(--spring); }
+
+/* Gym Size bonus on the Home Gym card */
+.size-bonus { display: flex; flex-direction: column; gap: 6px; margin-top: 12px; padding: 12px 14px; border-radius: var(--r-inner); background: color-mix(in srgb, var(--sage1) 8%, var(--card-inset)); }
+.size-bonus .bar { height: 7px; }
+
+/* Map: next cheapest gym + price list */
+.map-bottom {
+  position: fixed; z-index: 5; left: 50%; transform: translateX(-50%);
+  bottom: calc(env(safe-area-inset-bottom) + 92px);
+  width: min(460px, calc(100% - 24px));
+  display: flex; flex-direction: column; align-items: center; gap: 8px;
+}
+.map-bottom .map-status { position: static; transform: none; font-size: 12px; padding: 7px 14px; }
+.map-next {
+  width: 100%; display: flex; align-items: center; gap: 12px;
+  padding: 10px 12px; text-align: left;
+  background: var(--glass); -webkit-backdrop-filter: blur(18px); backdrop-filter: blur(18px);
+  border: 1px solid var(--glass-line);
+}
+.next-text { display: flex; flex-direction: column; gap: 3px; min-width: 0; }
+.next-text strong { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.next-text .bar { height: 5px; display: block; }
+.next-text .bar-fill { display: block; }
+.next-price { display: inline-flex; align-items: center; gap: 4px; padding: 7px 10px; border-radius: 12px; background: var(--card-inset); font-weight: 900; font-size: 14px; }
+.next-price.ready { background: linear-gradient(135deg, var(--sage1), var(--sage2)); color: #fff; }
+.cheap-row { padding: 10px 12px; }
+.cheap-info { flex: 1; min-width: 0; display: flex; align-items: center; gap: 12px; text-align: left; }
+.cheap-info .grow { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.cheap-info strong { font-size: 15px; }
+.pin-trend { display: grid; place-items: center; }
+.pin-price {
+  position: absolute; left: 50%; top: 100%; transform: translate(-50%, 3px);
+  padding: 1px 6px; border-radius: 999px; background: rgba(255,255,255,.95);
+  color: #2B211B; font-size: 10px; font-weight: 900; white-space: nowrap;
+  box-shadow: 0 2px 6px rgba(43,33,27,.18);
+}
+.city-pin.can-afford { box-shadow: 0 0 0 3px #4F9D69, 0 0 14px rgba(79,157,105,.6), 0 4px 12px rgba(43,33,27,.25); }
+.city-pin.can-afford .pin-price { background: #4F9D69; color: #fff; }
+
+/* Pictures in sheets */
+.welcome-pic, .empty-pic { display: grid; place-items: center; margin-bottom: 2px; }
+.record-pic { width: 28px; display: grid; place-items: center; }
+.slot-pic { display: grid; place-items: center; width: 34px; }
+.ob-art .art, .ob-art .pic { width: 120px; height: 120px; }
+.floor-count { display: inline-flex; align-items: center; gap: 6px; }
+.floor-golden-hint .pic { vertical-align: -3px; }

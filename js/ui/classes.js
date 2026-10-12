@@ -28,7 +28,7 @@ const ClassesScreen = (() => {
           </div>
           <div class="grow slot-class">
             ${!unlocked ? `<span class="muted small">${Icons.lock(13)} Locked</span>`
-              : st ? `<span class="slot-emoji">${st.emoji}</span><span><strong>${esc(CFG.classes[st.id])}</strong><span class="muted tiny">${esc(st.name)} x${mult}</span></span>`
+              : st ? `<span class="slot-pic">${Art.station(st.id, 34)}</span><span><strong>${esc(CFG.classes[st.id])}</strong><span class="muted tiny">${esc(st.name)} x${mult}</span></span>`
               : '<span class="muted small">Empty slot</span>'}
           </div>
           ${!unlocked
@@ -51,14 +51,14 @@ const ClassesScreen = (() => {
         </div>
         ${live ? `
           <div class="class-live">
-            ${UI.badge(live.station.emoji, live.station.tint, 64)}
+            ${UI.stationBadge(live.station, 64)}
             <div class="grow">
               <h2>${esc(CFG.classes[live.station.id])}</h2>
               <p class="muted small">${esc(live.station.name)} income <strong class="income-text">x${+live.mult.toFixed(1)}</strong></p>
             </div>
           </div>` : `
           <div class="class-live">
-            ${UI.badge('🗓️', '#EFE7DC', 64)}
+            ${UI.iconBadge('calendar', '#EFE7DC', 64)}
             <div class="grow">
               <h2>Nothing scheduled</h2>
               <p class="muted small">${nowUnlocked ? 'Pick a class for this slot to boost a station right now.' : 'Unlock this time slot to run a class in it.'}</p>
@@ -100,7 +100,7 @@ function openClassPicker(slotId) {
         const otherSlot = other && !here && CFG.timeSlots.find((t) => t.id === other);
         return `
           <button class="card upg-row pick-row ${here ? 'owned' : ''}" data-pick="${st.id}">
-            ${UI.badge(st.emoji, st.tint, 46)}
+            ${UI.stationBadge(st, 46)}
             <div class="grow">
               <h3>${esc(CFG.classes[st.id])}</h3>
               <p class="small muted">${esc(st.name)} · now ${Fmt.rate(G.stationIncome(st) / G.stationBoosts(st).class)}${otherSlot ? ` · moves from ${otherSlot.name}` : ''}</p>
@@ -116,6 +116,6 @@ function openClassPicker(slotId) {
     if (!b) return;
     G.setClass(slotId, b.dataset.pick || null);
     Sheet.close();
-    if (b.dataset.pick) Toast.show({ emoji: '🗓️', title: `${CFG.classes[b.dataset.pick]} scheduled`, subtitle: `${slot.name} · ${slotRange(slot)} · x${mult}` });
+    if (b.dataset.pick) Toast.show({ icon: Art.station(b.dataset.pick, 36), title: `${CFG.classes[b.dataset.pick]} scheduled`, subtitle: `${slot.name} · ${slotRange(slot)} · x${mult}` });
   });
 }

@@ -95,8 +95,30 @@ const UI = {
     return `<div class="pill pill-${kind}" role="text" aria-label="${label}"><span class="pill-icon">${icon}</span><span class="num" data-k="${key || kind}">${value}</span></div>`;
   },
 
-  badge(emoji, tint, size = 52) {
-    return `<div class="badge" style="--tint:${tint};width:${size}px;height:${size}px;font-size:${Math.round(size * 0.48)}px">${emoji}</div>`;
+  /** Round pastel badge holding a picture (an <img> or <svg>). */
+  badge(pic, tint, size = 52) {
+    return `<div class="badge" style="--tint:${tint};width:${size}px;height:${size}px">${pic}</div>`;
+  },
+  /** Badge with a station's equipment art. */
+  stationBadge(st, size = 52) { return UI.badge(Art.station(st.id, Math.round(size * 0.86)), st.tint, size); },
+  /** Badge with an SVG icon. */
+  iconBadge(name, tint = '#EFE7DC', size = 48) { return UI.badge(Pics.get(name, Math.round(size * 0.62)), tint, size); },
+  /** Picture for an upgrade: station art for station boosts, otherwise its icon. */
+  upgradePic(u, size = 30) {
+    return u.icon === 'station' ? Art.station(u.effect.station, size) : Pics.get(u.icon, size);
+  },
+  upgradeBadge(u, tint, size = 48) {
+    const st = u.effect?.station && CFG.stations.find((x) => x.id === u.effect.station);
+    return UI.badge(UI.upgradePic(u, Math.round(size * (u.icon === 'station' ? 0.86 : 0.62))) + (u.icon === 'station' ? `<span class="badge-x">x${u.effect.value}</span>` : ''), tint || (st ? st.tint : '#EFE5D6'), size);
+  },
+
+  /** Live-updates the Gym Size part of a Home Gym card inside `root`. */
+  syncSize(root) {
+    const m = root.querySelector('[data-k="sizeMult"]');
+    if (!m) return;
+    UI.setText(m, Fmt.mult(G.sizeMult));
+    UI.setStyle(root.querySelector('[data-k="sizeBar"]'), 'width', `${((G.totalLevels % CFG.sizeBonus.every) / CFG.sizeBonus.every) * 100}%`);
+    UI.setText(root.querySelector('[data-k="sizeNext"]'), `${G.totalLevels}/${G.nextSizeAt} station levels → all income x${CFG.sizeBonus.mult} more. Levels on any station count, even Free Weights.`);
   },
 
   progress(fraction, color = 'var(--sage1)', key) {
@@ -109,7 +131,7 @@ const UI = {
     return `
       <section class="card home-card">
         <div class="row gap-14">
-          ${UI.badge('🏠', '#DCEBDF', 52)}
+          ${UI.iconBadge('home', '#DCEBDF', 52)}
           <div class="grow">
             <div class="row gap-8"><h3>Home Gym</h3><span class="chip chip-sage">Level ${lvl}</span></div>
             <p class="muted small">Your next franchise grows the gym's income and costs.</p>
@@ -118,6 +140,11 @@ const UI = {
         <div class="stat-row">
           <div class="stat"><span class="muted tiny">Station income</span><strong class="num">${Fmt.mult(G.homeGymIncomeMult)}</strong></div>
           <div class="stat"><span class="muted tiny">Cost</span><strong class="num">${Fmt.mult(G.homeGymCostMult)}</strong></div>
+        </div>
+        <div class="size-bonus">
+          <div class="row gap-8"><strong class="small">Gym Size bonus</strong><span class="chip chip-sage num" data-k="sizeMult">${Fmt.mult(G.sizeMult)}</span></div>
+          <div class="bar"><div class="bar-fill" data-k="sizeBar" style="width:${((G.totalLevels % CFG.sizeBonus.every) / CFG.sizeBonus.every) * 100}%"></div></div>
+          <p class="tiny muted num" data-k="sizeNext">${G.totalLevels}/${G.nextSizeAt} station levels → all income x${CFG.sizeBonus.mult} more. Levels on any station count, even Free Weights.</p>
         </div>
       </section>`;
   },
@@ -189,13 +216,13 @@ const Sheet = (() => {
 /* ───────── Toasts & milestone banner ───────── */
 const Toast = (() => {
   let timer = null;
-  function show({ emoji = '✨', title, subtitle = '', celebrate = false }) {
+  function show({ icon, title, subtitle = '', celebrate = false }) {
     document.querySelector('.toast')?.remove();
     const el = document.createElement('div');
     el.className = 'toast' + (celebrate ? ' celebrate' : '');
     el.setAttribute('role', 'status');
     el.innerHTML = `
-      <div class="toast-icon"><span class="pulse-ring"></span><span>${emoji}</span></div>
+      <div class="toast-icon"><span class="pulse-ring"></span>${icon || Pics.get('sparkle', 26)}</div>
       <div><strong>${esc(title)}</strong>${subtitle ? `<span class="muted small">${esc(subtitle)}</span>` : ''}</div>`;
     document.body.appendChild(el);
     requestAnimationFrame(() => el.classList.add('show'));

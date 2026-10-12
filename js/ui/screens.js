@@ -36,7 +36,7 @@ const UpgradesScreen = makeScreen(() => {
     const st = u.effect.station && G.station(u.effect.station);
     return `
       <article class="card upg-row ${locked ? 'locked' : ''}">
-        ${locked ? `<div class="badge lock-badge" style="width:48px;height:48px">${Icons.lock(18)}</div>` : UI.badge(u.emoji, st ? st.tint : '#EFE5D6', 48)}
+        ${locked ? `<div class="badge lock-badge" style="width:48px;height:48px">${Icons.lock(18)}</div>` : UI.upgradeBadge(u, null, 48)}
         <div class="grow">
           <h3>${esc(u.name)}</h3>
           <p class="small muted">${locked ? `Open ${esc(st.name)} first` : esc(G.upgradeEffectText(u))}</p>
@@ -49,7 +49,7 @@ const UpgradesScreen = makeScreen(() => {
     const locked = G.proteinUpgradeLocked(u);
     return `
       <article class="card upg-row ${have ? 'owned' : ''} ${locked ? 'locked' : ''}">
-        ${UI.badge(u.emoji, '#D6F2F8', 48)}
+        ${UI.upgradeBadge(u, '#D6F2F8', 48)}
         <div class="grow">
           <h3>${esc(u.name)}</h3>
           <p class="small muted">${locked ? `Needs ${esc(CFG.proteinUpgrades.find((x) => x.id === u.requires).name)} first` : esc(u.detail)}</p>
@@ -65,12 +65,12 @@ const UpgradesScreen = makeScreen(() => {
     ${UI.homeGymCard()}
     ${UI.sectionHead('Coin Upgrades', 'Paid in Reps · last for this gym only and reset when you franchise.', Icons.reps(22))}
     <div class="list">
-      ${available.length ? available.map(coinRow).join('') : '<div class="card empty-state"><div class="empty-emoji">🏅</div><h3>Every coin upgrade owned</h3><p class="muted small">This gym is fully kitted out.</p></div>'}
+      ${available.length ? available.map(coinRow).join('') : `<div class="card empty-state"><div class="empty-pic">${Pics.get('trophy', 56)}</div><h3>Every coin upgrade owned</h3><p class="muted small">This gym is fully kitted out.</p></div>`}
     </div>
     ${owned.length ? `
       <details class="owned-list card">
         <summary><span class="grow">Owned this franchise</span><span class="chip chip-sage">${owned.length}</span></summary>
-        <div class="owned-chips">${owned.map((u) => `<span class="chip">${u.emoji} ${esc(u.name)}</span>`).join('')}</div>
+        <div class="owned-chips">${owned.map((u) => `<span class="chip">${UI.upgradePic(u, 16)} ${esc(u.name)}</span>`).join('')}</div>
       </details>` : ''}
     ${UI.sectionHead('Protein Upgrades', 'Paid in Protein from tasks, milestones and golden members · permanent forever.', Icons.protein(22))}
     <div class="list">${CFG.proteinUpgrades.map(proteinRow).join('')}</div>`;
@@ -84,7 +84,7 @@ const StaffScreen = makeScreen(() => {
     const cost = G.trainerCost(st);
     return `
       <article class="card upg-row ${open ? '' : 'locked'} ${hired ? 'owned' : ''}">
-        ${open ? UI.badge(st.emoji, st.tint, 48) : `<div class="badge lock-badge" style="width:48px;height:48px">${Icons.lock(18)}</div>`}
+        ${open ? UI.badge(Art.coach(st.id, 46), st.tint, 48) : `<div class="badge lock-badge" style="width:48px;height:48px">${Icons.lock(18)}</div>`}
         <div class="grow">
           <h3>${esc(st.trainer)}</h3>
           <p class="small muted">${open ? `Doubles ${esc(st.name)} income` : `Open ${esc(st.name)} first`}</p>
@@ -114,7 +114,7 @@ const PrestigeScreen = (() => {
       const cost = G.goldenUpgradeCost(u);
       return `
         <article class="card upg-row ${maxed ? 'owned' : ''}">
-          ${UI.badge(u.emoji, '#FBEFC9', 48)}
+          ${UI.iconBadge(u.icon, '#FBEFC9', 48)}
           <div class="grow">
             <h3>${esc(u.name)}</h3>
             <p class="small muted"><span class="num strong">Lv ${lvl}/${u.maxLevel}</span> · ${esc(u.detail)}</p>
@@ -136,11 +136,11 @@ const PrestigeScreen = (() => {
           <p class="tiny muted num" data-k="nextPlate">${Fmt.whole(G.s.runReps)} / ${Fmt.whole(G.nextPlateAt)} Reps to the next plate</p>
         </div>
         <div class="chip-row">
-          <span class="chip">🗺️ ${G.gymCount} gym${G.gymCount === 1 ? '' : 's'} in your chain</span>
+          <span class="chip">${Pics.get('map', 14)} ${G.gymCount} gym${G.gymCount === 1 ? '' : 's'} in your chain</span>
           <span class="chip chip-gold">Chain bonus x${G.chainMult.toFixed(1)}</span>
         </div>
-        <button class="btn btn-gold big" data-action="franchise" data-k="franchiseBtn" ${pending < 1 ? 'disabled' : ''}>⭐️ Open a Franchise</button>
-        <button class="pill-btn" data-action="records">🏆 Records</button>
+        <button class="btn btn-gold big" data-action="franchise" data-k="franchiseBtn" ${pending < 1 ? 'disabled' : ''}>${Pics.get('star', 20)} Open a Franchise</button>
+        <button class="pill-btn" data-action="records">${Pics.get('trophy', 18)} Records</button>
       </section>
       ${UI.sectionHead('Golden Plate Upgrades', 'Permanent. They survive every franchise.', Icons.plates(22))}
       <div class="list">${CFG.goldenUpgrades.map(row).join('')}</div>
