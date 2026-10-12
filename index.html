@@ -39,7 +39,7 @@
   --up: #4cc274;
   --down: #ef6a55;
   --on-yellow: #1a1606;
-  --dock-h: 132px;
+  --dock-h: 186px;
   --f-display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
   --f-body: "Barlow", "Segoe UI", system-ui, -apple-system, sans-serif;
   --f-num: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
@@ -145,6 +145,27 @@ button { font: inherit; color: inherit; -webkit-user-select: none; user-select: 
 .ol-lines div { display: flex; justify-content: space-between; gap: 10px; }
 .ol-lines .ol-next { margin: 4px 0 0; font-size: 13.5px; line-height: 1.45; }
 .warn-c { color: var(--orange); }
+/* daily money ledger */
+.ledger h3 { margin: 6px 0 2px; font-family: var(--f-num); font-size: 10.5px; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); font-weight: 500; }
+.ledger .ln { display: flex; justify-content: space-between; gap: 10px; font-size: 13.5px; padding: 2px 0; }
+.ledger .ln.sub { border-top: 1px solid var(--line); margin-top: 3px; padding-top: 5px; font-weight: 700; }
+.ledger .ln.total { border-top: 2px solid var(--line); margin-top: 6px; padding-top: 7px; font-weight: 700; font-size: 15px; }
+.ledger .ln .num { white-space: nowrap; }
+/* gym mood */
+.meter { display: grid; grid-template-columns: auto minmax(0, 1fr) auto; gap: 10px; align-items: center; font-size: 13.5px; }
+.meter .bar { height: 8px; background: var(--panel-2); border-radius: 4px; overflow: hidden; }
+.meter .bar > i { display: block; height: 100%; border-radius: 4px; transition: width .3s; }
+.mood-parts { display: flex; flex-wrap: wrap; gap: 4px 12px; font-size: 12.5px; color: var(--muted); }
+.mood-parts b { font-weight: 600; }
+.rival { border: 1px solid var(--down); border-radius: 7px; padding: 10px 12px; display: grid; gap: 6px; background: rgba(239,106,85,.06); }
+.rival .nm { font-family: var(--f-display); font-weight: 900; font-size: 20px; text-transform: uppercase; line-height: 1; }
+/* focus picker in the dock */
+.focus { grid-column: 1 / -1; display: flex; gap: 6px; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.focus::-webkit-scrollbar { display: none; }
+.focus button { flex: none; font-family: var(--f-num); font-size: 11.5px; font-weight: 700; padding: 0 11px; min-height: 32px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: var(--muted); cursor: pointer; }
+.focus button[aria-pressed="true"] { background: var(--chalk); border-color: var(--chalk); color: var(--floor); }
+.focus-desc { grid-column: 1 / -1; font-size: 11.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: -2px; }
+.codebox { width: 100%; min-height: 110px; padding: 10px; border-radius: 6px; border: 1px solid var(--line); background: var(--panel-2); color: var(--chalk); font: 500 12px var(--f-num); box-sizing: border-box; resize: vertical; word-break: break-all; }
 
 /* gym scene */
 .scene { position: relative; border-radius: 7px; overflow: hidden; background: var(--panel-2); }
@@ -194,13 +215,13 @@ button { font: inherit; color: inherit; -webkit-user-select: none; user-select: 
 /* action dock + tab bar */
 .bottom { position: fixed; left: 0; right: 0; bottom: 0; z-index: 8; background: var(--panel); border-top: 1px solid var(--line); padding-bottom: env(safe-area-inset-bottom, 0px); }
 .dock { max-width: 680px; margin: 0 auto; padding: 8px 16px 6px; display: grid; grid-template-columns: minmax(0, 1fr) 110px; gap: 8px; }
-.dock button { border-radius: 10px; min-height: 58px; cursor: pointer; display: grid; align-content: center; justify-items: start; gap: 1px; padding: 6px 14px; text-align: left; border: 0; }
+.dock > button { border-radius: 10px; min-height: 58px; cursor: pointer; display: grid; align-content: center; justify-items: start; gap: 1px; padding: 6px 14px; text-align: left; border: 0; }
 .dock .coach { background: var(--yellow); color: var(--on-yellow); }
 .dock .rest { background: var(--panel-2); border: 1px solid var(--line); }
 .dock .t { font-family: var(--f-display); font-weight: 900; font-size: 21px; text-transform: uppercase; line-height: 1; }
 .dock .s { font-family: var(--f-num); font-size: 11px; font-weight: 700; opacity: .8; }
-.dock button:active:not(:disabled) { transform: scale(.98); }
-.dock button:disabled { opacity: .45; cursor: not-allowed; }
+.dock > button:active:not(:disabled) { transform: scale(.98); }
+.dock > button:disabled { opacity: .45; cursor: not-allowed; }
 nav.tabs .in { max-width: 680px; margin: 0 auto; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); }
 nav.tabs button { background: none; border: 0; cursor: pointer; display: grid; justify-items: center; gap: 2px; padding: 6px 2px 8px; color: var(--muted); font-size: 10.5px; font-weight: 600; position: relative; min-height: 50px; }
 nav.tabs svg { width: 22px; height: 22px; }
@@ -248,7 +269,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
       <div><div class="k">Age</div><div class="big" id="hAge">22y 0d</div></div>
       <div><div class="k" style="text-align:right">Cash</div><div class="big cash" id="hCash">$0.00</div></div>
     </div>
-    <div class="sub-line"><span>Energy <b id="hEn">100/100</b></span><span>Dues <b id="hRate">$0</b>/day</span><span>Net <b id="hNet">$0</b></span></div>
+    <div class="sub-line"><span>Energy <b id="hEn">100/100</b></span><span>Earn <b id="hIn" class="up-c">$0</b>/day</span><span>Pay <b id="hOut" class="down-c">$0</b>/day</span></div>
     <div class="ebar"><i id="hEnBar"></i></div>
     <button class="ticker" type="button" id="logBtn"><span id="hTick">Welcome to your gym.</span><span class="k">Log ›</span></button>
   </header>
@@ -265,6 +286,8 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
 
 <div class="bottom">
   <div class="dock">
+    <div class="focus" id="focusRow" role="group" aria-label="Today's focus"></div>
+    <div class="focus-desc" id="focusDesc"></div>
     <button class="coach" id="coachBtn" type="button"><span class="t">Coach clients</span><span class="s" id="coachSub">+$3.00 · −8 energy · 1 day</span></button>
     <button class="rest" id="restBtn" type="button"><span class="t">Rest</span><span class="s">+35 energy · 1 day</span></button>
   </div>
@@ -385,7 +408,8 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
       goods: null, store: 50, shelves: 0,
       runEarned: 0, lifetime: 0, hustled: 0, reps: 0,
       legacy: 0, lives: 1, bestNet: 0, nwHist: [], log: [], warm: {}, warmOpen: true,
-      cd: {}, nextEvent: 18, name: "Iron Temple", dead: false
+      cd: {}, nextEvent: 18, name: "Iron Temple", dead: false,
+      focus: "balanced", happy: 65, clean: 80, staff: {}, rival: null, debtDays: 0, seasonName: "", haptics: true
     };
   }
   let S = fresh();
@@ -429,7 +453,98 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     return m;
   }
   const genRate = g => g.rate * genMult(g.id) * globalMult();
-  function income() { let t = 0; GENS.forEach(g => { t += (S.owned[g.id] || 0) * genRate(g); }); return t; }
+  function baseDues() { let t = 0; GENS.forEach(g => { t += (S.owned[g.id] || 0) * genRate(g); }); return t; }
+
+  // ---- daily focus ----
+  const FOCUS = [
+    { id: "balanced", name: "Balanced",     desc: "A normal day. No bonuses, no costs." },
+    { id: "sales",    name: "Push sales",   desc: "Dues +20%, coaching +40%. Members get annoyed: happiness −4 a day." },
+    { id: "clean",    name: "Deep clean",   desc: "Cleanliness +30, happiness +2. Dues −10% while areas are closed off." },
+    { id: "events",   name: "Member event", desc: "Costs about a tenth of a day's dues. Happiness +6. Hurts any rival." },
+    { id: "self",     name: "Self-care",    desc: "+15 energy and +1 physique a day. Dues −10%, happiness −2." }
+  ];
+  const focus = () => FOCUS.find(f => f.id === S.focus) || FOCUS[0];
+  const focusDuesMult = () => ({ sales: 1.2, clean: 0.9, self: 0.9 }[S.focus] || 1);
+  const coachToday = () => coachValue() * (S.focus === "sales" ? 1.4 : 1);
+
+  // ---- seasons (day 0 is January 1) ----
+  const SEASONS = [
+    { from: 0, to: 59, name: "Resolution season", mult: 1.25 }, { from: 60, to: 151, name: "Spring", mult: 1 },
+    { from: 152, to: 243, name: "Summer shred", mult: 1.15 }, { from: 244, to: 334, name: "Fall", mult: 1 },
+    { from: 335, to: 364, name: "Holiday slump", mult: 0.8 }
+  ];
+  const season = () => { const d = S.day % 365; return SEASONS.find(x => d >= x.from && d <= x.to); };
+
+  // ---- staff ----
+  const STAFF = [
+    { id: "desk",    name: "Front Desk",  note: "Dues ×1.12, happiness +3",                                hire: 50,   base: 6,  pct: 0.03 },
+    { id: "cleaner", name: "Cleaner",     note: "Cleanliness +10 every day",                               hire: 80,   base: 8,  pct: 0.02 },
+    { id: "manager", name: "Gym Manager", note: "Coaches for you on rest days, happiness +4, fights rivals", hire: 2500, base: 60, pct: 0.05, tier: 2 }
+  ];
+  const wage = st => st.base + st.pct * baseDues();
+  const staffWages = () => STAFF.reduce((a, st) => a + (S.staff[st.id] ? wage(st) : 0), 0);
+
+  // ---- amenities (placed on the floor, they raise happiness) ----
+  const AMEN = [
+    { id: "plant",    name: "Potted Plant",          note: "+1.5 happiness each, up to 6 count", base: 25,    grow: 1.25 },
+    { id: "fountain", name: "Water Fountain",        note: "+3 happiness each, up to 3 count",   base: 60,    grow: 1.4 },
+    { id: "lockers",  name: "Locker Room & Showers", note: "+12 happiness (one counts)",         base: 2500,  grow: 2 },
+    { id: "lounge",   name: "Recovery Lounge",       note: "+8 happiness (one counts)",          base: 40000, grow: 2 }
+  ];
+  const amenCost = a => a.base * Math.pow(a.grow, S.owned[a.id] || 0);
+  const nameOf = t => (GEN_BY_ID[t] || AMEN.find(a => a.id === t) || { name: t }).name;
+  const placedOf = t => S.layout.filter(i => i.t === t && i.c != null).length;
+  // how full the floor is, and how many items have no open space around them
+  function floorStats() {
+    const grid = occupied();
+    let used = 0; grid.forEach(r => r.forEach(v => { if (v) used++; }));
+    let cramped = 0;
+    S.layout.forEach(it => {
+      if (it.c == null) return;
+      const fp = FP[it.t]; let free = 0;
+      for (let c = it.c; c < it.c + fp.w; c++) { if (it.r - 1 >= 0 && !grid[it.r - 1][c]) free++; if (it.r + fp.h < ROWS && !grid[it.r + fp.h][c]) free++; }
+      for (let r = it.r; r < it.r + fp.h; r++) { if (it.c - 1 >= 0 && !grid[r][it.c - 1]) free++; if (it.c + fp.w < COLS && !grid[r][it.c + fp.w]) free++; }
+      if (!free) cramped++;
+    });
+    return { fill: used / (COLS * ROWS), cramped };
+  }
+  function moodParts() {
+    const g = floorStats();
+    const parts = [["Base", 55]];
+    const am = Math.min(placedOf("plant"), 6) * 1.5 + Math.min(placedOf("fountain"), 3) * 3 + (placedOf("lockers") ? 12 : 0) + (placedOf("lounge") ? 8 : 0);
+    if (am) parts.push(["Amenities", am]);
+    parts.push(["Cleanliness", Math.round((S.clean - 60) * 0.3)]);
+    if (g.fill > 0.55) parts.push(["Crowded floor", -Math.round((g.fill - 0.55) * 60)]);
+    if (g.cramped) parts.push([g.cramped + " boxed-in item" + (g.cramped > 1 ? "s" : ""), -Math.min(16, 4 * g.cramped)]);
+    if (S.staff.desk) parts.push(["Front desk", 3]);
+    if (S.staff.manager) parts.push(["Manager", 4]);
+    return parts;
+  }
+  const moodTarget = () => Math.max(0, Math.min(100, moodParts().reduce((a, x) => a + x[1], 0)));
+  const happyMult = () => 0.6 + 0.8 * S.happy / 100;
+  const happyLabel = h => h < 35 ? "Members are canceling" : h < 50 ? "Grumbling" : h < 70 ? "Content" : h < 85 ? "Happy" : "Loving it";
+  const rivalCut = () => S.rival ? 0.1 + S.rival.str * 0.0025 : 0;
+  // dues you actually collect today, after every modifier
+  function income() { return baseDues() * happyMult() * season().mult * (1 - rivalCut()) * (S.staff.desk ? 1.12 : 1) * focusDuesMult(); }
+  const eventCost = () => S.focus === "events" ? 10 + income() * 0.1 : 0;
+  const interestToday = () => S.bankOpen && S.savings > 0 ? S.savings * 0.04 / 365 : 0;
+
+  // ---- haptics (vibrate where supported; iPhone Safari gets the system switch tick) ----
+  let hapLabel = null;
+  function buzz(kind) {
+    if (!S.haptics) return;
+    try {
+      if (navigator.vibrate) { navigator.vibrate(kind === "warn" ? [35, 60, 35] : kind === "big" ? 25 : 12); return; }
+      if (!hapLabel) {
+        hapLabel = document.createElement("label"); hapLabel.setAttribute("aria-hidden", "true");
+        hapLabel.style.cssText = "position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none";
+        const i = document.createElement("input"); i.type = "checkbox"; i.setAttribute("switch", ""); i.tabIndex = -1;
+        hapLabel.append(i); document.body.append(hapLabel);
+      }
+      hapLabel.click();
+      if (kind === "warn") setTimeout(() => hapLabel.click(), 110);
+    } catch (e) {}
+  }
   const coachMult = () => (S.certs.cpt ? 2 : 1) * (S.certs.kin ? 3 : 1) * legacyMult();
   const coachValue = () => (3 + income() * 0.5) * coachMult();
   function hustleMult(h) {
@@ -453,10 +568,12 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
 
   function burnItems() {
     const items = [];
-    if (home().burn) items.push(["Rent · " + home().name, home().burn]);
-    items.push(["Meals · " + food().name, food().burn]);
+    if (home().burn) items.push(["Rent · " + home().name, home().burn, "life"]);
+    items.push(["Meals · " + food().name, food().burn, "life"]);
     const oh = income() * 0.1;
     if (oh > 0) items.push(["Gym lease & utilities", oh]);
+    STAFF.forEach(st => { if (S.staff[st.id]) items.push([st.name + " wages", wage(st)]); });
+    if (S.focus === "events") items.push(["Member event", eventCost()]);
     GEAR.forEach(g => { if (S.gear[g.id] && g.burn) items.push([g.name + " upkeep", g.burn]); });
     S.loans.forEach(l => items.push([l.kind + " loan payment", Math.min(l.pay, l.bal)]));
     return items;
@@ -514,20 +631,24 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     if (S.dead) return;
     S.day++;
     const dues = income();
+    const bills = burn();
     if (dues > 0) earn(dues);
-    S.energy = Math.min(maxEnergy(), S.energy + food().regen);
-    let bills = home().burn + food().burn + dues * 0.1;
-    GEAR.forEach(g => { if (S.gear[g.id] && g.burn) bills += g.burn; });
-    S.loans.forEach(l => { const p = Math.min(l.pay, l.bal); l.bal -= p; bills += p; });
+    S.loans.forEach(l => { l.bal -= Math.min(l.pay, l.bal); });
     const paid = S.loans.filter(l => l.bal <= 0.005);
     if (paid.length) { paid.forEach(l => logMsg("Paid off your " + l.kind.toLowerCase() + " loan.")); S.loans = S.loans.filter(l => l.bal > 0.005); S.credit += 15; }
     S.cash -= bills;
     let stress = "";
     if (S.cash < 0) {
-      S.cash *= 1.01; S.credit -= 4;
-      S.bonusDays -= 2; stress = " Broke: stress cost you 2 extra days.";
-    } else if (S.loans.length) S.credit += 0.4;
-    else S.credit += 0.08;
+      // in debt: you can't buy food, so no energy comes back, and the stress costs life
+      S.cash *= 1.01; S.credit -= 4; S.debtDays++;
+      S.bonusDays -= 2; stress = " In debt (day " + S.debtDays + " of 14): skipped meals, −2 days of life.";
+    } else {
+      S.debtDays = 0;
+      S.energy = Math.min(maxEnergy(), S.energy + food().regen);
+    }
+    if (S.focus === "self") { S.energy = Math.min(maxEnergy(), S.energy + 15); S.physique = Math.min(100, S.physique + 1); }
+    gymDay();
+    if (S.cash >= 0) S.credit += S.loans.length ? 0.4 : 0.08;
     S.credit = Math.max(300, Math.min(850, S.credit));
     if (S.bankOpen && S.savings > 0) S.savings *= 1 + 0.04 / 365;
     ensureGoods(); walkMarkets();
@@ -548,8 +669,47 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     checkWarm();
     const left = daysLeft();
     if (left <= 0) { die(); return; }
+    if (S.debtDays >= 14) { die("starved"); return; }
+    if (S.debtDays === 3 || S.debtDays === 7 || S.debtDays === 11) {
+      notify("In debt for " + S.debtDays + " days", "You can't afford food. You get no energy back and lose 2 extra days of life each day. After 14 days in a row below $0 you starve and this life ends. " + (14 - S.debtDays) + " days to get back above $0.", "I'll fix it");
+      buzz("warn");
+    }
     checkOutlook();
     if (S.day >= S.nextEvent) { S.nextEvent = S.day + Math.floor(rnd(14, 32)); fireEvent(); }
+  }
+  function gymDay() {
+    const placedCount = S.layout.filter(i => i.c != null).length;
+    S.clean = Math.max(0, Math.min(100, S.clean - (2 + placedCount * 0.12) + (S.staff.cleaner ? 10 : 0) + (S.focus === "clean" ? 30 : 0)));
+    const fd = { sales: -4, clean: 2, events: 6, self: -2 }[S.focus] || 0;
+    S.happy = Math.max(0, Math.min(100, S.happy + (moodTarget() - S.happy) * 0.25 + fd));
+    const since = id => S.day - (S.cd[id] ?? -999);
+    if (S.happy < 35 && since("warnHappy") >= 20) {
+      S.cd.warnHappy = S.day;
+      notify("Members are canceling", "Happiness is down to " + Math.round(S.happy) + ". Unhappy members cancel, so dues drop. Clean up, give equipment some space, add amenities, or run a member event.");
+    }
+    if (S.clean < 25 && since("dirty") >= 12) {
+      S.cd.dirty = S.day; S.happy = Math.max(0, S.happy - 8);
+      notify("Members complain about the smell", "The locker area is gross and people noticed. Happiness −8. A Deep clean day or a Cleaner fixes this.");
+    }
+    const sn = season().name;
+    if (S.seasonName && S.seasonName !== sn) logMsg(sn + " starts. Dues ×" + season().mult + ".");
+    S.seasonName = sn;
+    if (S.rival) {
+      S.rival.str += (55 - S.happy) * 0.25 - (S.focus === "events" ? 4 : 0) - (S.focus === "sales" ? 1.5 : 0) - (S.staff.manager ? 1 : 0);
+      S.rival.str = Math.min(150, S.rival.str);
+      if (S.rival.str <= 0) {
+        const prize = Math.max(50, baseDues() * 10);
+        earn(prize); S.happy = Math.min(100, S.happy + 5); S.cd.rival = S.day;
+        logMsg(S.rival.name + " closed. Their members joined you: +" + money(prize) + ".");
+        notify(S.rival.name + " closed", "Their members came over to you. You get " + money(prize) + " in sign-up fees and happiness +5.", "Nice");
+        S.rival = null;
+      }
+    } else if (S.day > 45 && S.runEarned > 1000 && since("rival") >= 150 && Math.random() < 0.012) {
+      S.rival = { name: pick(["Flex Factory", "PumpHaus", "Iron Republic", "Gainz Garage", "Apex Athletics", "Barbell Barn"]), str: 100 };
+      logMsg(S.rival.name + " opened across the street.");
+      openModal("A rival gym opened", S.rival.name + " opened across the street and is pulling your members away. They take " + Math.round(rivalCut() * 100) + "% of your dues until you win people back. Keep happiness above 55, run member events and push sales to wear them down.", [["Game on", () => {}]]);
+      buzz("warn");
+    }
   }
   function afterAction() { refresh(); save(); }
 
@@ -563,7 +723,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   function doCoach() {
     if (S.dead || modalOpen || S.energy < COACH_EN) return;
     S.energy -= COACH_EN;
-    const v = coachValue(); earn(v); S.reps++;
+    const v = coachToday(); earn(v); S.reps++; buzz();
     const m = people.filter(p => p.role === "member" && !p.hidden);
     if (m.length) { selected = pick(m); selectedUntil = performance.now() + 3500; }
     floaty("+" + money(v), el("coachBtn"));
@@ -573,21 +733,23 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   function doRest() {
     if (S.dead || modalOpen) return;
     S.energy = Math.min(maxEnergy(), S.energy + REST_EN);
-    passDay("Rest day");
+    buzz();
+    if (S.staff.manager) { const v = coachValue() * 0.6; earn(v); passDay("Rest day. Your manager coached for " + money(v)); }
+    else passDay("Rest day");
     afterAction();
   }
   function doHustle(h, btn) {
     if (S.dead || modalOpen || S.energy < h.en) return;
     S.energy -= h.en;
     const pay = h.max * rnd(0.4, 1) * hustleMult(h);
-    earn(pay); S.hustled += pay;
+    earn(pay); S.hustled += pay; buzz();
     floaty("+" + money(pay), btn);
     passDay(h.name + " paid " + money(pay));
     afterAction();
   }
   function doTrain() {
     if (S.dead || modalOpen || S.energy < 20 || S.physique >= 100) return;
-    S.energy -= 20; S.physique++;
+    S.energy -= 20; S.physique++; buzz();
     passDay("Trained yourself (physique " + S.physique + ")");
     afterAction();
   }
@@ -620,7 +782,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   }
   function outlook() {
     const dues = income(), bills = burn();
-    const coachDay = coachValue() * Math.min(1, food().regen / COACH_EN); // what steady coaching adds per day
+    const coachDay = coachToday() * Math.min(1, food().regen / COACH_EN); // what steady coaching adds per day
     const net = dues + coachDay - bills;
     const left = Math.floor(daysLeft());
     const brokeIn = net < 0 ? Math.floor(Math.max(0, S.cash) / -net) : Infinity;
@@ -656,7 +818,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     } else if (o.net < 0 && o.brokeIn < 15 && since("warnCash") >= 15) {
       S.cd.warnCash = S.day;
       openModal("Money is running out",
-        "You're losing " + money(-o.net) + " a day, even coaching every day. Cash runs out in " + o.brokeIn + " days, and every day under $0 costs you 2 extra days of life. Make " + money(-o.net) + " more per day or cut costs with cheaper housing or meals.",
+        "You're losing " + money(-o.net) + " a day, even coaching every day. Cash runs out in " + o.brokeIn + " days. Below $0 you skip meals, lose 2 extra days of life a day, and after 14 days you starve. Make " + money(-o.net) + " more per day or cut costs with cheaper housing or meals.",
         [["Show bills", () => { setTab("floor"); burnOpen = true; }], ["Keep going", () => {}]]);
     } else if ((o.left === 30 || o.left === 10) && since("warnSoon") >= 5) {
       S.cd.warnSoon = S.day;
@@ -726,15 +888,18 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
 
   // ======================= DEATH / RESTART =======================
   const starsFor = nw => Math.floor(Math.sqrt(Math.max(0, nw) / 2e4));
-  function die() {
-    S.dead = true; save();
+  function die(reason) {
+    S.dead = true; S.deathReason = reason || S.deathReason || ""; save(); buzz("warn");
     const stars = Math.max(S.legacy, starsFor(S.bestNet));
-    openModal("Final whistle",
-      "You passed away at " + ydays(ageDays()) + " after running " + S.name + " for " + S.day + " days. Final net worth: " + money(netWorth()) + ". Your legacy is " + stars + " ★. Each star adds 10% to everything you earn next life.",
+    const how = S.deathReason === "starved"
+      ? "You couldn't afford food for 14 days straight and starved at " + ydays(ageDays()) + "."
+      : "You passed away at " + ydays(ageDays()) + ".";
+    openModal(S.deathReason === "starved" ? "Starved" : "Final whistle",
+      how + " You ran " + S.name + " for " + S.day + " days. Final net worth: " + money(netWorth()) + ". Your legacy is " + stars + " ★. Each star adds 10% to everything you earn next life.",
       [["Start a new life", () => newLife(stars)]], true);
   }
   function newLife(stars) {
-    const keep = { legacy: stars, lives: S.lives + 1, name: S.name, lifetime: S.lifetime };
+    const keep = { legacy: stars, lives: S.lives + 1, name: S.name, lifetime: S.lifetime, haptics: S.haptics };
     S = Object.assign(fresh(), keep);
     ensureGoods();
     logMsg("Life #" + S.lives + " begins. Legacy " + stars + " ★.");
@@ -751,8 +916,39 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   }
 
   // ======================= SAVE =======================
-  function save() { try { localStorage.setItem(SAVE_KEY, JSON.stringify(S)); } catch (e) {} }
-  function load() { try { const r = localStorage.getItem(SAVE_KEY); if (r) return Object.assign(fresh(), JSON.parse(r)); } catch (e) {} return null; }
+  // main save every action, plus an automatic backup every 10 days in case the main one gets damaged
+  function save() {
+    try {
+      const json = JSON.stringify(S);
+      localStorage.setItem(SAVE_KEY, json);
+      if (S.day % 10 === 0 || !localStorage.getItem(SAVE_KEY + ":bak")) localStorage.setItem(SAVE_KEY + ":bak", json);
+    } catch (e) {}
+  }
+  const validSave = o => o && typeof o === "object" && isFinite(o.cash) && isFinite(o.day) && o.owned && typeof o.owned === "object" && Array.isArray(o.layout || []);
+  let restoredFromDay = null;
+  function load() {
+    let damaged = false;
+    try { const r = localStorage.getItem(SAVE_KEY); if (r) { const o = JSON.parse(r); if (validSave(o)) return Object.assign(fresh(), o); damaged = true; } } catch (e) { damaged = true; }
+    const b = readBackup();
+    if (b) { if (damaged) restoredFromDay = b.day; return Object.assign(fresh(), b); }
+    return null;
+  }
+  function readBackup() { try { const b = localStorage.getItem(SAVE_KEY + ":bak"); if (b) { const o = JSON.parse(b); if (validSave(o)) return o; } } catch (e) {} return null; }
+  function exportCode() {
+    const copy = Object.assign({}, S, { log: S.log.slice(0, 5) });
+    return "ITT1:" + btoa(unescape(encodeURIComponent(JSON.stringify(copy))));
+  }
+  function importCode(code) {
+    try {
+      const raw = code.trim().replace(/^ITT1:/, "");
+      const o = JSON.parse(decodeURIComponent(escape(atob(raw))));
+      if (!validSave(o)) return false;
+      S = Object.assign(fresh(), o);
+      ensureGoods(); syncLayout(); resetScene(); lastTier = -1; buildTab(); save();
+      logMsg("Loaded a backup code (day " + S.day + ").");
+      return true;
+    } catch (e) { return false; }
+  }
 
   // =====================================================================
   // GYM FLOOR: a grid you can rearrange. Each owned item gets placed
@@ -767,7 +963,11 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     bar:   { w: 2, h: 3, anchor: [18, 4] },
     sauna: { w: 3, h: 4, anchor: [0, 0] },
     pool:  { w: 7, h: 2, anchor: [13, 7] },
-    arena: { w: 4, h: 2, anchor: [8, 6] }
+    arena: { w: 4, h: 2, anchor: [8, 6] },
+    plant: { w: 1, h: 1, anchor: [19, 8] },
+    fountain: { w: 1, h: 1, anchor: [0, 4] },
+    lockers: { w: 3, h: 2, anchor: [0, 5] },
+    lounge: { w: 2, h: 2, anchor: [16, 6] }
   };
   const SPOTS = {
     mat: [{ x: 40, y: 28, act: "mat" }],
@@ -777,7 +977,11 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     bar: [{ x: 20, y: 34, act: "drink" }, { x: 20, y: 74, act: "drink" }, { x: 20, y: 114, act: "drink" }],
     sauna: [{ x: 60, y: 156, act: "sauna" }, { x: 60, y: 156, act: "sauna" }],
     pool: [{ x: 20, y: 22, act: "swim" }, { x: 20, y: 42, act: "swim" }, { x: 20, y: 62, act: "swim" }],
-    arena: [{ x: 56, y: 54, act: "flex" }, { x: 104, y: 54, act: "flex" }]
+    arena: [{ x: 56, y: 54, act: "flex" }, { x: 104, y: 54, act: "flex" }],
+    plant: [],
+    fountain: [{ x: 20, y: 38, act: "sip" }],
+    lockers: [],
+    lounge: [{ x: 22, y: 64, act: "lounge" }, { x: 58, y: 64, act: "lounge" }]
   };
   function occupied(skipKey) {
     const g = Array.from({ length: ROWS }, () => new Array(COLS).fill(false));
@@ -828,7 +1032,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   const PANTS = ["#2b2f38", "#3b4252", "#1d1f24", "#4a3b5c", "#2f4a3a"];
   const NAMES = ["Dana", "Marcus", "Priya", "Theo", "Lena", "Kofi", "Rosa", "Jin", "Ava", "Omar", "Sky", "Nina", "Ravi", "Tess", "Leo", "Mia", "Yusuf", "Ivy", "Cal", "Zoe", "Ben", "Hana", "Eli", "Noor"];
   const MOODS = ["Pumped", "Sore from leg day", "Chasing a PR", "Hydrated", "Focused", "Here for the vibes", "Counting macros", "New member", "Regular since day one"];
-  const ACT_LABEL = { walk: "is walking over", idle: "is catching their breath", run: "is running on a treadmill", curl: "is curling dumbbells", squat: "is squatting", mat: "is doing sit-ups", sauna: "is in the sauna", drink: "is drinking a smoothie", swim: "is swimming laps", flex: "is posing on stage", coach: "is coaching a member", leave: "is heading home", enter: "just walked in" };
+  const ACT_LABEL = { walk: "is walking over", idle: "is catching their breath", run: "is running on a treadmill", curl: "is curling dumbbells", squat: "is squatting", mat: "is doing sit-ups", sauna: "is in the sauna", drink: "is drinking a smoothie", swim: "is swimming laps", flex: "is posing on stage", desk: "is checking members in", mop: "is mopping the floor", clip: "is going over the numbers", sip: "is grabbing some water", lounge: "is foam rolling", coach: "is coaching a member", leave: "is heading home", enter: "just walked in" };
   const DOOR = { x: 34, y: 466 };
   let fixtures = [], people = [], pops = [];
   let selected = null, selectedUntil = 0, sceneDirty = true, nextId = 1, spawnTimer = 0;
@@ -838,8 +1042,8 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     fixtures = S.layout.filter(it => it.c != null).map(it => {
       const fp = FP[it.t];
       const x = it.c * CELL, y = WALL + it.r * CELL;
-      const flat = it.t === "mat" || it.t === "pool" || it.t === "arena";
-      const sortY = { bells: y + 42, tread: y + 14, rack: y + 62, bar: y + 4, sauna: y + 146 }[it.t] ?? y;
+      const flat = it.t === "mat" || it.t === "pool" || it.t === "arena" || it.t === "lounge";
+      const sortY = { bells: y + 42, tread: y + 14, rack: y + 62, bar: y + 4, sauna: y + 146, plant: y + 34, fountain: y + 22, lockers: y + 66 }[it.t] ?? y;
       return { k: it.k, type: it.t, x, y, w: fp.w * CELL, h: fp.h * CELL, flat, sortY, spots: SPOTS[it.t].map(s => ({ x: x + s.x, y: y + s.y, act: s.act })) };
     });
     // people keep their place; anyone whose machine moved walks to it instead of jumping
@@ -854,21 +1058,18 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
         if (moved) { p.hidden = false; moveTo(p, s.x, s.y, "walk"); p.after = "use"; }
       } else { p.spot = null; p.hidden = false; goWander(p); }
     });
-    const wantPT = Math.min(S.owned.pt || 0, 4), wantCeleb = Math.min(S.owned.celeb || 0, 1);
-    let pts = people.filter(p => p.role === "pt");
-    for (let i = pts.length; i < wantPT; i++) spawn("pt");
-    if (!people.some(p => p.role === "celeb") && wantCeleb) spawn("celeb");
-    pts = people.filter(p => p.role === "pt");
-    people = people.filter(p => (p.role !== "pt" || pts.indexOf(p) < wantPT) && (p.role !== "celeb" || wantCeleb));
+    const want = { pt: Math.min(S.owned.pt || 0, 4), celeb: Math.min(S.owned.celeb || 0, 1), desk: S.staff.desk ? 1 : 0, cleaner: S.staff.cleaner ? 1 : 0, manager: S.staff.manager ? 1 : 0 };
+    Object.keys(want).forEach(role => { for (let i = people.filter(p => p.role === role).length; i < want[role]; i++) spawn(role); });
+    people = people.filter(p => !(p.role in want) || people.filter(q => q.role === p.role).indexOf(p) < want[p.role]);
   }
   const totalSpots = () => fixtures.reduce((a, f) => a + f.spots.length, 0);
-  const memberTarget = () => Math.min(28, 2 + Math.round(totalSpots() * 0.85));
+  const memberTarget = () => Math.min(28, Math.round((2 + totalSpots() * 0.85) * (0.5 + S.happy / 200)));
 
   function spawn(role) {
     const p = { id: nextId++, role: role || "member", x: DOOR.x, y: DOOR.y, tx: DOOR.x, ty: DOOR.y, facing: 1, phase: Math.random() * 6, alpha: 0,
       skin: pick(SKIN), hair: pick(HAIR), pants: pick(PANTS), hairStyle: Math.floor(Math.random() * 3),
-      shirt: role === "pt" ? "--red" : role === "celeb" ? "--yellow" : pick(SHIRTS),
-      name: role === "pt" ? "Trainer " + pick(NAMES) : role === "celeb" ? "Coach Blaze" : pick(NAMES),
+      shirt: { pt: "--red", celeb: "--yellow", desk: "--blue", cleaner: "--green", manager: "--purple" }[role] || pick(SHIRTS),
+      name: ({ pt: "Trainer ", desk: "Front desk ", cleaner: "Cleaner ", manager: "Manager " }[role] || "") + (role === "celeb" ? "Coach Blaze" : pick(NAMES)),
       mood: role === "celeb" ? "Filming content" : pick(MOODS),
       state: "go", act: "enter", timer: 0, spot: null, hidden: false, seed: Math.random() * 100, speed: role === "celeb" ? 34 : rnd(36, 46) };
     people.push(p); nextTask(p); p.act = "enter";
@@ -893,6 +1094,8 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
       return;
     }
     if (p.role === "celeb") { goWander(p); p.after = Math.random() < 0.6 ? "flex" : "idle"; return; }
+    if (p.role === "desk") { moveTo(p, 118, 457, "walk"); p.after = "desk"; return; }
+    if (p.role === "cleaner" || p.role === "manager") { goWander(p); p.after = p.role === "cleaner" ? "mop" : "clip"; return; }
     const free = [];
     fixtures.forEach(f => f.spots.forEach((s, i) => { if (!s.taken) free.push([f, s, i]); }));
     if (free.length && Math.random() < 0.85) {
@@ -923,6 +1126,8 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
         }
         else if (p.after === "coach") { p.state = "use"; p.act = "coach"; p.timer = rnd(4, 7); const m = people.find(q => q.id === p.coachee); if (m) p.facing = m.x > p.x ? 1 : -1; }
         else if (p.after === "flex") { p.state = "use"; p.act = "flex"; p.timer = rnd(3, 5); }
+        else if (p.after === "desk") { p.state = "use"; p.act = "desk"; p.timer = 1e9; p.facing = 1; }
+        else if (p.after === "mop" || p.after === "clip") { p.state = "use"; p.act = p.after; p.timer = rnd(4, 8); }
         else { p.state = "use"; p.act = "idle"; p.timer = rnd(2, 5); }
       } else { p.x += dx / d * step; p.y += dy / d * step; }
       return;
@@ -1147,6 +1352,42 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
         ctx.fillStyle = g; ctx.beginPath(); ctx.ellipse(x + 80 + sway, y + 38, 70, 26, 0, 0, 7); ctx.fill();
         break;
       }
+      case "plant": {
+        shadow(x + 20, y + 34, 30, 10);
+        ctx.fillStyle = vgrad(y + 22, y + 36, "#c4693f", "#8e4528"); rr(x + 12, y + 22, 16, 14, 3); ctx.fill();
+        [[-7, -6], [6, -8], [0, -12], [-4, -15], [5, -16], [-9, -12], [9, -12]].forEach(([dx, dy], i) => {
+          ctx.fillStyle = i % 2 ? "#3f9a57" : "#2f7d45"; ctx.beginPath(); ctx.ellipse(x + 20 + dx, y + 22 + dy, 5, 3, dx * 0.08, 0, 7); ctx.fill();
+        });
+        break;
+      }
+      case "fountain": {
+        shadow(x + 20, y + 30, 30, 10);
+        ctx.fillStyle = vgrad(y + 6, y + 30, "#d6dde3", "#9aa6b0"); rr(x + 10, y + 6, 20, 24, 4); ctx.fill();
+        ctx.fillStyle = "#6f7b85"; rr(x + 12, y + 8, 16, 7, 3); ctx.fill();
+        ctx.fillStyle = "rgba(90,170,230,.9)"; ctx.beginPath(); ctx.ellipse(x + 20, y + 11.5, 5.5, 2.2, 0, 0, 7); ctx.fill();
+        break;
+      }
+      case "lockers": {
+        shadow(x + 60, y + 70, 124, 14);
+        ctx.fillStyle = vgrad(y + 4, y + 72, "#4b5563", "#343b46"); rr(x + 4, y + 4, 112, 64, 5); ctx.fill();
+        for (let i = 0; i < 7; i++) {
+          const lx = x + 8 + i * 15.5;
+          ctx.fillStyle = i % 2 ? "#5d6878" : "#566170"; rr(lx, y + 8, 14, 48, 2); ctx.fill();
+          ctx.fillStyle = "rgba(0,0,0,.35)"; ctx.fillRect(lx + 3, y + 12, 8, 1); ctx.fillRect(lx + 3, y + 15, 8, 1);
+          ctx.fillStyle = "#c9cdd2"; ctx.fillRect(lx + 10, y + 32, 2, 5);
+        }
+        ctx.fillStyle = "#2b3038"; rr(x + 4, y + 58, 112, 10, 3); ctx.fill();
+        ctx.fillStyle = "#cfd6dc"; ctx.font = "700 7px Barlow, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("LOCKERS · SHOWERS", x + 60, y + 63.5);
+        break;
+      }
+      case "lounge": {
+        ctx.fillStyle = "rgba(141,98,216,.25)"; rr(x + 3, y + 3, 74, 74, 10); ctx.fill();
+        ctx.strokeStyle = "rgba(141,98,216,.5)"; ctx.lineWidth = 1.5; rr(x + 3, y + 3, 74, 74, 10); ctx.stroke();
+        ctx.fillStyle = vgrad(y + 8, y + 30, "#7e5bc4", "#5d3f99"); rr(x + 8, y + 8, 64, 20, 6); ctx.fill();
+        ctx.fillStyle = "rgba(255,255,255,.14)"; rr(x + 12, y + 10, 56, 4, 2); ctx.fill();
+        [[x + 14, y + 44], [x + 50, y + 44]].forEach(([rx, ry]) => { ctx.fillStyle = "#2f7d45"; rr(rx, ry, 16, 6, 3); ctx.fill(); });
+        break;
+      }
       case "pool": {
         shadow(x + f.w / 2, y + f.h - 2, f.w + 10, 16);
         ctx.fillStyle = "#e6ebee"; rr(x + 2, y + 2, f.w - 4, f.h - 4, 7); ctx.fill();
@@ -1161,6 +1402,14 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
         break;
       }
     }
+  }
+  function drawDesk() {
+    shadow(118, 474, 80, 12);
+    ctx.fillStyle = vgrad(458, 478, "#3a3f46", "#24282d"); rr(84, 460, 68, 18, 4); ctx.fill();
+    ctx.fillStyle = "#4f565f"; rr(82, 457, 72, 5, 2.5); ctx.fill();
+    ctx.fillStyle = "#15171a"; rr(126, 448, 16, 10, 2); ctx.fill();
+    ctx.fillStyle = "#5aa0e8"; rr(128, 449.5, 12, 7, 1); ctx.fill();
+    ctx.fillStyle = C["--yellow"]; ctx.font = "700 6px Barlow, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("CHECK-IN", 108, 469);
   }
   function drawSteam(f, t) {
     if (f.type !== "sauna") return;
@@ -1240,6 +1489,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     ctx.fillStyle = shirt; rr(-5.5, hipY - 12.5, 11, 14, 4); ctx.fill();
     ctx.fillStyle = "rgba(0,0,0,.14)"; rr(-5.5, hipY - 4, 11, 5.5, 3); ctx.fill();
     ctx.fillStyle = "rgba(255,255,255,.14)"; rr(-4.5, hipY - 11.5, 2.2, 9, 1.1); ctx.fill();
+    if (p.role === "manager") { ctx.fillStyle = "#1b1d21"; ctx.beginPath(); ctx.moveTo(0, hipY - 12); ctx.lineTo(1.6, hipY - 9); ctx.lineTo(0, hipY - 4); ctx.lineTo(-1.6, hipY - 9); ctx.closePath(); ctx.fill(); }
     if (p.role === "pt" || p.role === "celeb") { ctx.fillStyle = p.role === "pt" ? "#fff" : "#1a1606"; ctx.font = "700 5.5px Barlow, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText(p.role === "pt" ? "PT" : "★", 0.5, hipY - 6.5); }
     // front arm
     ctx.strokeStyle = p.skin; ctx.lineWidth = 2.6;
@@ -1249,10 +1499,13 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     else if (p.act === "run") { const s = Math.sin(p.phase) * 4; limbs(3, sh, 5 + s, sh + 6, 8 + s, sh + 3); }
     else if (p.act === "drink") { limbs(3, sh, 6, sh + 6, 4.5, sh - 1); ctx.fillStyle = C["--purple"]; rr(3, sh - 6.5, 4, 7, 1.2); ctx.fill(); }
     else if (p.act === "coach") { const w = Math.sin(t * 4) * 2; limbs(3, sh, 10, sh - 4 + w); }
+    else if (p.act === "mop") { const m = Math.sin(t * 3 + p.seed) * 4; limbs(3, sh, 7, sh + 7); ctx.strokeStyle = "#b58a4b"; ctx.lineWidth = 1.6; limbs(6, sh - 2, 12 + m, -1); ctx.fillStyle = "#c9cdd2"; ctx.beginPath(); ctx.ellipse(12 + m, -1, 4.5, 1.8, 0, 0, 7); ctx.fill(); }
+    else if (p.act === "clip") { limbs(3, sh, 7, sh + 5, 8, sh + 1); ctx.fillStyle = "#e9e4d8"; rr(6, sh - 4, 6, 8, 1); ctx.fill(); ctx.fillStyle = "#6b4a31"; ctx.fillRect(7.5, sh - 4.5, 3, 1.5); }
     else { const s = p.state === "go" ? Math.sin(p.phase) * 3 : 0; limbs(3, sh, 3 + s, sh + 10.5); }
     drawHead(p, hy);
     if (p.role === "pt") { ctx.fillStyle = C["--red"]; rr(-5.6, hy - 6, 11, 3.4, 1.5); ctx.fill(); rr(1, hy - 3.8, 7, 1.6, 0.8); ctx.fill(); }
     if (p.role === "celeb") { ctx.fillStyle = "#111"; rr(0.5, hy - 1.2, 5.5, 2.2, 1); ctx.fill(); }
+    if (p.role === "cleaner") { ctx.fillStyle = C["--green"]; rr(-5.6, hy - 6, 11, 3.4, 1.5); ctx.fill(); }
     ctx.restore();
     drawTags(p, t, (hy - 6) * PS);
   }
@@ -1332,6 +1585,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
       const items = [];
       shown.filter(f => !f.flat).forEach(f => items.push({ y: f.sortY, id: -f.k, d: () => { if (f.ghost) ctx.globalAlpha = 0.75; drawFixture(f, t); ctx.globalAlpha = 1; } }));
       if (!editMode) people.forEach(p => { if (p.act !== "swim") items.push({ y: p.y, id: p.id, d: () => drawPerson(p, t) }); });
+      if (S.staff.desk) items.push({ y: 470, id: 1e9, d: drawDesk });
       items.sort((a, b) => a.y - b.y || a.id - b.id).forEach(i => i.d());
       shown.forEach(f => drawSteam(f, t));
       if (editMode) drawEditOverlay(); else drawPops(dt);
@@ -1342,7 +1596,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   function updateWho() {
     const who = el("who"); if (!who) return;
     let html;
-    if (editMode) html = selItem ? "Selected: <b>" + GEN_BY_ID[selItem.t].name + "</b>. Drag it to a new spot." : "Drag any item to move it.";
+    if (editMode) html = selItem ? "Selected: <b>" + nameOf(selItem.t) + "</b>. Drag it to a new spot." : "Drag any item to move it. Leave walking space so nothing is boxed in.";
     else html = selected ? "<b>" + selected.name + "</b> " + (ACT_LABEL[selected.act] || "is hanging out") + " · " + selected.mood : people.filter(p => p.role === "member").length + " members inside. Tap someone to see what they're doing.";
     if (who._h !== html) { who._h = html; who.innerHTML = html; }
   }
@@ -1418,7 +1672,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
       bar.append(E("div", "k", "In storage (still earning)"));
       const sl = E("div", "store-list");
       types.forEach(t => {
-        const b = E("button", "btn g"); b.type = "button"; b.textContent = "Place " + GEN_BY_ID[t].name + " · " + storedOf(t);
+        const b = E("button", "btn g"); b.type = "button"; b.textContent = "Place " + nameOf(t) + " · " + storedOf(t);
         b.addEventListener("click", () => { const it = S.layout.find(i => i.t === t && i.c == null); if (it && autoPlace(it)) { selItem = it; sceneDirty = true; save(); } else toast("No room. Move or store something first."); buildSceneCap(); });
         sl.append(b);
       });
@@ -1514,7 +1768,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     const c = Object.keys(S.certs).join(",");
     const k = (...parts) => tab + ":" + parts.join("|");
     switch (tab) {
-      case "floor": return k(revealedIdx(), c, availableUps().map(u => u.id).join(","), Object.keys(S.warm).length, S.warmOpen, burnOpen, outlookOpen);
+      case "floor": return k(revealedIdx(), c, availableUps().map(u => u.id).join(","), Object.keys(S.warm).length, S.warmOpen, outlookOpen, Object.keys(S.staff).join(","), tierIndex() >= 2, !!S.rival);
       case "hustle": return k(c, Object.keys(S.gear).join(","), S.physique >= 60);
       case "supply": return k(tierIndex(), S.shelves);
       case "certs": return k(c, "study=" + (S.study ? S.study.id : ""), "fin=" + finSel);
@@ -1549,6 +1803,63 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     });
     return c;
   }
+  // what you make and what you pay, every day
+  function moneyCard() {
+    const c = E("div", "card ledger");
+    c.append(E("div", "k", "Daily money"));
+    const body = E("div");
+    on(() => {
+      const ln = (label, v, cls, extra) => "<div class='ln" + (extra ? " " + extra : "") + "'><span>" + label + "</span><span class='num " + (cls || "") + "'>" + v + "</span></div>";
+      const items = burnItems();
+      const life = items.filter(i => i[2] === "life"), gym = items.filter(i => i[2] !== "life");
+      const sum = a => a.reduce((x, i) => x + i[1], 0);
+      const dues = income(), coach = coachToday(), intr = interestToday();
+      const out = sum(items), passive = dues + intr;
+      let h = "<h3>You make</h3>";
+      h += ln("Dues from members", "+" + money(dues), "up-c");
+      if (intr) h += ln("Savings interest", "+" + money(intr), "up-c");
+      h += ln("Coaching, on days you coach", "+" + money(coach), "muted");
+      h += "<h3>Staying alive</h3>";
+      life.forEach(i => { h += ln(i[0], "−" + money(i[1]), "down-c"); });
+      h += ln("Cost of living", "−" + money(sum(life)) + "/day", "down-c", "sub");
+      h += "<h3>Running the gym</h3>";
+      if (!gym.length) h += ln("Nothing yet", "$0.00", "muted");
+      gym.forEach(i => { h += ln(i[0], "−" + money(i[1]), "down-c"); });
+      if (gym.length) h += ln("Gym costs", "−" + money(sum(gym)) + "/day", "down-c", "sub");
+      const restNet = passive - out, coachNet = passive + coach - out;
+      h += ln("Left over on a rest day", (restNet >= 0 ? "+" : "−") + money(Math.abs(restNet)), restNet >= 0 ? "up-c" : "down-c", "total");
+      h += ln("Left over on a coaching day", (coachNet >= 0 ? "+" : "−") + money(Math.abs(coachNet)), coachNet >= 0 ? "up-c" : "down-c");
+      if (S.debtDays) h += "<p class='down-c' style='margin:6px 0 0;font-size:13px'>In debt " + S.debtDays + " day" + (S.debtDays > 1 ? "s" : "") + " in a row. At 14 you starve.</p>";
+      if (body._h !== h) { body._h = h; body.innerHTML = h; }
+    });
+    c.append(body);
+    return c;
+  }
+  // happiness, cleanliness, season and any rival
+  function moodCard() {
+    const c = E("div", "card");
+    c.append(E("div", "k", "Gym mood"));
+    const body = E("div"); body.style.cssText = "display:grid;gap:10px";
+    on(() => {
+      const hcol = S.happy < 35 ? "var(--down)" : S.happy < 55 ? "var(--orange)" : "var(--up)";
+      const ccol = S.clean < 30 ? "var(--down)" : S.clean < 55 ? "var(--orange)" : "var(--up)";
+      const tgt = Math.round(moodTarget());
+      let h = "<div class='meter'><span>Happiness</span><div class='bar'><i style='width:" + S.happy + "%;background:" + hcol + "'></i></div><span class='num'>" + Math.round(S.happy) + "</span></div>";
+      h += "<div class='muted' style='font-size:13px'>" + happyLabel(S.happy) + ". Dues ×" + happyMult().toFixed(2) + ". Heading toward " + tgt + ".</div>";
+      h += "<div class='mood-parts'>" + moodParts().map(p => "<span>" + p[0] + " <b class='" + (p[1] >= 0 ? "up-c" : "down-c") + "'>" + (p[1] >= 0 ? "+" : "") + p[1] + "</b></span>").join("") + "</div>";
+      h += "<div class='meter'><span>Cleanliness</span><div class='bar'><i style='width:" + S.clean + "%;background:" + ccol + "'></i></div><span class='num'>" + Math.round(S.clean) + "</span></div>";
+      const sn = season();
+      h += "<div class='muted' style='font-size:13px'>Season: <b style='color:var(--chalk)'>" + sn.name + "</b> · dues ×" + sn.mult + "</div>";
+      if (S.rival) {
+        h += "<div class='rival'><div class='k' style='color:var(--down)'>Rival gym</div><div class='nm'>" + S.rival.name + "</div>";
+        h += "<div class='meter'><span>Strength</span><div class='bar'><i style='width:" + Math.min(100, S.rival.str / 1.5) + "%;background:var(--down)'></i></div><span class='num'>" + Math.round(S.rival.str) + "</span></div>";
+        h += "<div style='font-size:13px'>Taking <b class='down-c'>" + Math.round(rivalCut() * 100) + "%</b> of your dues. Happiness above 55, member events, sales pushes and a manager wear them down.</div></div>";
+      }
+      if (body._h !== h) { body._h = h; body.innerHTML = h; }
+    });
+    c.append(body);
+    return c;
+  }
   function burnBlock() {
     const wrap = E("div");
     const b = E("button", "burn"); b.type = "button";
@@ -1567,7 +1878,8 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     const f = document.createDocumentFragment();
     f.append(outlookCard());
     const w = warmBlock(); if (w) f.append(w);
-    f.append(burnBlock());
+    f.append(moneyCard());
+    f.append(moodCard());
     const seg = E("div", "seg"); seg.setAttribute("role", "group"); seg.setAttribute("aria-label", "Buy amount");
     [["1", "×1"], ["10", "×10"], ["max", "Max"]].forEach(([m, l]) => {
       const b = E("button", null, l); b.type = "button"; b.setAttribute("aria-pressed", String(buyMode === m));
@@ -1593,6 +1905,34 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
       }));
     });
     f.append(list);
+    f.append(sec("Amenities", "Make members happier. Place them on the floor to count."));
+    const al = E("div", "list");
+    AMEN.forEach(a => al.append(row({
+      name: a.name, note: () => a.note + " · own " + (S.owned[a.id] || 0) + (storedOf(a.id) ? " · " + storedOf(a.id) + " in storage" : ""),
+      price: () => money(amenCost(a)),
+      btns: [B("Buy", "y", () => {
+        const cost = amenCost(a); if (S.cash < cost) return;
+        S.cash -= cost; S.spentEquip += cost; S.owned[a.id] = (S.owned[a.id] || 0) + 1;
+        const stored = syncLayout(); logMsg("Bought a " + a.name.toLowerCase() + ".");
+        if (stored) notify("No floor space", "Your " + a.name.toLowerCase() + " went into storage. It only helps once it's on the floor. Tap Rearrange to make room.");
+      }, () => S.cash < amenCost(a))]
+    })));
+    f.append(al);
+    f.append(sec("Staff", "Paid every day. They show up on the floor."));
+    const sl = E("div", "list");
+    STAFF.forEach(st => {
+      const locked = st.tier && tierIndex() < st.tier;
+      const hired = !!S.staff[st.id];
+      sl.append(row({
+        name: st.name, tag: hired ? mkTag("Hired", "cur") : null, cls: hired ? "cur" : locked ? "dim" : "",
+        note: () => st.note + " · wage " + money(wage(st)) + "/day" + (locked ? " · needs a " + TIERS[st.tier].name : ""),
+        price: hired ? null : money(st.hire), small: hired ? null : "to hire",
+        btns: [hired
+          ? B("Let go", "r", () => { delete S.staff[st.id]; sceneDirty = true; logMsg("Let your " + st.name.toLowerCase() + " go."); })
+          : B("Hire", "y", () => { if (S.cash < st.hire || locked) return; S.cash -= st.hire; S.staff[st.id] = true; sceneDirty = true; logMsg("Hired a " + st.name.toLowerCase() + "."); }, () => S.cash < st.hire || locked)]
+      }));
+    });
+    f.append(sl);
     const ups = availableUps();
     if (ups.length) {
       f.append(sec("Upgrades", "One-time boosts"));
@@ -1861,6 +2201,16 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
 
     f.append(sec("Legacy", "Carries over when a life ends"));
     f.append(row({ name: S.legacy + " ★ · life #" + S.lives, note: "Each star adds 10% to everything you earn. Stars come from your best net worth in a life. Restart from the ↻ button up top.", btns: [] }));
+
+    f.append(sec("Settings & backups", "Your game saves after every action"));
+    const st = E("div", "list");
+    st.append(row({ name: "Haptics", note: "A small tap you can feel on each action. iPhone with iOS 18 or later.", btns: [B(() => S.haptics ? "On" : "Off", "", () => { S.haptics = !S.haptics; buzz(); })] }));
+    st.append(row({ name: "Backup code", note: "Copy this somewhere safe. Paste it back in to restore this exact game, even on another phone.", btns: [B("Show code", "y", showExport)] }));
+    st.append(row({ name: "Load a backup code", note: "Replaces your current game with the one in the code.", btns: [B("Paste code", "", showImport)] }));
+    const bak = readBackup();
+    st.append(row({ name: "Automatic backup", note: bak ? "Saved on day " + bak.day + (bak.dead ? " (after this life ended)" : "") + ". Made every 10 days." : "Made every 10 days. None yet.",
+      btns: [B("Restore", "r", () => { const b = readBackup(); if (!b) return; S = Object.assign(fresh(), b); ensureGoods(); syncLayout(); resetScene(); lastTier = -1; logMsg("Restored the automatic backup from day " + S.day + "."); buildTab(); }, () => !bak)] }));
+    f.append(st);
     return f;
   }
 
@@ -1874,13 +2224,15 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     const hc = el("hCash"); hc.textContent = money(S.cash); hc.classList.toggle("neg", S.cash < 0);
     el("hEn").textContent = Math.floor(S.energy) + "/" + maxEnergy();
     el("hEnBar").style.width = Math.min(100, S.energy / maxEnergy() * 100) + "%";
-    el("hRate").textContent = money(income());
-    el("hNet").textContent = money(netWorth());
+    el("hIn").textContent = money(income() + interestToday());
+    el("hOut").textContent = money(burn());
+    document.querySelectorAll("#focusRow button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.f === S.focus)));
+    el("focusDesc").textContent = focus().name + ": " + focus().desc;
     el("hTick").textContent = S.log[0] ? S.log[0].m : "Welcome to " + S.name + ".";
     el("gymName").textContent = S.name;
     const cb = el("coachBtn");
     cb.disabled = S.dead || S.energy < COACH_EN;
-    el("coachSub").textContent = S.energy < COACH_EN ? "Too tired. Rest first." : "+" + money(coachValue()) + " · −" + COACH_EN + " energy · 1 day";
+    el("coachSub").textContent = S.energy < COACH_EN ? "Too tired. Rest first." : "+" + money(coachToday()) + " · −" + COACH_EN + " energy · 1 day";
     el("restBtn").disabled = S.dead;
     const ti = tierIndex();
     if (ti !== lastTier) { if (lastTier !== -1 && ti > lastTier) { logMsg("Your gym is now a " + TIERS[ti].name + "."); notify("New level: " + TIERS[ti].name, "Your gym has earned " + money(TIERS[ti].at) + " in total. The place gets a makeover and new supplies show up in the supply room."); } lastTier = ti; }
@@ -1917,6 +2269,24 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     S.log.slice(0, 50).forEach(x => { const d = E("div"); d.append(E("span", "muted num", "Day " + x.d)); const s = E("span"); s.textContent = x.m; d.append(s); l.append(d); });
     openModal("Front desk log", l, [["Close", () => {}]]);
   }
+  function showExport() {
+    const wrap = E("div"); wrap.style.cssText = "display:grid;gap:8px";
+    const ta = E("textarea", "codebox"); ta.readOnly = true; ta.value = exportCode(); ta.id = "exportCode"; ta.setAttribute("aria-label", "Backup code");
+    const copy = E("button", "btn y", "Copy code"); copy.type = "button";
+    copy.addEventListener("click", () => {
+      const done = () => { copy.textContent = "Copied"; };
+      try { navigator.clipboard.writeText(ta.value).then(done, () => { ta.select(); copy.textContent = "Selected. Copy it now"; }); }
+      catch (e) { ta.select(); copy.textContent = "Selected. Copy it now"; }
+    });
+    wrap.append(E("p", null, "This code holds your whole game on day " + S.day + "."), ta, copy);
+    openModal("Backup code", wrap, [["Done", () => {}]]);
+  }
+  function showImport() {
+    const wrap = E("div"); wrap.style.cssText = "display:grid;gap:8px";
+    const ta = E("textarea", "codebox"); ta.placeholder = "Paste a code that starts with ITT1:"; ta.id = "importCode"; ta.setAttribute("aria-label", "Backup code to load");
+    wrap.append(E("p", null, "This replaces your current game."), ta);
+    openModal("Load a backup code", wrap, [["Load it", () => { if (!importCode(ta.value)) notify("That code didn't work", "Make sure you copied the whole code, starting with ITT1:"); else notify("Game loaded", "You're back on day " + S.day + "."); }], ["Cancel", () => {}]]);
+  }
   function renameGym() {
     const wrap = E("div"); const inp = E("input"); inp.id = "nameInput"; inp.maxLength = 24; inp.value = S.name;
     inp.style.cssText = "width:100%;padding:10px;border-radius:6px;border:1px solid var(--line);background:var(--panel-2);color:var(--chalk);font:600 16px var(--f-body);box-sizing:border-box";
@@ -1937,6 +2307,12 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     try { const t = localStorage.getItem(SAVE_KEY + ":tab"); if (t && TABS.some(x => x[0] === t)) tab = t; } catch (e) {}
     buildTabBar(); setTab(tab);
     if (S.dead) die();
+    else if (restoredFromDay != null) notify("Save restored", "Your latest save was damaged, so the game loaded the automatic backup from day " + restoredFromDay + ".");
+    FOCUS.forEach(fc => {
+      const b = E("button", null, fc.name); b.type = "button"; b.dataset.f = fc.id;
+      b.addEventListener("click", () => { S.focus = fc.id; buzz(); refresh(); save(); });
+      el("focusRow").append(b);
+    });
 
     el("coachBtn").addEventListener("click", doCoach);
     el("restBtn").addEventListener("click", doRest);
