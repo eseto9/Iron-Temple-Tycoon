@@ -65,7 +65,7 @@ button { font: inherit; color: inherit; -webkit-user-select: none; user-select: 
 .left { font-family: var(--f-num); font-weight: 700; font-size: 14px; }
 .left .lim { color: var(--muted); font-weight: 500; }
 .hdr-tools { display: flex; gap: 6px; align-items: center; min-width: 0; }
-.gname { font-family: var(--f-display); font-weight: 900; font-size: 17px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); background: none; border: 0; padding: 0 4px; max-width: 12ch; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; min-height: 36px; }
+.gname { max-width: 10ch !important; font-family: var(--f-display); font-weight: 900; font-size: 17px; text-transform: uppercase; letter-spacing: .03em; color: var(--muted); background: none; border: 0; padding: 0 4px; max-width: 12ch; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer; min-height: 36px; }
 .icon-btn { width: 38px; height: 38px; border-radius: 50%; border: 1px solid var(--line); background: var(--panel); display: grid; place-items: center; cursor: pointer; flex: none; }
 .icon-btn svg { width: 18px; height: 18px; }
 .hdr-main { display: flex; justify-content: space-between; align-items: end; gap: 12px; }
@@ -243,6 +243,53 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
 #toast { position: fixed; left: 50%; bottom: calc(var(--dock-h) + 14px + env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); background: var(--chalk); color: var(--floor); font-weight: 600; padding: 9px 14px; border-radius: 8px; max-width: calc(100% - 32px); z-index: 30; box-shadow: 0 6px 24px rgba(0,0,0,.45); text-align: center; }
 @media (max-width: 420px) { .idx { grid-template-columns: 1fr; } .row .nm { font-size: 15px; } }
 @media (prefers-reduced-motion: reduce) { .floaty { animation-duration: .01s; } .ebar > i { transition: none; } }
+/* ---- map, legacy, milestones, hype ---- */
+.gold-c { color: var(--yellow); }
+.gp { display: inline-block; width: 12px; height: 12px; border-radius: 50%; margin-left: 4px; vertical-align: -1px; background: radial-gradient(circle, var(--floor) 0 2px, var(--yellow) 2.6px); box-shadow: inset 0 0 0 1.5px #c99d14; }
+.gp.big { width: 14px; height: 14px; }
+.ms { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; align-items: center; margin-top: 6px; font-size: 11px; color: var(--muted); }
+.ms-bar { height: 5px; background: var(--panel-2); border-radius: 3px; overflow: hidden; }
+.ms-bar i { display: block; height: 100%; background: var(--yellow); border-radius: 3px; transition: width .3s; }
+.chal { border-left: 3px solid var(--yellow); }
+.chal-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.chal-t { font-weight: 700; font-size: 16px; margin: 6px 0 2px; }
+.dead-card { border-color: var(--yellow); }
+.dead-card p { margin: 0; }
+.dock .coach { position: relative; overflow: hidden; }
+.hype { position: absolute; left: 0; right: 0; bottom: 0; height: 6px; background: rgba(0,0,0,.14); }
+.hype i { display: block; height: 100%; width: 0; background: rgba(26,22,6,.55); transition: width .35s ease; }
+.hype-lbl { position: absolute; right: 12px; top: 9px; font: 700 10px var(--f-num); opacity: .65; letter-spacing: .04em; text-transform: uppercase; }
+.dock .coach.packed { background: linear-gradient(100deg, #ff9b4a, #ebbb24 40%, #ffd76a 50%, #ebbb24 60%, #ff9b4a); background-size: 220% 100%; animation: shimmer 2.2s linear infinite; }
+@keyframes shimmer { from { background-position: 0 0; } to { background-position: -220% 0; } }
+.usmap { width: 100%; height: auto; display: block; }
+.usmap .land { fill: #2a3139; stroke: #3c444e; stroke-width: 1.6; stroke-linejoin: round; }
+.usmap .grat { stroke: rgba(255,255,255,.045); stroke-width: 1; }
+.usmap .route { stroke: var(--yellow); stroke-width: 1.8; stroke-dasharray: 4 5; opacity: .55; }
+.pin { cursor: pointer; }
+.pin .hit { fill: transparent; }
+.pin .dot { stroke: var(--floor); stroke-width: 2.5; }
+.pin.open .dot { fill: #a7aeb6; } .pin.locked .dot { fill: #3d434b; } .pin.chain .dot { fill: var(--yellow); } .pin.here .dot { fill: var(--plumbob); }
+.pin .lbl { font: 600 19px Barlow, sans-serif; fill: var(--chalk); paint-order: stroke; stroke: var(--panel); stroke-width: 3px; }
+.pin.locked .lbl { fill: #6e757d; }
+.pin .cnt { font: 700 12px "JetBrains Mono", monospace; fill: #1a1606; text-anchor: middle; }
+.pin:focus { outline: none; } .pin:focus .dot, .pin:hover .dot { stroke: var(--yellow); }
+.map-key { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--muted); }
+.map-key i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+.map-key .k1 { background: var(--plumbob); } .map-key .k2 { background: var(--yellow); } .map-key .k3 { background: #a7aeb6; } .map-key .k4 { background: #3d434b; }
+.legacy-hero { grid-template-columns: 84px minmax(0, 1fr); align-items: center; gap: 16px; }
+.plate-big { width: 84px; height: 84px; border-radius: 50%; display: grid; place-items: center; background: radial-gradient(circle at 35% 30%, #ffe08a, var(--yellow) 45%, #b8890f); box-shadow: inset 0 0 0 6px rgba(0,0,0,.12), 0 6px 22px rgba(235,187,36,.25); }
+.plate-big i { width: 22px; height: 22px; border-radius: 50%; background: var(--floor); box-shadow: inset 0 0 0 4px #8e949b; display: block; }
+@media (prefers-reduced-motion: reduce) { .dock .coach.packed { animation: none; } .hype i, .ms-bar i { transition: none; } }
+.hdr-top > div:first-child { min-width: 0; }
+.hdr-top .left { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.hdr-tools { flex: none; }
+.focus { min-width: 0; }
+@media (max-width: 500px) { .gname { display: none; } }
+.app, #view { grid-template-columns: minmax(0, 1fr); }
+.app > *, #view > * { min-width: 0; }
+.sec > div { min-width: 0; }
+[hidden] { display: none !important; }
+
 </style>
 
 
@@ -259,9 +306,10 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
 <div class="app">
   <header class="hdr">
     <div class="hdr-top">
-      <div><div class="k">Life left</div><div class="left"><span id="hLeft">0y 200d</span> <span class="lim">· day <span id="hDay">0</span></span></div></div>
+      <div><div class="k">Life left</div><div class="left"><span id="hLeft">0y 200d</span> <span class="lim">· <span id="hCity">Columbus</span> · day <span id="hDay">0</span></span></div></div>
       <div class="hdr-tools">
         <button class="gname" id="gymName" type="button" aria-label="Rename your gym">Iron Temple</button>
+        <button class="icon-btn" id="settingsBtn" type="button" aria-label="Settings"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></button>
         <button class="icon-btn" id="restartBtn" type="button" aria-label="Restart"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 4v5h5"/></svg></button>
       </div>
     </div>
@@ -288,7 +336,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   <div class="dock">
     <div class="focus" id="focusRow" role="group" aria-label="Today's focus"></div>
     <div class="focus-desc" id="focusDesc"></div>
-    <button class="coach" id="coachBtn" type="button"><span class="t">Coach clients</span><span class="s" id="coachSub">+$3.00 · −8 energy · 1 day</span></button>
+    <button class="coach" id="coachBtn" type="button"><span class="t" id="coachTitle">Coach clients</span><span class="s" id="coachSub">+$3.00 · −8 energy · 1 day</span><span class="hype-lbl" id="hypeLbl">hype 0%</span><span class="hype" aria-hidden="true"><i id="hypeBar"></i></span></button>
     <button class="rest" id="restBtn" type="button"><span class="t">Rest</span><span class="s">+35 energy · 1 day</span></button>
   </div>
   <nav class="tabs" aria-label="Sections"><div class="in" id="tabs" role="tablist"></div></nav>
@@ -304,39 +352,31 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   const COACH_EN = 8, REST_EN = 35;
 
   // ======================= DATA =======================
-  // rates are dollars per day
+  // equipment: dollars per day per level
   const GENS = [
-    { id: "mat",   name: "Yoga Mats",         base: 15,     rate: 2,     color: "--green" },
-    { id: "bells", name: "Dumbbell Rack",     base: 100,    rate: 12,    color: "--blue" },
-    { id: "tread", name: "Treadmill",         base: 1100,   rate: 48,    color: "--white" },
-    { id: "rack",  name: "Squat Rack",        base: 12000,  rate: 240,   color: "--red" },
-    { id: "pt",    name: "Personal Trainer",  base: 130000, rate: 1200,  color: "--yellow", cert: "cpt", staff: true },
-    { id: "bar",   name: "Smoothie Bar",      base: 1.4e6,  rate: 6000,  color: "--orange", cert: "nutri" },
-    { id: "sauna", name: "Sauna & Steam",     base: 2e7,    rate: 32000, color: "--purple" },
-    { id: "pool",  name: "Lap Pool",          base: 3.3e8,  rate: 1.8e5, color: "--blue" },
-    { id: "arena", name: "Competition Stage", base: 5.1e9,  rate: 1.04e6,color: "--red", cert: "cscs" },
-    { id: "celeb", name: "Celebrity Coach",   base: 7.5e10, rate: 6.4e6, color: "--yellow", cert: "mba", staff: true }
+    { id: "mat",   name: "Yoga Mats",         base: 15,     rate: 2,      color: "--green" },
+    { id: "bells", name: "Dumbbell Rack",     base: 100,    rate: 12,     color: "--blue" },
+    { id: "tread", name: "Treadmill",         base: 1100,   rate: 48,     color: "--white" },
+    { id: "rack",  name: "Squat Rack",        base: 12000,  rate: 240,    color: "--red" },
+    { id: "pt",    name: "Personal Trainer",  base: 130000, rate: 1200,   color: "--yellow", cert: "cpt" },
+    { id: "bar",   name: "Smoothie Bar",      base: 1.4e6,  rate: 6000,   color: "--orange", cert: "nutri" },
+    { id: "sauna", name: "Sauna & Steam",     base: 2e7,    rate: 32000,  color: "--purple" },
+    { id: "pool",  name: "Lap Pool",          base: 3.3e8,  rate: 1.8e5,  color: "--blue" },
+    { id: "arena", name: "Competition Stage", base: 5.1e9,  rate: 1.04e6, color: "--red", cert: "cscs" },
+    { id: "celeb", name: "Celebrity Coach",   base: 7.5e10, rate: 6.4e6,  color: "--yellow", cert: "mba" }
   ];
   const GEN_BY_ID = Object.fromEntries(GENS.map(g => [g.id, g]));
-  const GEN_UP_NAMES = {
-    mat: ["Non-Slip Mats", "Hot Yoga Room"], bells: ["Hex Dumbbells", "Adjustable Bells"], tread: ["Incline Mode", "Curved Treadmills"],
-    rack: ["Calibrated Plates", "Competition Bars"], pt: ["Program Templates", "Group Classes"], bar: ["Whey Upsell", "Protein Bakery"],
-    sauna: ["Cold Plunge", "Infrared Panels"], pool: ["Lane Ropes", "Swim Team"], arena: ["Livestream Deal", "Sponsor Banners"], celeb: ["Viral Clips", "Signature Program"]
-  };
-  const UPGRADES = [];
-  GENS.forEach(g => {
-    UPGRADES.push({ id: "u_" + g.id + "_1", name: GEN_UP_NAMES[g.id][0], desc: g.name + " earn ×2", cost: g.base * 20, need: 10, gen: g.id });
-    UPGRADES.push({ id: "u_" + g.id + "_2", name: GEN_UP_NAMES[g.id][1], desc: g.name + " earn ×2", cost: g.base * 400, need: 25, gen: g.id });
-  });
-  [["g1", "Neon Sign", "All dues ×1.25. Lights up your wall.", 5000, 1.25], ["g2", "Member App", "All dues ×1.5", 5e5, 1.5], ["g3", "24/7 Access", "All dues ×2", 5e7, 2],
-   ["g4", "Branded Merch", "All dues ×2", 5e9, 2], ["g5", "TV Ad Campaign", "All dues ×3", 5e11, 3]]
-    .forEach(([id, name, desc, cost, mult]) => UPGRADES.push({ id, name, desc, cost, mult, global: true }));
-
+  // how many of each thing physically fit on the floor; extra levels just earn more
+  const FLOOR_CAP = { mat: 8, bells: 4, tread: 5, rack: 4, bar: 1, sauna: 1, pool: 1, arena: 1, plant: 6, fountain: 3, lockers: 1, lounge: 1 };
+  const MILESTONES = [10, 25, 50, 100, 200];
+  const UPGRADES = [
+    ["g1", "Neon Sign", "All dues ×1.25. Lights up your wall.", 5000, 1.25], ["g2", "Member App", "All dues ×1.5", 5e5, 1.5],
+    ["g3", "24/7 Access", "All dues ×2", 5e7, 2], ["g4", "Branded Merch", "All dues ×2", 5e9, 2], ["g5", "TV Ad Campaign", "All dues ×3", 5e11, 3]
+  ].map(([id, name, desc, cost, mult]) => ({ id, name, desc, cost, mult }));
   const TIERS = [
     { at: 0, name: "Garage Gym" }, { at: 1e3, name: "Basement Box" }, { at: 1e5, name: "Strip-Mall Gym" }, { at: 1e7, name: "Fitness Center" },
     { at: 1e9, name: "Athletic Club" }, { at: 1e11, name: "Mega Gym" }, { at: 1e13, name: "Global Fitness Empire" }
   ];
-
   const HUSTLES = [
     { id: "flyers",  name: "Hand Out Flyers",    note: "Outside the grocery store",  max: 7,     en: 6,  color: "--red" },
     { id: "mirrors", name: "Clean Mirrors",      note: "Cash job at the chain gym",  max: 16,    en: 12, color: "--blue" },
@@ -355,20 +395,17 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     { id: "light",   name: "Ring Light",        note: "Unlocks photoshoots",     cost: 2000 },
     { id: "van",     name: "Tour Van",          note: "Unlocks seminar tours",   cost: 60000, burn: 25 }
   ];
-
-  // life values are in days
   const CERTS = [
     { id: "cpr",   name: "CPR & First Aid",            cost: 40,     days: 4,   life: 30,  req: [],       perk: "Pass health inspections" },
     { id: "cpt",   name: "Personal Trainer Cert",      cost: 700,    days: 30,  life: 60,  req: ["cpr"],  perk: "Hire trainers, take clients, coaching ×2" },
     { id: "nutri", name: "Nutrition Coach",            cost: 2000,   days: 45,  life: 150, req: ["cpt"],  perk: "Unlocks the smoothie bar" },
-    { id: "biz",   name: "Small Business Course",      cost: 9000,   days: 60,  life: 45,  req: ["cpr"],  perk: "All dues ×1.5, +40 credit" },
+    { id: "biz",   name: "Small Business Course",      cost: 9000,   days: 60,  life: 45,  req: ["cpr"],  perk: "All dues ×1.5" },
     { id: "cscs",  name: "Strength & Conditioning",    cost: 30000,  days: 120, life: 150, req: ["cpt"],  perk: "Unlocks the stage, squat racks ×2" },
     { id: "kin",   name: "Kinesiology Degree",         cost: 90000,  days: 365, life: 365, req: ["cscs"], perk: "Seminar tours, coaching ×3" },
     { id: "mba",   name: "MBA",                        cost: 250000, days: 240, life: 120, req: ["biz"],  perk: "All dues ×2, celebrity coach" },
     { id: "dpt",   name: "Doctor of Physical Therapy", cost: 1.2e6,  days: 540, life: 700, req: ["kin"],  perk: "All dues ×2" }
   ];
   const CERT_BY_ID = Object.fromEntries(CERTS.map(c => [c.id, c]));
-
   const HOMES = [
     { id: "couch",  name: "Office Couch",       cost: 0,      burn: 0,    life: 0,    max: 100 },
     { id: "room",   name: "Rented Room",        cost: 150,    burn: 4,    life: 45,   max: 110 },
@@ -384,36 +421,85 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     { id: "diet",  name: "Sports Dietitian",  burn: 400,  life: 365, regen: 15 },
     { id: "chef",  name: "Private Chef",      burn: 5000, life: 800, regen: 20 }
   ];
-  const GOODS = [
-    { id: "bands",  name: "Resistance Bands",   base: 14,  vol: .05, tier: 0 },
-    { id: "bars",   name: "Protein Bar Boxes",  base: 18,  vol: .06, tier: 0 },
-    { id: "crea",   name: "Creatine Tubs",      base: 22,  vol: .05, tier: 0 },
-    { id: "whey",   name: "Whey Protein 2 kg",  base: 45,  vol: .07, tier: 0 },
-    { id: "pre",    name: "Pre-Workout",        base: 34,  vol: .12, tier: 1 },
-    { id: "kb",     name: "Kettlebells 16 kg",  base: 65,  vol: .06, tier: 1 },
-    { id: "plates", name: "Used Bumper Plates", base: 85,  vol: .09, tier: 2 },
-    { id: "rower",  name: "Refurbished Rowers", base: 600, vol: .1,  tier: 3 }
+  const FOCUS = [
+    { id: "balanced", name: "Balanced",     desc: "A normal day. No bonuses, no costs." },
+    { id: "sales",    name: "Push sales",   desc: "Dues +20%, coaching +40%, hype builds faster. Happiness −4 a day." },
+    { id: "clean",    name: "Deep clean",   desc: "Cleanliness +30, happiness +2. Dues −10% while areas are closed off." },
+    { id: "events",   name: "Member event", desc: "Costs about a tenth of a day's dues. Happiness +6, big hype, hurts rivals." },
+    { id: "self",     name: "Self-care",    desc: "+15 energy and +1 physique a day. Dues −10%, happiness −2." }
   ];
-  const SHELVES = [{ add: 50, cost: 250, name: "Wire Shelving" }, { add: 150, cost: 3000, name: "Back Storage Room" }, { add: 600, cost: 45000, name: "Rented Warehouse" }];
+  // day 0 is January 1. Each season has its own challenge.
+  const SEASONS = [
+    { from: 0,   to: 59,  name: "Resolution season", mult: 1.25, cold: true,  ch: { id: "coach",  text: "Coach on 25 days this season", goal: 25 } },
+    { from: 60,  to: 151, name: "Spring",            mult: 1,                 ch: { id: "clean",  text: "End 30 days with cleanliness 70+", goal: 30 } },
+    { from: 152, to: 243, name: "Summer shred",      mult: 1.15, hot: true,   ch: { id: "happy",  text: "End 30 days with happiness 70+", goal: 30 } },
+    { from: 244, to: 334, name: "Fall",              mult: 1,                 ch: { id: "cert",   text: "Earn a certification", goal: 1 } },
+    { from: 335, to: 364, name: "Holiday slump",     mult: 0.8,  cold: true,  ch: { id: "nodebt", text: "Stay out of debt for the whole slump", goal: 30 } }
+  ];
+  const STAFF = [
+    { id: "desk",    name: "Front Desk",  note: "Dues ×1.12, happiness +3",                                 hire: 50,   base: 6,  pct: 0.03 },
+    { id: "cleaner", name: "Cleaner",     note: "Cleanliness +10 every day",                                hire: 80,   base: 8,  pct: 0.02 },
+    { id: "manager", name: "Gym Manager", note: "Coaches for you on rest days, happiness +4, fights rivals", hire: 2500, base: 60, pct: 0.05, tier: 2 }
+  ];
+  const AMEN = [
+    { id: "plant",    name: "Potted Plant",          note: "+1.5 happiness each, up to 6", base: 25,    grow: 1.25 },
+    { id: "fountain", name: "Water Fountain",        note: "+3 happiness each, up to 3",   base: 60,    grow: 1.4 },
+    { id: "lockers",  name: "Locker Room & Showers", note: "+12 happiness",                base: 2500,  grow: 2 },
+    { id: "lounge",   name: "Recovery Lounge",       note: "+8 happiness",                 base: 40000, grow: 2 }
+  ];
+  // every life is a gym in one of these cities. "need" is Golden Plates earned in total.
+  const CITIES = [
+    { id: "columbus",  name: "Columbus",      st: "OH", lon: -83.0,  lat: 40.0, need: 0,   trait: "Your hometown. No surprises.", mods: {} },
+    { id: "nashville", name: "Nashville",     st: "TN", lon: -86.8,  lat: 36.2, need: 3,   trait: "Cheap and friendly. Rent and meals cost 30% less.", mods: { cost: 0.7 } },
+    { id: "denver",    name: "Denver",        st: "CO", lon: -105.0, lat: 39.7, need: 6,   trait: "Thin air, fit locals. +60 days of life, happiness +4.", mods: { life: 60, happy: 4 } },
+    { id: "austin",    name: "Austin",        st: "TX", lon: -97.7,  lat: 30.3, need: 10,  trait: "Social city. Member events give double happiness and double hype.", mods: { events: 2 } },
+    { id: "phoenix",   name: "Phoenix",       st: "AZ", lon: -112.1, lat: 33.4, need: 15,  trait: "Brutal summers drive everyone indoors. Summer dues ×1.5, rent 15% less.", mods: { hot: 1.5, cost: 0.85 } },
+    { id: "chicago",   name: "Chicago",       st: "IL", lon: -87.6,  lat: 41.9, need: 20,  trait: "Long winters. Winter and holiday dues ×1.4, summer ×0.85.", mods: { cold: 1.4, hot: 0.85 } },
+    { id: "miami",     name: "Miami",         st: "FL", lon: -80.2,  lat: 25.8, need: 28,  trait: "Beach-body city. Dues ×1.25, but rivals open twice as often.", mods: { dues: 1.25, rival: 2 } },
+    { id: "seattle",   name: "Seattle",       st: "WA", lon: -122.3, lat: 47.6, need: 36,  trait: "Rainy and rich. Dues ×1.3, costs ×1.3.", mods: { dues: 1.3, cost: 1.3 } },
+    { id: "boston",    name: "Boston",        st: "MA", lon: -71.1,  lat: 42.4, need: 45,  trait: "College town. Certifications cost half and take 30% less time.", mods: { cert: 0.5, study: 0.7 } },
+    { id: "la",        name: "Los Angeles",   st: "CA", lon: -118.2, lat: 34.1, need: 60,  trait: "Fitness capital. Dues ×1.6, coaching ×1.5, rivals everywhere.", mods: { dues: 1.6, coach: 1.5, rival: 2.5 } },
+    { id: "sf",        name: "San Francisco", st: "CA", lon: -122.4, lat: 37.8, need: 80,  trait: "Tech money. Dues ×2, costs ×2.5.", mods: { dues: 2, cost: 2.5 } },
+    { id: "nyc",       name: "New York",      st: "NY", lon: -74.0,  lat: 40.7, need: 100, trait: "The big one. Dues ×2.5, costs ×2, rivals ×2.", mods: { dues: 2.5, cost: 2, rival: 2 } }
+  ];
+  const CITY_BY_ID = Object.fromEntries(CITIES.map(c => [c.id, c]));
+  // Golden Plate upgrades: permanent, across every life
+  const LEGACY = [
+    { id: "genes",   name: "Strong Genes",    desc: "+20 days of life at the start", max: 10, cost: l => 1 + l },
+    { id: "brand",   name: "Brand Power",     desc: "+10% dues",                     max: 20, cost: l => 1 + l },
+    { id: "trust",   name: "Trust Fund",      desc: "+$40 starting cash",            max: 10, cost: l => 1 + Math.floor(l / 2) },
+    { id: "coach",   name: "Coach's Eye",     desc: "+25% coaching pay",             max: 10, cost: l => 1 + l },
+    { id: "mouth",   name: "Word of Mouth",   desc: "+5 starting happiness, +3 hype per coaching day", max: 5, cost: l => 2 + l },
+    { id: "deals",   name: "Supplier Deals",  desc: "Equipment costs 4% less",       max: 8,  cost: l => 2 + l },
+    { id: "stomach", name: "Iron Stomach",    desc: "Survive 3 more days in debt",   max: 3,  cost: l => 3 + 2 * l },
+    { id: "royal",   name: "Franchise Fees",  desc: "+50% royalties from your chain", max: 6, cost: l => 3 + 2 * l }
+  ];
 
   // ======================= STATE =======================
-  function fresh() {
-    return {
+  // things that carry from one life to the next
+  const KEEP = ["plates", "platesEarned", "lu", "chain", "hof", "lives", "name", "haptics", "lifetime"];
+  function fresh(keep) {
+    const s = {
       cash: 25, energy: 100, physique: 0, day: 0, bonusDays: 0,
       owned: {}, ups: {}, spentEquip: 0, gear: {}, certs: {}, study: null,
       layout: [], nextKey: 1,
       home: "couch", homesOwned: { couch: true }, food: "ramen",
-      bankOpen: false, savings: 0, credit: 520, loans: [],
-      fund: { units: 0, price: 100, hist: [100] },
-      goods: null, store: 50, shelves: 0,
+      bankOpen: false, savings: 0, loans: [],
       runEarned: 0, lifetime: 0, hustled: 0, reps: 0,
-      legacy: 0, lives: 1, bestNet: 0, nwHist: [], log: [], warm: {}, warmOpen: true,
-      cd: {}, nextEvent: 18, name: "Iron Temple", dead: false,
-      focus: "balanced", happy: 65, clean: 80, staff: {}, rival: null, debtDays: 0, seasonName: "", haptics: true
+      lives: 1, bestNet: 0, nwHist: [], log: [], warm: {}, warmOpen: true,
+      cd: {}, nextEvent: 18, name: "Iron Temple", dead: false, deathReason: "",
+      focus: "balanced", happy: 65, clean: 80, staff: {}, rival: null, debtDays: 0, seasonName: "", haptics: true,
+      hype: 0, packed: 0, chal: null, rivalsBeaten: 0, peakTier: 0,
+      city: "columbus", plates: 0, platesEarned: 0, lu: {}, chain: [], hof: {}
     };
+    if (keep) KEEP.forEach(k => { if (keep[k] !== undefined) s[k] = keep[k]; });
+    // legacy head starts
+    s.cash += 40 * ((s.lu && s.lu.trust) || 0);
+    s.happy += 5 * ((s.lu && s.lu.mouth) || 0);
+    return s;
   }
   let S = fresh();
-  let tab = "floor", buyMode = "1";
+  let tab = "gym", buyMode = "1";
 
   // ======================= MATH =======================
   const SUF = ["", "K", "M", "B", "T", "Qa", "Qi", "Sx", "Sp", "Oc", "No", "Dc"];
@@ -431,22 +517,25 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     return s + "$" + fmt(n);
   }
   const ydays = d => { d = Math.max(0, Math.floor(d)); return Math.floor(d / 365) + "y " + (d % 365) + "d"; };
-  const lifeTxt = d => d >= 365 ? (Math.round(d / 365 * 10) / 10) + "y" : d + "d";
+  const lifeTxt = d => d >= 365 ? (Math.round(d / 365 * 10) / 10) + "y" : Math.round(d) + "d";
   const rnd = (a, b) => a + Math.random() * (b - a);
   const pick = a => a[Math.floor(Math.random() * a.length)];
-  const gauss = () => { let u = 0, v = 0; while (!u) u = Math.random(); while (!v) v = Math.random(); return Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); };
 
-  const legacyMult = () => 1 + 0.1 * S.legacy;
+  const lv = id => (S.lu && S.lu[id]) || 0;
+  const city = () => CITY_BY_ID[S.city] || CITIES[0];
+  const cm = (k, d) => city().mods[k] ?? d;
+  const cityCost = () => cm("cost", 1);
+
+  // equipment doubles at each milestone level
   function genMult(id) {
-    let m = 1;
-    if (S.ups["u_" + id + "_1"]) m *= 2;
-    if (S.ups["u_" + id + "_2"]) m *= 2;
+    const n = S.owned[id] || 0;
+    let m = Math.pow(2, MILESTONES.filter(x => n >= x).length);
     if (id === "rack" && S.certs.cscs) m *= 2;
     return m;
   }
   function globalMult() {
-    let m = legacyMult();
-    UPGRADES.forEach(u => { if (u.global && S.ups[u.id]) m *= u.mult; });
+    let m = 1 + 0.1 * lv("brand");
+    UPGRADES.forEach(u => { if (S.ups[u.id]) m *= u.mult; });
     if (S.certs.biz) m *= 1.5;
     if (S.certs.mba) m *= 2;
     if (S.certs.dpt) m *= 2;
@@ -454,47 +543,19 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   }
   const genRate = g => g.rate * genMult(g.id) * globalMult();
   function baseDues() { let t = 0; GENS.forEach(g => { t += (S.owned[g.id] || 0) * genRate(g); }); return t; }
+  const unitCost = (g, n) => g.base * Math.pow(1.15, n) * (1 - 0.04 * lv("deals"));
+  const bulkCost = (g, n, k) => unitCost(g, n) * (Math.pow(1.15, k) - 1) / 0.15;
+  const maxAfford = (g, n, m) => Math.max(0, Math.floor(Math.log(Math.max(0, m) * 0.15 / unitCost(g, n) + 1) / Math.log(1.15)));
+  function tierIndex() { let i = 0; TIERS.forEach((t, j) => { if (S.runEarned >= t.at) i = j; }); return i; }
 
-  // ---- daily focus ----
-  const FOCUS = [
-    { id: "balanced", name: "Balanced",     desc: "A normal day. No bonuses, no costs." },
-    { id: "sales",    name: "Push sales",   desc: "Dues +20%, coaching +40%. Members get annoyed: happiness −4 a day." },
-    { id: "clean",    name: "Deep clean",   desc: "Cleanliness +30, happiness +2. Dues −10% while areas are closed off." },
-    { id: "events",   name: "Member event", desc: "Costs about a tenth of a day's dues. Happiness +6. Hurts any rival." },
-    { id: "self",     name: "Self-care",    desc: "+15 energy and +1 physique a day. Dues −10%, happiness −2." }
-  ];
   const focus = () => FOCUS.find(f => f.id === S.focus) || FOCUS[0];
   const focusDuesMult = () => ({ sales: 1.2, clean: 0.9, self: 0.9 }[S.focus] || 1);
-  const coachToday = () => coachValue() * (S.focus === "sales" ? 1.4 : 1);
-
-  // ---- seasons (day 0 is January 1) ----
-  const SEASONS = [
-    { from: 0, to: 59, name: "Resolution season", mult: 1.25 }, { from: 60, to: 151, name: "Spring", mult: 1 },
-    { from: 152, to: 243, name: "Summer shred", mult: 1.15 }, { from: 244, to: 334, name: "Fall", mult: 1 },
-    { from: 335, to: 364, name: "Holiday slump", mult: 0.8 }
-  ];
   const season = () => { const d = S.day % 365; return SEASONS.find(x => d >= x.from && d <= x.to); };
-
-  // ---- staff ----
-  const STAFF = [
-    { id: "desk",    name: "Front Desk",  note: "Dues ×1.12, happiness +3",                                hire: 50,   base: 6,  pct: 0.03 },
-    { id: "cleaner", name: "Cleaner",     note: "Cleanliness +10 every day",                               hire: 80,   base: 8,  pct: 0.02 },
-    { id: "manager", name: "Gym Manager", note: "Coaches for you on rest days, happiness +4, fights rivals", hire: 2500, base: 60, pct: 0.05, tier: 2 }
-  ];
+  function seasonMult() { const s = season(); let m = s.mult; if (s.hot) m *= cm("hot", 1); if (s.cold) m *= cm("cold", 1); return m; }
   const wage = st => st.base + st.pct * baseDues();
-  const staffWages = () => STAFF.reduce((a, st) => a + (S.staff[st.id] ? wage(st) : 0), 0);
-
-  // ---- amenities (placed on the floor, they raise happiness) ----
-  const AMEN = [
-    { id: "plant",    name: "Potted Plant",          note: "+1.5 happiness each, up to 6 count", base: 25,    grow: 1.25 },
-    { id: "fountain", name: "Water Fountain",        note: "+3 happiness each, up to 3 count",   base: 60,    grow: 1.4 },
-    { id: "lockers",  name: "Locker Room & Showers", note: "+12 happiness (one counts)",         base: 2500,  grow: 2 },
-    { id: "lounge",   name: "Recovery Lounge",       note: "+8 happiness (one counts)",          base: 40000, grow: 2 }
-  ];
   const amenCost = a => a.base * Math.pow(a.grow, S.owned[a.id] || 0);
   const nameOf = t => (GEN_BY_ID[t] || AMEN.find(a => a.id === t) || { name: t }).name;
   const placedOf = t => S.layout.filter(i => i.t === t && i.c != null).length;
-  // how full the floor is, and how many items have no open space around them
   function floorStats() {
     const grid = occupied();
     let used = 0; grid.forEach(r => r.forEach(v => { if (v) used++; }));
@@ -511,6 +572,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   function moodParts() {
     const g = floorStats();
     const parts = [["Base", 55]];
+    if (cm("happy", 0)) parts.push([city().name, cm("happy", 0)]);
     const am = Math.min(placedOf("plant"), 6) * 1.5 + Math.min(placedOf("fountain"), 3) * 3 + (placedOf("lockers") ? 12 : 0) + (placedOf("lounge") ? 8 : 0);
     if (am) parts.push(["Amenities", am]);
     parts.push(["Cleanliness", Math.round((S.clean - 60) * 0.3)]);
@@ -525,51 +587,40 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   const happyLabel = h => h < 35 ? "Members are canceling" : h < 50 ? "Grumbling" : h < 70 ? "Content" : h < 85 ? "Happy" : "Loving it";
   const rivalCut = () => S.rival ? 0.1 + S.rival.str * 0.0025 : 0;
   // dues you actually collect today, after every modifier
-  function income() { return baseDues() * happyMult() * season().mult * (1 - rivalCut()) * (S.staff.desk ? 1.12 : 1) * focusDuesMult(); }
-  const eventCost = () => S.focus === "events" ? 10 + income() * 0.1 : 0;
-  const interestToday = () => S.bankOpen && S.savings > 0 ? S.savings * 0.04 / 365 : 0;
-
-  // ---- haptics (vibrate where supported; iPhone Safari gets the system switch tick) ----
-  let hapLabel = null;
-  function buzz(kind) {
-    if (!S.haptics) return;
-    try {
-      if (navigator.vibrate) { navigator.vibrate(kind === "warn" ? [35, 60, 35] : kind === "big" ? 25 : 12); return; }
-      if (!hapLabel) {
-        hapLabel = document.createElement("label"); hapLabel.setAttribute("aria-hidden", "true");
-        hapLabel.style.cssText = "position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none";
-        const i = document.createElement("input"); i.type = "checkbox"; i.setAttribute("switch", ""); i.tabIndex = -1;
-        hapLabel.append(i); document.body.append(hapLabel);
-      }
-      hapLabel.click();
-      if (kind === "warn") setTimeout(() => hapLabel.click(), 110);
-    } catch (e) {}
+  function income() {
+    return baseDues() * happyMult() * seasonMult() * (1 - rivalCut()) * (S.staff.desk ? 1.12 : 1) * focusDuesMult() * cm("dues", 1) * (S.packed > 0 ? 2 : 1);
   }
-  const coachMult = () => (S.certs.cpt ? 2 : 1) * (S.certs.kin ? 3 : 1) * legacyMult();
+  // every gym from your past lives pays a small royalty every day
+  const ROYALTY = 0.015;
+  const royaltyOf = g => (g.dues || 0) * ROYALTY * (1 + 0.5 * lv("royal"));
+  const royalties = () => S.chain.reduce((a, g) => a + royaltyOf(g), 0);
+  const coachMult = () => (S.certs.cpt ? 2 : 1) * (S.certs.kin ? 3 : 1) * (1 + 0.25 * lv("coach")) * cm("coach", 1);
   const coachValue = () => (3 + income() * 0.5) * coachMult();
+  const coachToday = () => coachValue() * (S.focus === "sales" ? 1.4 : 1);
   function hustleMult(h) {
-    let m = legacyMult() * (S.gear.tees ? 1.25 : 1);
+    let m = (S.gear.tees ? 1.25 : 1);
     if (h.id === "flyers" && S.gear.dog) m *= 1.5;
     if (h.id === "boot" && S.gear.clip) m *= 1.3;
     return m;
   }
-  const unitCost = (g, n) => g.base * Math.pow(1.15, n);
-  const bulkCost = (g, n, k) => unitCost(g, n) * (Math.pow(1.15, k) - 1) / 0.15;
-  const maxAfford = (g, n, m) => Math.max(0, Math.floor(Math.log(Math.max(0, m) * 0.15 / unitCost(g, n) + 1) / Math.log(1.15)));
-  function tierIndex() { let i = 0; TIERS.forEach((t, j) => { if (S.runEarned >= t.at) i = j; }); return i; }
+  const eventCost = () => S.focus === "events" ? 10 + income() * 0.1 : 0;
+  const interestToday = () => S.bankOpen && S.savings > 0 ? S.savings * 0.04 / 365 : 0;
+  const certCost = c => c.cost * cm("cert", 1);
+  const certDays = c => Math.max(1, Math.round(c.days * cm("study", 1)));
+  const debtLimit = () => 14 + 3 * lv("stomach");
 
   const home = () => HOMES.find(h => h.id === S.home) || HOMES[0];
   const food = () => FOODS.find(f => f.id === S.food) || FOODS[0];
   const maxEnergy = () => home().max;
   const certLife = () => CERTS.reduce((a, c) => a + (S.certs[c.id] ? c.life : 0), 0);
-  const lifespanDays = () => BASE_DAYS + home().life + food().life + certLife() + S.physique * 1.5 + S.bonusDays;
+  const lifespanDays = () => BASE_DAYS + 20 * lv("genes") + cm("life", 0) + home().life + food().life + certLife() + S.physique * 1.5 + S.bonusDays;
   const ageDays = () => START_AGE * 365 + S.day;
   const daysLeft = () => lifespanDays() - S.day;
 
   function burnItems() {
     const items = [];
-    if (home().burn) items.push(["Rent · " + home().name, home().burn, "life"]);
-    items.push(["Meals · " + food().name, food().burn, "life"]);
+    if (home().burn) items.push(["Rent · " + home().name, home().burn * cityCost(), "life"]);
+    items.push(["Meals · " + food().name, food().burn * cityCost(), "life"]);
     const oh = income() * 0.1;
     if (oh > 0) items.push(["Gym lease & utilities", oh]);
     STAFF.forEach(st => { if (S.staff[st.id]) items.push([st.name + " wages", wage(st)]); });
@@ -579,99 +630,63 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     return items;
   }
   const burn = () => burnItems().reduce((a, b) => a + b[1], 0);
-
-  function goodsValue() { if (!S.goods) return 0; let v = 0; GOODS.forEach(g => { const q = S.goods[g.id]; v += q.own * q.price; }); return v; }
-  function storeUsed() { if (!S.goods) return 0; let n = 0; GOODS.forEach(g => { n += S.goods[g.id].own; }); return n; }
   const loanTotal = () => S.loans.reduce((a, l) => a + l.bal, 0);
   const equipValue = () => S.spentEquip * 0.5;
-  const fundValue = () => S.fund.units * S.fund.price;
-  const netWorth = () => S.cash + S.savings + fundValue() + goodsValue() + equipValue() - loanTotal();
-  const bizApr = () => Math.max(0.04, 0.24 - (S.credit - 500) / 350 * 0.2);
-  const STUDENT_APR = 0.065;
-  function bizLimit() {
-    const cur = S.loans.filter(l => l.kind === "Business").reduce((a, l) => a + l.bal, 0);
-    return Math.max(0, Math.floor((S.credit - 520) * 40 + Math.max(0, netWorth()) * 0.4 - cur));
-  }
-  function makeLoan(kind, amount, apr, years) {
-    const total = amount * (1 + apr * years * 0.55);
-    return { kind, bal: total, pay: total / (years * 365), apr };
-  }
-  const creditLabel = c => c < 580 ? "Poor" : c < 670 ? "Fair" : c < 740 ? "Good" : c < 800 ? "Very good" : "Excellent";
+  const netWorth = () => S.cash + S.savings + equipValue() - loanTotal();
+  function makeLoan(kind, amount, fee, days) { const total = amount * (1 + fee); return { kind, bal: total, pay: total / days, fee }; }
+  const emergencyLimit = () => Math.max(0, Math.floor(150 + 20 * (income() + coachToday()) - S.loans.filter(l => l.kind === "Emergency").reduce((a, l) => a + l.bal, 0)));
+  const platesFor = () => Math.max(0, Math.floor(S.day / 50 + Math.sqrt(Math.max(0, S.bestNet) / 2000) + S.peakTier * 1.5 + Object.keys(S.certs).length * 0.5 + S.rivalsBeaten));
 
   function earn(v) { S.cash += v; S.runEarned += v; S.lifetime += v; }
   function logMsg(m) { S.log.unshift({ d: S.day, m }); if (S.log.length > 80) S.log.length = 80; }
-
-  // ======================= MARKETS =======================
-  function ensureGoods() {
-    if (S.goods) return;
-    S.goods = {};
-    GOODS.forEach(g => { const p = g.base * rnd(0.85, 1.15); S.goods[g.id] = { price: p, hist: [p], own: 0, cost: 0 }; });
-  }
-  function walkMarkets() {
-    GOODS.forEach(g => {
-      const q = S.goods[g.id];
-      let p = q.price * Math.exp(g.vol * gauss());
-      p += (g.base - p) * 0.06;
-      p = Math.min(g.base * 2.6, Math.max(g.base * 0.35, p));
-      q.price = p; q.hist.push(p); if (q.hist.length > 30) q.hist.shift();
-    });
-    const f = S.fund;
-    f.price = Math.max(5, f.price * Math.exp(0.09 / 365 + 0.014 * gauss()));
-    f.hist.push(f.price); if (f.hist.length > 60) f.hist.shift();
-  }
-  const prevOf = h => h.length > 1 ? h[h.length - 2] : h[0];
-  function marketIndex(prev) {
-    let s = 0; GOODS.forEach(g => { const q = S.goods[g.id]; s += (prev ? prevOf(q.hist) : q.price) / g.base; });
-    return s / GOODS.length * 100;
-  }
 
   // ======================= A DAY PASSES =======================
   // Every action that takes time (coach, rest, hustle, train) calls this once.
   function passDay(what) {
     if (S.dead) return;
     S.day++;
-    const dues = income();
-    const bills = burn();
+    const dues = income(), roy = royalties(), bills = burn();
     if (dues > 0) earn(dues);
+    if (roy > 0) earn(roy);
     S.loans.forEach(l => { l.bal -= Math.min(l.pay, l.bal); });
     const paid = S.loans.filter(l => l.bal <= 0.005);
-    if (paid.length) { paid.forEach(l => logMsg("Paid off your " + l.kind.toLowerCase() + " loan.")); S.loans = S.loans.filter(l => l.bal > 0.005); S.credit += 15; }
+    if (paid.length) { paid.forEach(l => logMsg("Paid off your " + l.kind.toLowerCase() + " loan.")); S.loans = S.loans.filter(l => l.bal > 0.005); }
     S.cash -= bills;
-    let stress = "";
+    let note = "";
     if (S.cash < 0) {
       // in debt: you can't buy food, so no energy comes back, and the stress costs life
-      S.cash *= 1.01; S.credit -= 4; S.debtDays++;
-      S.bonusDays -= 2; stress = " In debt (day " + S.debtDays + " of 14): skipped meals, −2 days of life.";
+      S.cash *= 1.01; S.debtDays++;
+      S.bonusDays -= 2; note = " In debt (day " + S.debtDays + " of " + debtLimit() + "): skipped meals, −2 days of life.";
     } else {
       S.debtDays = 0;
       S.energy = Math.min(maxEnergy(), S.energy + food().regen);
     }
     if (S.focus === "self") { S.energy = Math.min(maxEnergy(), S.energy + 15); S.physique = Math.min(100, S.physique + 1); }
+    if (S.packed > 0) { S.packed--; if (!S.packed) logMsg("The packed house is over. Back to normal."); }
     gymDay();
-    if (S.cash >= 0) S.credit += S.loans.length ? 0.4 : 0.08;
-    S.credit = Math.max(300, Math.min(850, S.credit));
-    if (S.bankOpen && S.savings > 0) S.savings *= 1 + 0.04 / 365;
-    ensureGoods(); walkMarkets();
+    if (S.bankOpen && S.savings > 0) S.savings += interestToday();
     if (S.study) {
       S.study.left--;
       if (S.study.left <= 0) {
         const c = CERT_BY_ID[S.study.id]; S.certs[c.id] = true; S.study = null;
-        if (c.id === "biz") S.credit = Math.min(850, S.credit + 40);
-        logMsg("You earned your " + c.name + "! +" + lifeTxt(c.life) + " life."); notify("Certified", "You earned your " + c.name + ". " + c.perk + ". It also adds " + lifeTxt(c.life) + " to your life.", "Nice");
+        logMsg("You earned your " + c.name + "! +" + lifeTxt(c.life) + " life.");
+        notify("Certified", "You earned your " + c.name + ". " + c.perk + ". It also adds " + lifeTxt(c.life) + " to your life.", "Nice");
+        challengeTick("cert", 1);
         sceneDirty = true;
       }
     }
     const nw = netWorth();
     S.nwHist.push(nw); if (S.nwHist.length > 60) S.nwHist.shift();
     S.bestNet = Math.max(S.bestNet, nw);
-    logMsg((what ? what + " · " : "") + (dues > 0 ? "dues +" + money(dues) + " · " : "") + "bills −" + money(bills) + "." + stress);
+    S.peakTier = Math.max(S.peakTier, tierIndex());
+    logMsg((what ? what + " · " : "") + (dues > 0 ? "dues +" + money(dues) + " · " : "") + (roy > 0 ? "royalties +" + money(roy) + " · " : "") + "bills −" + money(bills) + "." + note);
     if (S.day % 365 === 0) logMsg("Happy birthday! You turned " + Math.floor(ageDays() / 365) + ".");
     checkWarm();
-    const left = daysLeft();
-    if (left <= 0) { die(); return; }
-    if (S.debtDays >= 14) { die("starved"); return; }
-    if (S.debtDays === 3 || S.debtDays === 7 || S.debtDays === 11) {
-      notify("In debt for " + S.debtDays + " days", "You can't afford food. You get no energy back and lose 2 extra days of life each day. After 14 days in a row below $0 you starve and this life ends. " + (14 - S.debtDays) + " days to get back above $0.", "I'll fix it");
+    if (daysLeft() <= 0) { die(); return; }
+    if (S.debtDays >= debtLimit()) { die("starved"); return; }
+    const toGo = debtLimit() - S.debtDays;
+    if (S.debtDays && (toGo === 11 || toGo === 7 || toGo === 3)) {
+      notify("In debt for " + S.debtDays + " days", "You can't afford food. You get no energy back and lose 2 extra days of life each day. After " + debtLimit() + " days in a row below $0 you starve. " + toGo + " days to get back above $0.", "I'll fix it");
       buzz("warn");
     }
     checkOutlook();
@@ -680,35 +695,71 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   function gymDay() {
     const placedCount = S.layout.filter(i => i.c != null).length;
     S.clean = Math.max(0, Math.min(100, S.clean - (2 + placedCount * 0.12) + (S.staff.cleaner ? 10 : 0) + (S.focus === "clean" ? 30 : 0)));
-    const fd = { sales: -4, clean: 2, events: 6, self: -2 }[S.focus] || 0;
+    const ev = cm("events", 1);
+    const fd = { sales: -4, clean: 2, events: 6 * ev, self: -2 }[S.focus] || 0;
     S.happy = Math.max(0, Math.min(100, S.happy + (moodTarget() - S.happy) * 0.25 + fd));
+    if (S.focus === "events") addHype(12 * ev);
+    if (S.focus === "sales") addHype(3);
     const since = id => S.day - (S.cd[id] ?? -999);
     if (S.happy < 35 && since("warnHappy") >= 20) {
       S.cd.warnHappy = S.day;
       notify("Members are canceling", "Happiness is down to " + Math.round(S.happy) + ". Unhappy members cancel, so dues drop. Clean up, give equipment some space, add amenities, or run a member event.");
     }
-    if (S.clean < 25 && since("dirty") >= 12) {
+    if (S.clean < 25 && since("dirty") >= 25) {
       S.cd.dirty = S.day; S.happy = Math.max(0, S.happy - 8);
       notify("Members complain about the smell", "The locker area is gross and people noticed. Happiness −8. A Deep clean day or a Cleaner fixes this.");
     }
-    const sn = season().name;
-    if (S.seasonName && S.seasonName !== sn) logMsg(sn + " starts. Dues ×" + season().mult + ".");
-    S.seasonName = sn;
+    // seasons and their challenges
+    const sn = season();
+    const key = sn.name + "#" + Math.floor(S.day / 365);
+    if (!S.chal || S.chal.key !== key) {
+      if (S.seasonName) logMsg(sn.name + " starts. Dues ×" + seasonMult().toFixed(2) + ". New challenge: " + sn.ch.text + ".");
+      S.chal = { key, prog: 0, done: false };
+    }
+    S.seasonName = sn.name;
+    if (sn.ch.id === "clean" && S.clean >= 70) challengeTick("clean", 1);
+    if (sn.ch.id === "happy" && S.happy >= 70) challengeTick("happy", 1);
+    if (sn.ch.id === "nodebt" && S.cash >= 0) challengeTick("nodebt", 1);
+    // rivals
     if (S.rival) {
-      S.rival.str += (55 - S.happy) * 0.25 - (S.focus === "events" ? 4 : 0) - (S.focus === "sales" ? 1.5 : 0) - (S.staff.manager ? 1 : 0);
+      S.rival.str += (55 - S.happy) * 0.25 - (S.focus === "events" ? 4 * ev : 0) - (S.focus === "sales" ? 1.5 : 0) - (S.staff.manager ? 1 : 0);
       S.rival.str = Math.min(150, S.rival.str);
       if (S.rival.str <= 0) {
         const prize = Math.max(50, baseDues() * 10);
-        earn(prize); S.happy = Math.min(100, S.happy + 5); S.cd.rival = S.day;
+        earn(prize); S.happy = Math.min(100, S.happy + 5); S.cd.rival = S.day; S.rivalsBeaten++;
         logMsg(S.rival.name + " closed. Their members joined you: +" + money(prize) + ".");
-        notify(S.rival.name + " closed", "Their members came over to you. You get " + money(prize) + " in sign-up fees and happiness +5.", "Nice");
+        notify(S.rival.name + " closed", "Their members came over to you. You get " + money(prize) + " in sign-up fees, happiness +5, and a Golden Plate when this life ends.", "Nice");
         S.rival = null;
       }
-    } else if (S.day > 45 && S.runEarned > 1000 && since("rival") >= 150 && Math.random() < 0.012) {
+    } else if (S.day > 45 && S.runEarned > 1000 && since("rival") >= 150 && Math.random() < 0.012 * cm("rival", 1)) {
       S.rival = { name: pick(["Flex Factory", "PumpHaus", "Iron Republic", "Gainz Garage", "Apex Athletics", "Barbell Barn"]), str: 100 };
       logMsg(S.rival.name + " opened across the street.");
-      openModal("A rival gym opened", S.rival.name + " opened across the street and is pulling your members away. They take " + Math.round(rivalCut() * 100) + "% of your dues until you win people back. Keep happiness above 55, run member events and push sales to wear them down.", [["Game on", () => {}]]);
+      openModal("A rival gym opened", S.rival.name + " opened across the street and is pulling your members away. They take " + Math.round(rivalCut() * 100) + "% of your dues until you win people back. Keep happiness above 55, run member events and push sales to wear them down. Beat them for a Golden Plate.", [["Game on", () => {}]]);
       buzz("warn");
+    }
+  }
+  function challengeTick(id, n) {
+    const sn = season();
+    if (!S.chal || S.chal.done || sn.ch.id !== id) return;
+    S.chal.prog = Math.min(sn.ch.goal, S.chal.prog + n);
+    if (S.chal.prog >= sn.ch.goal) {
+      S.chal.done = true;
+      const cash = Math.max(100, income() * 15);
+      earn(cash); S.plates += 2; S.platesEarned += 2;
+      logMsg("Season challenge done: " + sn.ch.text + ". +" + money(cash) + " and 2 Golden Plates.");
+      notify("Challenge complete", sn.name + ": " + sn.ch.text + ". You earn " + money(cash) + " and 2 Golden Plates.", "Nice");
+      buzz("big");
+    }
+  }
+  // hype fills by coaching; when it's full the house is packed for 5 days
+  function addHype(n) {
+    if (S.packed > 0) return;
+    S.hype = Math.min(100, S.hype + n);
+    if (S.hype >= 100) {
+      S.hype = 0; S.packed = 5;
+      logMsg("Packed house! Dues ×2 for 5 days.");
+      notify("Packed house", "Word got out. The gym is slammed and dues are doubled for the next 5 days.", "Let's go");
+      buzz("big");
     }
   }
   function afterAction() { refresh(); save(); }
@@ -727,6 +778,8 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     const m = people.filter(p => p.role === "member" && !p.hidden);
     if (m.length) { selected = pick(m); selectedUntil = performance.now() + 3500; }
     floaty("+" + money(v), el("coachBtn"));
+    addHype(6 + 3 * lv("mouth"));
+    challengeTick("coach", 1);
     passDay("Coached clients for " + money(v));
     afterAction();
   }
@@ -754,39 +807,55 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     afterAction();
   }
 
+  // ---- haptics (vibrate where supported; iPhone Safari gets the system switch tick) ----
+  let hapLabel = null;
+  function buzz(kind) {
+    if (!S.haptics) return;
+    try {
+      if (navigator.vibrate && navigator.userActivation && navigator.userActivation.hasBeenActive) { navigator.vibrate(kind === "warn" ? [35, 60, 35] : kind === "big" ? [20, 40, 20, 40, 20] : 12); return; }
+      if (!hapLabel) {
+        hapLabel = document.createElement("label"); hapLabel.setAttribute("aria-hidden", "true");
+        hapLabel.style.cssText = "position:fixed;left:-200px;top:0;width:1px;height:1px;opacity:0;pointer-events:none";
+        const i = document.createElement("input"); i.type = "checkbox"; i.setAttribute("switch", ""); i.tabIndex = -1;
+        hapLabel.append(i); document.body.append(hapLabel);
+      }
+      hapLabel.click();
+      if (kind === "warn" || kind === "big") setTimeout(() => hapLabel.click(), 110);
+    } catch (e) {}
+  }
+
   // ======================= WARM-UP =======================
   const WARM = [
     { id: "w1", t: "Earn your first $10", d: "Tap Coach clients below, or try a hustle.", r: "+$10", ok: () => S.hustled + S.reps * 3 >= 10, give: () => earn(10) },
-    { id: "w2", t: "Put equipment on the floor", d: "Buy yoga mats below. They pay dues every day.", r: "+$15", ok: () => Object.keys(S.owned).length > 0, give: () => earn(15) },
-    { id: "w3", t: "Get off the office couch", d: "Home tab. Better housing adds days to your life.", r: "+20d life", ok: () => S.home !== "couch", give: () => { S.bonusDays += 20; } },
+    { id: "w2", t: "Put equipment on the floor", d: "Buy yoga mats below. They pay dues every day.", r: "+$15", ok: () => GENS.some(g => S.owned[g.id]), give: () => earn(15) },
+    { id: "w3", t: "Get off the office couch", d: "Life tab. Better housing adds days to your life.", r: "+20d life", ok: () => S.home !== "couch", give: () => { S.bonusDays += 20; } },
     { id: "w4", t: "Earn your CPR card", d: "Certs tab. Certifications unlock jobs and add life.", r: "+20d life", ok: () => !!S.certs.cpr, give: () => { S.bonusDays += 20; } },
-    { id: "w5", t: "Open a bank account", d: "Bank tab. Keeps cash safe and builds credit.", r: "+$100", ok: () => S.bankOpen, give: () => earn(100) }
+    { id: "w5", t: "Fill the hype meter", d: "Coaching builds hype. A full meter packs the house.", r: "+$100", ok: () => S.packed > 0 || S.cd.packedOnce, give: () => earn(100) }
   ];
   function checkWarm() {
+    if (S.packed > 0) S.cd.packedOnce = 1;
     WARM.forEach(w => { if (!S.warm[w.id] && w.ok()) { S.warm[w.id] = true; w.give(); logMsg("Warm-up done: " + w.t + " (" + w.r + ")"); notify("Warm-up done", w.t + ". Reward: " + w.r + "."); } });
   }
 
   // ======================= OUTLOOK =======================
-  // Can this life keep going? Looks at money per day and the cheapest way to buy more time.
   function lifeOptions() {
     const opts = [];
     const hi = HOMES.findIndex(h => h.id === S.home);
     const nh = HOMES[hi + 1];
-    if (nh) opts.push({ name: nh.name, kind: "home", cost: S.homesOwned[nh.id] ? 0 : nh.cost, days: nh.life - home().life, extra: nh.burn - home().burn, study: 0, tab: "home" });
+    if (nh) opts.push({ name: nh.name, cost: S.homesOwned[nh.id] ? 0 : nh.cost, days: nh.life - home().life, extra: (nh.burn - home().burn) * cityCost(), study: 0, tab: "life" });
     const fi = FOODS.findIndex(f => f.id === S.food);
     const nf = FOODS[fi + 1];
-    if (nf) opts.push({ name: nf.name, kind: "meals", cost: 0, days: nf.life - food().life, extra: nf.burn - food().burn, study: 0, tab: "home" });
-    if (!S.study) CERTS.forEach(c => { if (certState(c) === "open") opts.push({ name: c.name, kind: "cert", cost: c.cost, days: c.life, extra: 0, study: c.days, tab: "certs" }); });
-    if (S.cd.check == null || S.day - S.cd.check >= 90) opts.push({ name: "Doctor checkup", kind: "care", cost: 250, days: 20, extra: 0, study: 0, tab: "home" });
+    if (nf) opts.push({ name: nf.name, cost: 0, days: nf.life - food().life, extra: (nf.burn - food().burn) * cityCost(), study: 0, tab: "life" });
+    if (!S.study) CERTS.forEach(c => { if (certState(c) === "open") opts.push({ name: c.name, cost: certCost(c), days: c.life, extra: 0, study: certDays(c), tab: "certs" }); });
+    if (S.cd.check == null || S.day - S.cd.check >= 90) opts.push({ name: "Doctor checkup", cost: 250, days: 20, extra: 0, study: 0, tab: "life" });
     return opts.filter(o => o.days > 0);
   }
   function outlook() {
-    const dues = income(), bills = burn();
-    const coachDay = coachToday() * Math.min(1, food().regen / COACH_EN); // what steady coaching adds per day
+    const dues = income() + royalties(), bills = burn();
+    const coachDay = coachToday() * Math.min(1, food().regen / COACH_EN);
     const net = dues + coachDay - bills;
     const left = Math.floor(daysLeft());
     const brokeIn = net < 0 ? Math.floor(Math.max(0, S.cash) / -net) : Infinity;
-    // for each option: how many days until you can afford it at today's pace
     const scored = lifeOptions().map(o => {
       const pace = net - o.extra;
       const gap = Math.max(0, o.cost - S.cash);
@@ -800,7 +869,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     const best = reachable[0] || cheapest;
     let status = "ok";
     if ((net < 0 && brokeIn < left) || left < 60) status = "warn";
-    if ((net < 0 && brokeIn < 15) || (left < 90 && !reachable.length)) status = "bad";
+    if ((net < 0 && brokeIn < 15) || (left < 90 && !reachable.length) || S.debtDays) status = "bad";
     return { dues, bills, coachDay, net, left, brokeIn, best, reachable, status };
   }
   function checkOutlook() {
@@ -815,102 +884,84 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
           ? "The cheapest way to buy time is " + b.name + " (+" + lifeTxt(b.days) + "), but you can't afford it in time. You need to make about " + money(b.needPerDay) + " more per day."
           : "There's nothing left to buy that adds life. Make the most of the time you have."),
         b ? [["Show me", () => setTab(b.tab)], ["Keep going", () => {}]] : [["Keep going", () => {}]]);
+      buzz("warn");
     } else if (o.net < 0 && o.brokeIn < 15 && since("warnCash") >= 15) {
       S.cd.warnCash = S.day;
       openModal("Money is running out",
-        "You're losing " + money(-o.net) + " a day, even coaching every day. Cash runs out in " + o.brokeIn + " days. Below $0 you skip meals, lose 2 extra days of life a day, and after 14 days you starve. Make " + money(-o.net) + " more per day or cut costs with cheaper housing or meals.",
-        [["Show bills", () => { setTab("floor"); burnOpen = true; }], ["Keep going", () => {}]]);
+        "You're losing " + money(-o.net) + " a day, even coaching every day. Cash runs out in " + o.brokeIn + " days. Below $0 you skip meals, lose 2 extra days of life a day, and after " + debtLimit() + " days you starve. Make " + money(-o.net) + " more per day or cut costs.",
+        [["Keep going", () => {}]]);
+      buzz("warn");
     } else if ((o.left === 30 || o.left === 10) && since("warnSoon") >= 5) {
       S.cd.warnSoon = S.day;
-      notify(o.left + " days left", "Your time is almost up. " + (o.best ? "Best way to buy time now: " + o.best.name + " for " + money(o.best.cost) + " (+" + lifeTxt(o.best.days) + ")." : "Spend it well."));
+      notify(o.left + " days left", "Your time is almost up. " + (o.best ? "Best way to buy time now: " + o.best.name + (o.best.cost ? " for " + money(o.best.cost) : "") + " (+" + lifeTxt(o.best.days) + ")." : "Spend it well.") + " When this life ends you'll earn about " + platesFor() + " Golden Plates.");
     }
-  }
-  function outlookCard() {
-    const c = E("div", "card outlook");
-    const top = E("button", "warm-h"); top.type = "button";
-    const pill = E("span", "pill"); const ttl = E("span"); ttl.innerHTML = '<span class="k">Outlook</span>';
-    ttl.append(" ", pill);
-    top.append(ttl, E("span", "k", outlookOpen ? "Hide" : "Show"));
-    top.addEventListener("click", () => { outlookOpen = !outlookOpen; refresh(); });
-    c.append(top);
-    on(() => {
-      const o = outlook();
-      pill.textContent = { ok: "On track", warn: "Watch out", bad: "In danger" }[o.status];
-      pill.className = "pill " + o.status;
-      c.dataset.status = o.status;
-    });
-    if (!outlookOpen) return c;
-    const lines = E("div", "ol-lines");
-    on(() => {
-      const o = outlook();
-      const rows = [];
-      rows.push(["Per day if you coach daily", (o.net >= 0 ? "+" : "−") + money(Math.abs(o.net)), o.net >= 0 ? "up-c" : "down-c"]);
-      rows.push(["Dues + coaching − bills", money(o.dues) + " + " + money(o.coachDay) + " − " + money(o.bills), "muted"]);
-      rows.push(["Life left", o.left + " days", o.left < 30 ? "down-c" : o.left < 90 ? "warn-c" : "up-c"]);
-      if (o.net < 0) rows.push(["Cash runs out in", o.brokeIn + " days", "down-c"]);
-      let html = rows.map(r => "<div><span class='muted'>" + r[0] + "</span><span class='num " + r[2] + "'>" + r[1] + "</span></div>").join("");
-      const b = o.best;
-      if (b) {
-        const when = b.ready ? (b.wait === 0 ? "You can do it now." : "Affordable in about " + b.wait + " days.") : "Not reachable at this pace. Make " + money(b.needPerDay) + " more per day.";
-        html += "<p class='ol-next'><b>Next way to buy time:</b> " + b.name + (b.cost ? " for " + money(b.cost) : "") + (b.extra > 0 ? " (+" + money(b.extra) + "/day)" : "") + ", adds " + lifeTxt(b.days) + (b.study ? " after " + b.study + " days of study" : "") + ". " + when + "</p>";
-      }
-      if (lines._h !== html) { lines._h = html; lines.innerHTML = html; }
-    });
-    c.append(lines);
-    return c;
   }
 
   // ======================= EVENTS =======================
   const big = () => Math.max(30, income() * 8);
   const EVENTS = [
     () => { const c = big() * 0.5; return { t: "Cracked floor tile", x: "A member dropped a 40 kg dumbbell from overhead. The repair costs " + money(c) + ".", b: [["Pay for it", () => { S.cash -= c; logMsg("Paid " + money(c) + " to fix the floor."); }]] }; },
-    () => { const c = big(); return { t: "Influencer visit", x: "A fitness influencer filmed a workout at your gym. New sign-ups bring in " + money(c) + ".", b: [["Nice", () => { earn(c); logMsg("Influencer visit brought " + money(c) + "."); }]] }; },
-    () => { const c = big() * 0.8; return { t: "Burst pipe", x: "The locker room is flooded. Plumber and cleanup: " + money(c) + ".", b: [["Call the plumber", () => { S.cash -= c; logMsg("Burst pipe cost " + money(c) + "."); }]] }; },
+    () => { const c = big(); return { t: "Influencer visit", x: "A fitness influencer filmed a workout at your gym. New sign-ups bring in " + money(c) + " and hype +30.", b: [["Nice", () => { earn(c); addHype(30); logMsg("Influencer visit brought " + money(c) + "."); }]] }; },
+    () => { const c = big() * 0.8; return { t: "Burst pipe", x: "The locker room is flooded. Plumber and cleanup: " + money(c) + ".", b: [["Call the plumber", () => { S.cash -= c; S.clean = Math.max(0, S.clean - 15); logMsg("Burst pipe cost " + money(c) + "."); }]] }; },
     () => { if (S.certs.cpr) return { t: "Health inspection", x: "The inspector checks your first aid kit and your CPR card. You pass.", b: [["Good", () => logMsg("Passed the health inspection.")]] };
       const c = 60 + big() * 0.3; return { t: "Health inspection", x: "Nobody on staff is CPR certified. That is a fine of " + money(c) + ".", b: [["Pay the fine", () => { S.cash -= c; logMsg("Inspection fine " + money(c) + "."); }]] }; },
-    () => { const c = big() * 1.5; return { t: "Resolution rush", x: "Sign-ups spike and you collect " + money(c) + " in joining fees.", b: [["Let them in", () => { earn(c); logMsg("Resolution rush: " + money(c) + "."); }]] }; },
     () => { if (S.certs.cpr) return { t: "Slip in the shower", x: "A member slipped. Your CPR training kicks in and everyone is fine.", b: [["Phew", () => logMsg("Handled a shower slip calmly.")]] };
       const c = big() * 1.2; return { t: "Slip in the shower", x: "A member slipped and nobody knew first aid. Settlement: " + money(c) + ".", b: [["Settle", () => { S.cash -= c; logMsg("Shower slip settlement " + money(c) + "."); }]] }; },
-    () => { if (S.bankOpen || S.cash < 80) return null; const c = S.cash * 0.25; return { t: "Wallet stolen", x: "Someone lifted your wallet at the bus stop. You lose " + money(c) + ". A bank account would have kept it safe.", b: [["Ugh", () => { S.cash -= c; logMsg("Wallet stolen: " + money(c) + "."); }]] }; },
-    () => { const g = pick(GOODS.filter(x => x.tier <= tierIndex())); return { t: "Supplier clearance", x: g.name + " just dropped to half price in the supply room.", b: [["Go look", () => { S.goods[g.id].price *= 0.5; setTab("supply"); }], ["Later", () => { S.goods[g.id].price *= 0.5; }]] }; },
+    () => { if (S.bankOpen || S.cash < 80) return null; const c = S.cash * 0.25; return { t: "Wallet stolen", x: "Someone lifted your wallet at the bus stop. You lose " + money(c) + ". A bank account (Life tab) would have kept it safe.", b: [["Ugh", () => { S.cash -= c; logMsg("Wallet stolen: " + money(c) + "."); }]] }; },
     () => ({ t: "Pulled hamstring", x: "You skipped your warm-up. Lose 40 energy and 6 days of life.", b: [["Ice it", () => { S.energy = Math.max(0, S.energy - 40); S.bonusDays -= 6; logMsg("Pulled a hamstring (−6 days)."); }]] }),
     () => S.food === "ramen" ? { t: "Food poisoning", x: "That gas-station ramen was a mistake. You lose 10 days of life. Better meals would help.", b: [["Never again", () => { S.bonusDays -= 10; S.energy = Math.max(0, S.energy - 30); logMsg("Food poisoning (−10 days)."); }]] } : null,
     () => S.physique < 20 ? { t: "Back tweak", x: "You lifted a box of plates with a rounded back. Lose 8 days of life. Training yourself makes you sturdier.", b: [["Ouch", () => { S.bonusDays -= 8; logMsg("Tweaked your back (−8 days)."); }]] } : null,
-    () => { const c = big() * 0.6; return { t: "Local news story", x: "The evening news ran a piece on your gym. Walk-ins pay " + money(c) + ".", b: [["Nice", () => { earn(c); logMsg("News story brought " + money(c) + "."); }]] }; },
+    () => { const c = big() * 0.6; return { t: "Local news story", x: "The evening news ran a piece on your gym. Walk-ins pay " + money(c) + ".", b: [["Nice", () => { earn(c); addHype(15); logMsg("News story brought " + money(c) + "."); }]] }; },
     () => { const c = big() * 0.4; return { t: "Power outage", x: "The block lost power for an afternoon. Refunds cost " + money(c) + ".", b: [["Refund them", () => { S.cash -= c; logMsg("Power outage refunds " + money(c) + "."); }]] }; },
     () => { const c = Math.round(rnd(15, 80) * (tierIndex() + 1)); return { t: "Tip jar", x: "Regulars filled the front desk tip jar: " + money(c) + ".", b: [["Thanks, everyone", () => { earn(c); logMsg("Tip jar: " + money(c) + "."); }]] }; },
-    () => { const c = Math.max(20, S.cash * 0.05); return { t: "Charity 5K", x: "The neighborhood is running a charity 5K. Sponsor it for " + money(c) + "? Giving back adds 10 days to your life.", b: [["Sponsor", () => { S.cash -= c; S.bonusDays += 10; logMsg("Sponsored the charity 5K (+10 days)."); }], ["Pass", () => {}]] }; },
-    () => { if (!(S.owned.rack > 0)) return null; const c = unitCost(GEN_BY_ID.rack, S.owned.rack - 1) * 0.9; return { t: "Rival's offer", x: "The gym across the street offers " + money(c) + " for one of your squat racks.", b: [["Sell one", () => { S.owned.rack--; S.cash += c; syncLayout(); logMsg("Sold a squat rack for " + money(c) + "."); }], ["Keep it", () => {}]] }; },
-    () => S.fund.units > 0 ? { t: "Market dip", x: "Stocks slid today. The IRON 500 fund dropped 12%.", b: [["Hold", () => { S.fund.price *= 0.88; logMsg("IRON 500 dropped 12%."); }]] } : null,
-    () => { const c = big() * 0.4; return { t: "Referral week", x: "Members brought friends. " + money(c) + " in new dues.", b: [["Nice", () => { earn(c); logMsg("Referral week: " + money(c) + "."); }]] }; }
+    () => { const c = Math.max(20, S.cash * 0.05); return { t: "Charity 5K", x: "The neighborhood is running a charity 5K. Sponsor it for " + money(c) + "? Giving back adds 10 days to your life and hype +20.", b: [["Sponsor", () => { S.cash -= c; S.bonusDays += 10; addHype(20); logMsg("Sponsored the charity 5K (+10 days)."); }], ["Pass", () => {}]] }; },
+    () => { if (!(S.owned.rack > 0)) return null; const c = unitCost(GEN_BY_ID.rack, S.owned.rack - 1) * 0.9; return { t: "Rival's offer", x: "A gym across town offers " + money(c) + " for one level of your squat racks.", b: [["Sell one", () => { S.owned.rack--; S.cash += c; syncLayout(); logMsg("Sold a squat rack for " + money(c) + "."); }], ["Keep it", () => {}]] }; },
+    () => { const c = big() * 0.4; return { t: "Referral week", x: "Members brought friends. " + money(c) + " in new dues and hype +25.", b: [["Nice", () => { earn(c); addHype(25); logMsg("Referral week: " + money(c) + "."); }]] }; },
+    () => S.chain.length ? (() => { const c = Math.max(50, royalties() * 20); return { t: "Franchise check-in", x: "Your old gym in " + CITY_BY_ID[pick(S.chain).city].name + " had a record month and sends a bonus of " + money(c) + ".", b: [["Nice", () => { earn(c); logMsg("Franchise bonus: " + money(c) + "."); }]] }; })() : null
   ];
   function fireEvent() { for (let i = 0; i < 10; i++) { const e = pick(EVENTS)(); if (e) { openModal(e.t, e.x, e.b); return; } } }
 
-  // ======================= DEATH / RESTART =======================
-  const starsFor = nw => Math.floor(Math.sqrt(Math.max(0, nw) / 2e4));
+  // ======================= END OF A LIFE =======================
+  // When a life ends the gym joins your chain, you bank Golden Plates and pick your next city.
   function die(reason) {
-    S.dead = true; S.deathReason = reason || S.deathReason || ""; save(); buzz("warn");
-    const stars = Math.max(S.legacy, starsFor(S.bestNet));
-    const how = S.deathReason === "starved"
-      ? "You couldn't afford food for 14 days straight and starved at " + ydays(ageDays()) + "."
-      : "You passed away at " + ydays(ageDays()) + ".";
-    openModal(S.deathReason === "starved" ? "Starved" : "Final whistle",
-      how + " You ran " + S.name + " for " + S.day + " days. Final net worth: " + money(netWorth()) + ". Your legacy is " + stars + " ★. Each star adds 10% to everything you earn next life.",
-      [["Start a new life", () => newLife(stars)]], true);
+    if (S.dead && S.deathDone) { showDeath(); return; }
+    S.dead = true; S.deathReason = reason || S.deathReason || "";
+    const gain = platesFor();
+    const before = CITIES.filter(c => c.need <= S.platesEarned).length;
+    S.plates += gain; S.platesEarned += gain;
+    const unlocked = CITIES.filter(c => c.need <= S.platesEarned).slice(before);
+    const tierName = TIERS[S.peakTier].name;
+    S.chain.push({ city: S.city, life: S.lives, days: S.day, bestNet: S.bestNet, tier: tierName, dues: income() / (S.packed > 0 ? 2 : 1) });
+    const h = S.hof[S.city] || { lives: 0, bestDays: 0, bestNet: 0 };
+    S.hof[S.city] = { lives: h.lives + 1, bestDays: Math.max(h.bestDays, S.day), bestNet: Math.max(h.bestNet, S.bestNet) };
+    S.deathGain = gain; S.deathUnlocked = unlocked.map(c => c.id); S.deathDone = true;
+    save(); buzz("warn");
+    showDeath();
   }
-  function newLife(stars) {
-    const keep = { legacy: stars, lives: S.lives + 1, name: S.name, lifetime: S.lifetime, haptics: S.haptics };
-    S = Object.assign(fresh(), keep);
-    ensureGoods();
-    logMsg("Life #" + S.lives + " begins. Legacy " + stars + " ★.");
-    resetScene(); lastTier = -1; buildTab(); save();
+  function showDeath() {
+    const reason = S.deathReason;
+    const how = reason === "starved" ? "You couldn't afford food for " + debtLimit() + " days straight and starved at " + ydays(ageDays()) + "."
+      : reason === "retired" ? "You handed over the keys at " + ydays(ageDays()) + "."
+      : "You passed away at " + ydays(ageDays()) + ".";
+    const unl = (S.deathUnlocked || []).map(id => CITY_BY_ID[id].name);
+    openModal(reason === "starved" ? "Starved" : reason === "retired" ? "Retired" : "Final whistle",
+      how + " Your " + city().name + " gym lasted " + S.day + " days and reached " + TIERS[S.peakTier].name + ". It joins your chain and will pay royalties every day from now on. You earned " + (S.deathGain || 0) + " Golden Plates." + (unl.length ? " New cities unlocked: " + unl.join(", ") + "." : ""),
+      [["Pick your next city", () => setTab("map")], ["Spend Golden Plates first", () => setTab("legacy")]], true);
+  }
+  function newLife(cityId) {
+    const keep = {}; KEEP.forEach(k => { keep[k] = S[k]; });
+    keep.lives = S.dead ? S.lives + 1 : S.lives + 1;
+    S = fresh(keep); S.city = cityId;
+    logMsg("Life #" + S.lives + " begins in " + city().name + ". " + city().trait);
+    resetScene(); lastTier = -1; setTab("gym"); save();
+    notify("Welcome to " + city().name, city().trait + " You start with " + money(S.cash) + ", a couch in the back office and " + Math.floor(daysLeft()) + " days to live.", "Let's go");
   }
   function restartMenu() {
     const box = E("div");
-    box.append(E("p", null, "Start over from day one. A new life keeps your legacy stars and gym name. Erasing wipes everything."));
+    box.append(E("p", null, "Retire now to end this life, bank about " + platesFor() + " Golden Plates and pick a new city. Erasing wipes everything, including your map and plates."));
     openModal("Restart?", box, [
-      ["New life (keep legacy)", () => newLife(S.legacy)],
-      ["Erase everything", () => { S = fresh(); ensureGoods(); logMsg("Fresh start."); resetScene(); lastTier = -1; buildTab(); save(); }],
+      ["Retire and pick a city", () => { if (!S.dead) die("retired"); else setTab("map"); }],
+      ["Erase everything", () => { S = fresh(); logMsg("Fresh start."); resetScene(); lastTier = -1; setTab("gym"); save(); }],
       ["Cancel", () => {}]
     ], false, true);
   }
@@ -924,13 +975,22 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
       if (S.day % 10 === 0 || !localStorage.getItem(SAVE_KEY + ":bak")) localStorage.setItem(SAVE_KEY + ":bak", json);
     } catch (e) {}
   }
-  const validSave = o => o && typeof o === "object" && isFinite(o.cash) && isFinite(o.day) && o.owned && typeof o.owned === "object" && Array.isArray(o.layout || []);
+  const validSave = o => o && typeof o === "object" && isFinite(o.cash) && isFinite(o.day) && o.owned && typeof o.owned === "object";
   let restoredFromDay = null;
+  function migrate(o) {
+    const s = Object.assign(fresh(), o);
+    // older saves: drop the removed systems and turn the old per-item upgrades into levels
+    delete s.goods; delete s.fund; delete s.credit; delete s.store; delete s.shelves; delete s.legacy;
+    Object.keys(s.ups).forEach(k => { if (k.startsWith("u_")) delete s.ups[k]; });
+    if (!CITY_BY_ID[s.city]) s.city = "columbus";
+    if (!Array.isArray(s.layout)) s.layout = [];
+    return s;
+  }
   function load() {
     let damaged = false;
-    try { const r = localStorage.getItem(SAVE_KEY); if (r) { const o = JSON.parse(r); if (validSave(o)) return Object.assign(fresh(), o); damaged = true; } } catch (e) { damaged = true; }
+    try { const r = localStorage.getItem(SAVE_KEY); if (r) { const o = JSON.parse(r); if (validSave(o)) return migrate(o); damaged = true; } } catch (e) { damaged = true; }
     const b = readBackup();
-    if (b) { if (damaged) restoredFromDay = b.day; return Object.assign(fresh(), b); }
+    if (b) { if (damaged) restoredFromDay = b.day; return migrate(b); }
     return null;
   }
   function readBackup() { try { const b = localStorage.getItem(SAVE_KEY + ":bak"); if (b) { const o = JSON.parse(b); if (validSave(o)) return o; } } catch (e) {} return null; }
@@ -943,8 +1003,8 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
       const raw = code.trim().replace(/^ITT1:/, "");
       const o = JSON.parse(decodeURIComponent(escape(atob(raw))));
       if (!validSave(o)) return false;
-      S = Object.assign(fresh(), o);
-      ensureGoods(); syncLayout(); resetScene(); lastTier = -1; buildTab(); save();
+      S = migrate(o);
+      syncLayout(); resetScene(); lastTier = -1; buildTab(); save();
       logMsg("Loaded a backup code (day " + S.day + ").");
       return true;
     } catch (e) { return false; }
@@ -1009,7 +1069,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   function syncLayout() {
     let stored = 0;
     Object.keys(FP).forEach(t => {
-      const own = S.owned[t] || 0;
+      const own = Math.min(S.owned[t] || 0, FLOOR_CAP[t] ?? 99);
       let items = S.layout.filter(i => i.t === t);
       while (items.length > own) { const drop = items.find(i => i.c == null) || items[items.length - 1]; S.layout.splice(S.layout.indexOf(drop), 1); items = S.layout.filter(i => i.t === t); }
       for (let n = items.length; n < own; n++) { const it = { k: S.nextKey++, t, c: null, r: null }; S.layout.push(it); if (!autoPlace(it)) stored++; }
@@ -1063,7 +1123,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     people = people.filter(p => !(p.role in want) || people.filter(q => q.role === p.role).indexOf(p) < want[p.role]);
   }
   const totalSpots = () => fixtures.reduce((a, f) => a + f.spots.length, 0);
-  const memberTarget = () => Math.min(28, Math.round((2 + totalSpots() * 0.85) * (0.5 + S.happy / 200)));
+  const memberTarget = () => Math.min(32, Math.round((2 + totalSpots() * 0.85) * (0.5 + S.happy / 200) * (S.packed > 0 ? 1.5 : 1)));
 
   function spawn(role) {
     const p = { id: nextId++, role: role || "member", x: DOOR.x, y: DOOR.y, tx: DOOR.x, ty: DOOR.y, facing: 1, phase: Math.random() * 6, alpha: 0,
@@ -1168,7 +1228,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
 
   // ---------- the room (cached; only redrawn when something about it changes) ----------
   let bgCanvas = null, bgKey = "";
-  function roomKey() { return [cv.width, cv.height, tierIndex(), S.name, S.ups.g1 ? 1 : 0, S.ups.g2 ? 1 : 0, S.ups.g3 ? 1 : 0].join("|"); }
+  function roomKey() { return [cv.width, cv.height, tierIndex(), S.name, S.ups.g1 ? 1 : 0, S.ups.g2 ? 1 : 0, S.ups.g3 ? 1 : 0, S.city].join("|"); }
   function buildRoom() {
     bgCanvas = bgCanvas || document.createElement("canvas");
     bgCanvas.width = cv.width; bgCanvas.height = cv.height;
@@ -1220,7 +1280,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     else ctx.fillStyle = C["--chalk"];
     ctx.fillText((S.name || "Iron Temple").toUpperCase(), 292, 33, 214);
     ctx.shadowBlur = 0;
-    ctx.font = "600 9.5px Barlow, sans-serif"; ctx.fillStyle = "#9aa1a9"; ctx.fillText(TIERS[ti].name.toUpperCase(), 292, 52);
+    ctx.font = "600 9.5px Barlow, sans-serif"; ctx.fillStyle = "#9aa1a9"; ctx.fillText((TIERS[ti].name + " · " + city().name).toUpperCase(), 292, 52, 214);
     if (S.ups.g2) { ctx.fillStyle = "#1b1d21"; rr(146, 22, 24, 40, 5); ctx.fill(); ctx.fillStyle = vgrad(26, 54, "#4f8ff0", C["--blue"]); rr(149, 26, 18, 30, 3); ctx.fill(); }
     if (S.ups.g3) { ctx.fillStyle = C["--green"]; ctx.font = "900 13px 'Big Shoulders Display', Impact, sans-serif"; ctx.fillText("OPEN 24/7", 292, 76); }
     // baseboard
@@ -1411,6 +1471,15 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     ctx.fillStyle = "#5aa0e8"; rr(128, 449.5, 12, 7, 1); ctx.fill();
     ctx.fillStyle = C["--yellow"]; ctx.font = "700 6px Barlow, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle"; ctx.fillText("CHECK-IN", 108, 469);
   }
+  // a ribbon across the wall while the house is packed
+  function drawPacked(t) {
+    const w = 168, x = W - w - 12, y = 70;
+    ctx.fillStyle = "rgba(0,0,0,.3)"; rr(x + 2, y + 3, w, 24, 12); ctx.fill();
+    const g = ctx.createLinearGradient(x, 0, x + w, 0); g.addColorStop(0, "#ff9b4a"); g.addColorStop(0.5 + Math.sin(t * 2) * 0.3, "#ffd76a"); g.addColorStop(1, "#ebbb24");
+    ctx.fillStyle = g; rr(x, y, w, 24, 12); ctx.fill();
+    ctx.fillStyle = "#1a1606"; ctx.font = "900 15px 'Big Shoulders Display', Impact, sans-serif"; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+    ctx.fillText("PACKED HOUSE · DUES ×2", x + w / 2, y + 12.5);
+  }
   function drawSteam(f, t) {
     if (f.type !== "sauna") return;
     const n = f.spots.filter(s => s.taken).length;
@@ -1571,7 +1640,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
       people = people.filter(p => !p.gone);
     }
     if (selected && (selected.gone || performance.now() > selectedUntil)) selected = null;
-    if (tab === "floor" && !document.hidden) {
+    if (tab === "gym" && !document.hidden) {
       fitCanvas();
       if (roomKey() !== bgKey) buildRoom();
       ctx.setTransform(1, 0, 0, 1, 0, 0);
@@ -1589,6 +1658,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
       items.sort((a, b) => a.y - b.y || a.id - b.id).forEach(i => i.d());
       shown.forEach(f => drawSteam(f, t));
       if (editMode) drawEditOverlay(); else drawPops(dt);
+      if (S.packed > 0 && !editMode) drawPacked(t);
       updateWho();
     }
     requestAnimationFrame(frame);
@@ -1639,7 +1709,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   };
   cv.addEventListener("pointerup", endDrag);
   cv.addEventListener("pointercancel", () => { drag = null; });
-  function resetScene() { people = []; fixtures = []; selected = null; selItem = null; drag = null; editMode = false; sceneDirty = true; }
+  function resetScene() { people = []; fixtures = []; pops = []; selected = null; selItem = null; drag = null; editMode = false; sceneDirty = true; }
   function setEdit(on) {
     editMode = on; selItem = null; drag = null;
     cv.classList.toggle("editing", on);
@@ -1690,10 +1760,11 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   const on = f => U.push(f);
   function E(tag, cls, html) { const e = document.createElement(tag); if (cls) e.className = cls; if (html != null) e.innerHTML = html; return e; }
   function T(e, f) { if (typeof f === "function") on(() => { const v = f(); if (e._t !== v) { e._t = v; e.textContent = v; } }); else e.textContent = f; return e; }
-  function B(label, cls, click, dis) {
+  // a button; `anytime` lets it work after a life has ended (map, legacy, settings)
+  function B(label, cls, click, dis, anytime) {
     const b = E("button", "btn " + (cls || "")); b.type = "button"; T(b, label);
-    b.addEventListener("click", () => { if (b.disabled || S.dead || modalOpen) return; click(); afterAction(); });
-    if (dis) on(() => { b.disabled = !!dis(); });
+    b.addEventListener("click", () => { if (b.disabled || modalOpen || (S.dead && !anytime)) return; click(); afterAction(); });
+    on(() => { b.disabled = (!!dis && !!dis()) || (S.dead && !anytime); });
     return b;
   }
   function sec(title, sub, meta) {
@@ -1705,6 +1776,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     const r = E("div", "row" + (o.cls ? " " + o.cls : ""));
     const l = E("div"); const nm = E("div", "nm"); nm.append(T(E("span"), o.name)); if (o.tag) nm.append(o.tag); l.append(nm);
     if (o.note != null) l.append(T(E("div", "nt"), o.note));
+    if (o.extra) l.append(o.extra);
     r.append(l);
     const rs = E("div", "rs");
     if (o.price != null) { const p = E("div", "pr"); p.append(T(E("span"), o.price)); if (o.small) p.append(T(E("small"), o.small)); rs.append(p); }
@@ -1713,38 +1785,18 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     return r;
   }
   const mkTag = (text, cls) => E("span", "tag " + cls, text);
-  function chartSVG(cls, w, h) {
-    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-    svg.setAttribute("viewBox", "0 0 " + w + " " + h); svg.setAttribute("preserveAspectRatio", "none"); svg.setAttribute("class", cls); svg.setAttribute("aria-hidden", "true");
-    svg.innerHTML = '<path class="a" stroke="none"/><path class="l" fill="none" stroke-width="1.6" vector-effect="non-scaling-stroke"/>';
-    svg._w = w; svg._h = h; return svg;
-  }
-  function drawChart(svg, data, labelFn, holder) {
-    const w = svg._w, h = svg._h;
-    if (!data || !data.length) data = [0];
-    if (data.length < 2) data = [data[0], data[0]];
-    const key = data.length + ":" + data[data.length - 1] + ":" + data[0];
-    if (svg._k === key) return; svg._k = key;
-    const mn = Math.min(...data), mx = Math.max(...data), span = mx - mn || Math.abs(mx) * 0.1 || 1;
-    const pts = data.map((v, i) => [i / (data.length - 1) * w, 4 + (1 - (v - mn) / span) * (h - 8)]);
-    const d = pts.map((p, i) => (i ? "L" : "M") + p[0].toFixed(1) + " " + p[1].toFixed(1)).join("");
-    const col = data[data.length - 1] >= data[0] ? "var(--up)" : "var(--down)";
-    const l = svg.querySelector(".l"), a = svg.querySelector(".a");
-    l.setAttribute("d", d); l.setAttribute("stroke", col);
-    a.setAttribute("d", d + "L" + w + " " + h + "L0 " + h + "Z"); a.setAttribute("fill", col); a.setAttribute("fill-opacity", ".14");
-    if (holder && labelFn) holder.textContent = "High " + labelFn(mx) + " · Low " + labelFn(mn);
-  }
+  const plateIcon = '<span class="gp" aria-hidden="true"></span>';
 
   // ======================= TABS =======================
   const ICON = {
-    floor: '<path d="M2 12h2M20 12h2M6 7v10M18 7v10M4 9v6M20 9v6M6 12h12"/>',
+    gym: '<path d="M2 12h2M20 12h2M6 7v10M18 7v10M4 9v6M20 9v6M6 12h12"/>',
     hustle: '<path d="M13 2L4 14h7l-1 8 9-12h-7z"/>',
-    supply: '<path d="M4 8l8-4 8 4v9l-8 4-8-4z"/><path d="M4 8l8 4 8-4M12 12v9"/>',
     certs: '<path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c3 2 9 2 12 0v-5"/>',
-    bank: '<path d="M3 10l9-6 9 6"/><path d="M5 10v8M9.5 10v8M14.5 10v8M19 10v8M3 20h18"/>',
-    home: '<path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/>'
+    life: '<path d="M4 11l8-7 8 7"/><path d="M6 10v10h12V10"/><path d="M10 20v-5h4v5"/>',
+    map: '<path d="M9 4L3 6v14l6-2 6 2 6-2V4l-6 2-6-2z"/><path d="M9 4v14M15 6v14"/>',
+    legacy: '<circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="3.2"/>'
   };
-  const TABS = [["floor", "Floor"], ["hustle", "Hustle"], ["supply", "Supply"], ["certs", "Certs"], ["bank", "Bank"], ["home", "Home"]];
+  const TABS = [["gym", "Gym"], ["hustle", "Hustle"], ["certs", "Certs"], ["life", "Life"], ["map", "Map"], ["legacy", "Legacy"]];
   function buildTabBar() {
     const t = el("tabs");
     TABS.forEach(([id, label]) => {
@@ -1755,38 +1807,89 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     });
   }
   function setTab(id) {
-    if (editMode && id !== "floor") setEdit(false);
+    if (editMode && id !== "gym") setEdit(false);
     tab = id; try { localStorage.setItem(SAVE_KEY + ":tab", id); } catch (e) {}
     document.querySelectorAll("#tabs button").forEach(b => b.setAttribute("aria-selected", String(b.dataset.tab === id)));
-    el("sceneWrap").hidden = id !== "floor";
+    el("sceneWrap").hidden = id !== "gym";
     buildTab(); window.scrollTo({ top: 0 });
   }
-  let curKey = "", burnOpen = false, finSel = "", outlookOpen = true;
+  let curKey = "", moneyOpen = false, finSel = "", outlookOpen = true;
   function revealedIdx() { let r = 0; GENS.forEach((g, i) => { if ((S.owned[g.id] || 0) > 0 || S.runEarned >= g.base * 0.5) r = i; }); return r; }
   function tabKey() {
-    // every part separated so two different states can never produce the same key
     const c = Object.keys(S.certs).join(",");
-    const k = (...parts) => tab + ":" + parts.join("|");
+    const k = (...parts) => tab + ":" + S.dead + ":" + S.lives + ":" + parts.join("|");
     switch (tab) {
-      case "floor": return k(revealedIdx(), c, availableUps().map(u => u.id).join(","), Object.keys(S.warm).length, S.warmOpen, outlookOpen, Object.keys(S.staff).join(","), tierIndex() >= 2, !!S.rival);
+      case "gym": return k(revealedIdx(), c, availableUps().map(u => u.id).join(","), Object.keys(S.warm).length, S.warmOpen, outlookOpen, moneyOpen, Object.keys(S.staff).join(","), tierIndex() >= 2, !!S.rival, S.chal && S.chal.key);
       case "hustle": return k(c, Object.keys(S.gear).join(","), S.physique >= 60);
-      case "supply": return k(tierIndex(), S.shelves);
       case "certs": return k(c, "study=" + (S.study ? S.study.id : ""), "fin=" + finSel);
-      case "bank": return k(S.bankOpen, S.loans.length);
-      case "home": return k(S.home, S.food, Object.keys(S.homesOwned).join(","), S.legacy);
+      case "life": return k(S.home, S.food, Object.keys(S.homesOwned).join(","), S.bankOpen, S.loans.length);
+      case "map": return k(S.platesEarned, S.chain.length, S.city);
+      case "legacy": return k(S.chain.length);
     }
     return tab;
   }
   function buildTab() {
     U = []; const v = el("view"); v.innerHTML = "";
-    const f = { floor: tabFloor, hustle: tabHustle, supply: tabSupply, certs: tabCerts, bank: tabBank, home: tabHome }[tab];
+    const f = { gym: tabGym, hustle: tabHustle, certs: tabCerts, life: tabLife, map: tabMap, legacy: tabLegacy }[tab];
     v.append(f());
-    if (tab === "floor") buildSceneCap();
+    if (tab === "gym") buildSceneCap();
     curKey = tabKey(); refresh();
   }
+  function deadBanner() {
+    const c = E("div", "card dead-card");
+    c.append(E("div", "k", "This life is over"));
+    const p = E("p"); p.textContent = "Your " + city().name + " gym is on the map now. Spend Golden Plates on Legacy upgrades, then pick a city for your next life."; c.append(p);
+    const b = E("div", "two"); b.append(B("Pick a city", "y", () => setTab("map"), null, true), B("Legacy upgrades", "", () => setTab("legacy"), null, true));
+    c.append(b);
+    return c;
+  }
 
-  // ---- FLOOR ----
-  function availableUps() { return UPGRADES.filter(u => !S.ups[u.id] && (u.global ? S.runEarned >= u.cost * 0.3 : (S.owned[u.gen] || 0) >= u.need)).sort((a, b) => a.cost - b.cost); }
+  // ---- GYM ----
+  function availableUps() { return UPGRADES.filter(u => !S.ups[u.id] && S.runEarned >= u.cost * 0.3).sort((a, b) => a.cost - b.cost); }
+  function outlookCard() {
+    const c = E("div", "card outlook");
+    const top = E("button", "warm-h"); top.type = "button";
+    const pill = E("span", "pill"); const ttl = E("span"); ttl.innerHTML = '<span class="k">Outlook</span>'; ttl.append(" ", pill);
+    top.append(ttl, E("span", "k", outlookOpen ? "Hide" : "Show"));
+    top.addEventListener("click", () => { outlookOpen = !outlookOpen; refresh(); });
+    c.append(top);
+    on(() => { const o = outlook(); pill.textContent = { ok: "On track", warn: "Watch out", bad: "In danger" }[o.status]; pill.className = "pill " + o.status; c.dataset.status = o.status; });
+    if (!outlookOpen) return c;
+    const lines = E("div", "ol-lines");
+    on(() => {
+      const o = outlook();
+      const rows = [["Per day if you coach daily", (o.net >= 0 ? "+" : "−") + money(Math.abs(o.net)), o.net >= 0 ? "up-c" : "down-c"],
+        ["Life left", o.left + " days", o.left < 30 ? "down-c" : o.left < 90 ? "warn-c" : "up-c"]];
+      if (o.net < 0) rows.push(["Cash runs out in", o.brokeIn + " days", "down-c"]);
+      if (S.debtDays) rows.push(["Days in debt", S.debtDays + " of " + debtLimit(), "down-c"]);
+      rows.push(["Golden Plates if this life ended now", String(platesFor()), "gold-c"]);
+      let html = rows.map(r => "<div><span class='muted'>" + r[0] + "</span><span class='num " + r[2] + "'>" + r[1] + "</span></div>").join("");
+      const b = o.best;
+      if (b) {
+        const when = b.ready ? (b.wait === 0 ? "You can do it now." : "Affordable in about " + b.wait + " days.") : "Not reachable at this pace. Make " + money(b.needPerDay) + " more per day.";
+        html += "<p class='ol-next'><b>Next way to buy time:</b> " + b.name + (b.cost ? " for " + money(b.cost) : "") + (b.extra > 0 ? " (+" + money(b.extra) + "/day)" : "") + ", adds " + lifeTxt(b.days) + (b.study ? " after " + b.study + " days of study" : "") + ". " + when + "</p>";
+      }
+      if (lines._h !== html) { lines._h = html; lines.innerHTML = html; }
+    });
+    c.append(lines);
+    return c;
+  }
+  function challengeCard() {
+    const sn = season();
+    const c = E("div", "card chal");
+    const body = E("div");
+    on(() => {
+      const ch = sn.ch, prog = S.chal ? S.chal.prog : 0, done = S.chal && S.chal.done;
+      const left = sn.to - (S.day % 365) + 1;
+      const h = "<div class='chal-top'><span class='k'>" + sn.name + " · dues ×" + seasonMult().toFixed(2) + "</span><span class='pill " + (done ? "ok" : "warn") + "'>" + (done ? "Done" : left + "d left") + "</span></div>" +
+        "<div class='chal-t'>" + ch.text + "</div>" +
+        "<div class='ms'><div class='ms-bar'><i style='width:" + Math.min(100, prog / ch.goal * 100) + "%'></i></div><span class='num'>" + prog + "/" + ch.goal + "</span></div>" +
+        "<div class='muted' style='font-size:12.5px'>Reward: 15 days of dues and 2 Golden Plates" + plateIcon + "</div>";
+      if (body._h !== h) { body._h = h; body.innerHTML = h; }
+    });
+    c.append(body);
+    return c;
+  }
   function warmBlock() {
     const done = WARM.filter(w => S.warm[w.id]).length;
     if (done === WARM.length) return null;
@@ -1806,36 +1909,41 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   // what you make and what you pay, every day
   function moneyCard() {
     const c = E("div", "card ledger");
-    c.append(E("div", "k", "Daily money"));
+    const top = E("button", "warm-h"); top.type = "button";
+    const sum = E("span", "num");
+    top.append(E("span", "k", "Daily money"), sum);
+    on(() => { const i = income() + royalties() + interestToday(), o = burn(); sum.innerHTML = "<span class='up-c'>+" + money(i) + "</span> <span class='muted'>/</span> <span class='down-c'>−" + money(o) + "</span> <span class='muted'>" + (moneyOpen ? "▴" : "▾") + "</span>"; });
+    top.addEventListener("click", () => { moneyOpen = !moneyOpen; refresh(); });
+    c.append(top);
+    if (!moneyOpen) return c;
     const body = E("div");
     on(() => {
       const ln = (label, v, cls, extra) => "<div class='ln" + (extra ? " " + extra : "") + "'><span>" + label + "</span><span class='num " + (cls || "") + "'>" + v + "</span></div>";
       const items = burnItems();
       const life = items.filter(i => i[2] === "life"), gym = items.filter(i => i[2] !== "life");
-      const sum = a => a.reduce((x, i) => x + i[1], 0);
-      const dues = income(), coach = coachToday(), intr = interestToday();
-      const out = sum(items), passive = dues + intr;
+      const tot = a => a.reduce((x, i) => x + i[1], 0);
+      const dues = income(), roy = royalties(), coach = coachToday(), intr = interestToday();
+      const out = tot(items), passive = dues + roy + intr;
       let h = "<h3>You make</h3>";
       h += ln("Dues from members", "+" + money(dues), "up-c");
+      if (roy) h += ln("Royalties from your chain", "+" + money(roy), "up-c");
       if (intr) h += ln("Savings interest", "+" + money(intr), "up-c");
       h += ln("Coaching, on days you coach", "+" + money(coach), "muted");
       h += "<h3>Staying alive</h3>";
       life.forEach(i => { h += ln(i[0], "−" + money(i[1]), "down-c"); });
-      h += ln("Cost of living", "−" + money(sum(life)) + "/day", "down-c", "sub");
+      h += ln("Cost of living", "−" + money(tot(life)) + "/day", "down-c", "sub");
       h += "<h3>Running the gym</h3>";
       if (!gym.length) h += ln("Nothing yet", "$0.00", "muted");
       gym.forEach(i => { h += ln(i[0], "−" + money(i[1]), "down-c"); });
-      if (gym.length) h += ln("Gym costs", "−" + money(sum(gym)) + "/day", "down-c", "sub");
+      if (gym.length) h += ln("Gym costs", "−" + money(tot(gym)) + "/day", "down-c", "sub");
       const restNet = passive - out, coachNet = passive + coach - out;
       h += ln("Left over on a rest day", (restNet >= 0 ? "+" : "−") + money(Math.abs(restNet)), restNet >= 0 ? "up-c" : "down-c", "total");
       h += ln("Left over on a coaching day", (coachNet >= 0 ? "+" : "−") + money(Math.abs(coachNet)), coachNet >= 0 ? "up-c" : "down-c");
-      if (S.debtDays) h += "<p class='down-c' style='margin:6px 0 0;font-size:13px'>In debt " + S.debtDays + " day" + (S.debtDays > 1 ? "s" : "") + " in a row. At 14 you starve.</p>";
       if (body._h !== h) { body._h = h; body.innerHTML = h; }
     });
     c.append(body);
     return c;
   }
-  // happiness, cleanliness, season and any rival
   function moodCard() {
     const c = E("div", "card");
     c.append(E("div", "k", "Gym mood"));
@@ -1843,13 +1951,10 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     on(() => {
       const hcol = S.happy < 35 ? "var(--down)" : S.happy < 55 ? "var(--orange)" : "var(--up)";
       const ccol = S.clean < 30 ? "var(--down)" : S.clean < 55 ? "var(--orange)" : "var(--up)";
-      const tgt = Math.round(moodTarget());
       let h = "<div class='meter'><span>Happiness</span><div class='bar'><i style='width:" + S.happy + "%;background:" + hcol + "'></i></div><span class='num'>" + Math.round(S.happy) + "</span></div>";
-      h += "<div class='muted' style='font-size:13px'>" + happyLabel(S.happy) + ". Dues ×" + happyMult().toFixed(2) + ". Heading toward " + tgt + ".</div>";
+      h += "<div class='muted' style='font-size:13px'>" + happyLabel(S.happy) + ". Dues ×" + happyMult().toFixed(2) + ". Heading toward " + Math.round(moodTarget()) + ".</div>";
       h += "<div class='mood-parts'>" + moodParts().map(p => "<span>" + p[0] + " <b class='" + (p[1] >= 0 ? "up-c" : "down-c") + "'>" + (p[1] >= 0 ? "+" : "") + p[1] + "</b></span>").join("") + "</div>";
       h += "<div class='meter'><span>Cleanliness</span><div class='bar'><i style='width:" + S.clean + "%;background:" + ccol + "'></i></div><span class='num'>" + Math.round(S.clean) + "</span></div>";
-      const sn = season();
-      h += "<div class='muted' style='font-size:13px'>Season: <b style='color:var(--chalk)'>" + sn.name + "</b> · dues ×" + sn.mult + "</div>";
       if (S.rival) {
         h += "<div class='rival'><div class='k' style='color:var(--down)'>Rival gym</div><div class='nm'>" + S.rival.name + "</div>";
         h += "<div class='meter'><span>Strength</span><div class='bar'><i style='width:" + Math.min(100, S.rival.str / 1.5) + "%;background:var(--down)'></i></div><span class='num'>" + Math.round(S.rival.str) + "</span></div>";
@@ -1860,23 +1965,21 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     c.append(body);
     return c;
   }
-  function burnBlock() {
-    const wrap = E("div");
-    const b = E("button", "burn"); b.type = "button";
-    b.innerHTML = '<span class="k" style="color:var(--chalk)">Daily bills</span><span><span class="num"></span> <span class="muted">' + (burnOpen ? "▴" : "▾") + "</span></span>";
-    T(b.querySelector(".num"), () => "−" + money(burn()) + "/day");
-    b.addEventListener("click", () => { burnOpen = !burnOpen; refresh(); });
-    wrap.append(b);
-    if (burnOpen) {
-      const l = E("div", "burn-list");
-      on(() => { const html = burnItems().map(([n, a]) => "<div><span class='muted'>" + n + "</span><span class='num'>−" + money(a) + "</span></div>").join("") + "<div class='muted' style='font-size:12px'>A day passes each time you coach, rest, hustle or train. Going below $0 costs you extra days of life.</div>"; if (l._h !== html) { l._h = html; l.innerHTML = html; } });
-      wrap.append(l);
-    }
-    return wrap;
+  function milestoneBar(g) {
+    const box = E("div", "ms");
+    on(() => {
+      const n = S.owned[g.id] || 0;
+      const next = MILESTONES.find(x => n < x), prev = [0].concat(MILESTONES).filter(x => x <= n).pop();
+      const h = next ? "<div class='ms-bar'><i style='width:" + ((n - prev) / (next - prev) * 100) + "%'></i></div><span class='num'>×2 at " + next + "</span>" : "<div class='ms-bar'><i style='width:100%'></i></div><span class='num'>maxed</span>";
+      if (box._h !== h) { box._h = h; box.innerHTML = h; }
+    });
+    return box;
   }
-  function tabFloor() {
+  function tabGym() {
     const f = document.createDocumentFragment();
+    if (S.dead) f.append(deadBanner());
     f.append(outlookCard());
+    f.append(challengeCard());
     const w = warmBlock(); if (w) f.append(w);
     f.append(moneyCard());
     f.append(moodCard());
@@ -1886,7 +1989,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
       b.addEventListener("click", () => { buyMode = m; seg.querySelectorAll("button").forEach(x => x.setAttribute("aria-pressed", String(x === b))); refresh(); });
       seg.append(b);
     });
-    f.append(sec("Equipment", "Pays dues every day. Shows up on your floor.", seg));
+    f.append(sec("Equipment", "Pays dues every day. Doubles at level 10, 25, 50, 100 and 200.", seg));
     const list = E("div", "list");
     const rev = revealedIdx();
     GENS.forEach((g, i) => {
@@ -1898,14 +2001,15 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
       list.append(row({
         name: locked ? "???" : g.name, tag: locked ? null : dot,
         note: locked ? "Earn " + money(g.base * 0.5) + " at this gym to reveal" : needCert ? "Needs " + CERT_BY_ID[g.cert].name + " (Certs tab)" :
-          () => "+" + money(genRate(g)) + "/day each · own " + (S.owned[g.id] || 0) + (FP[g.id] && storedOf(g.id) ? " · " + storedOf(g.id) + " in storage" : ""),
-        price: () => money(cost()), small: () => "buy " + qty(),
+          () => "Lv " + (S.owned[g.id] || 0) + " · +" + money(genRate(g)) + "/day per level" + (genMult(g.id) > 1 ? " · ×" + genMult(g.id) : ""),
+        extra: locked || needCert ? null : milestoneBar(g),
+        price: () => money(cost()), small: () => "+" + qty() + " lv",
         cls: locked || needCert ? "dim" : "",
         btns: [B("Buy", "y", () => buyGen(g), () => locked || needCert || cost() > S.cash)]
       }));
     });
     f.append(list);
-    f.append(sec("Amenities", "Make members happier. Place them on the floor to count."));
+    f.append(sec("Amenities", "Make members happier. They only count on the floor."));
     const al = E("div", "list");
     AMEN.forEach(a => al.append(row({
       name: a.name, note: () => a.note + " · own " + (S.owned[a.id] || 0) + (storedOf(a.id) ? " · " + storedOf(a.id) + " in storage" : ""),
@@ -1921,8 +2025,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     f.append(sec("Staff", "Paid every day. They show up on the floor."));
     const sl = E("div", "list");
     STAFF.forEach(st => {
-      const locked = st.tier && tierIndex() < st.tier;
-      const hired = !!S.staff[st.id];
+      const locked = st.tier && tierIndex() < st.tier, hired = !!S.staff[st.id];
       sl.append(row({
         name: st.name, tag: hired ? mkTag("Hired", "cur") : null, cls: hired ? "cur" : locked ? "dim" : "",
         note: () => st.note + " · wage " + money(wage(st)) + "/day" + (locked ? " · needs a " + TIERS[st.tier].name : ""),
@@ -1935,7 +2038,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     f.append(sl);
     const ups = availableUps();
     if (ups.length) {
-      f.append(sec("Upgrades", "One-time boosts"));
+      f.append(sec("Upgrades", "One-time boosts for this gym"));
       const ul = E("div", "list");
       ups.forEach(u => ul.append(row({ name: u.name, note: u.desc, price: money(u.cost), btns: [B("Buy", "y", () => { if (S.cash < u.cost) return; S.cash -= u.cost; S.ups[u.id] = true; logMsg("Installed " + u.name + "."); }, () => S.cash < u.cost)] })));
       f.append(ul);
@@ -1947,9 +2050,11 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     const k = buyMode === "max" ? maxAfford(g, n, S.cash) : Number(buyMode);
     if (k < 1) return;
     const c = bulkCost(g, n, k); if (c > S.cash) return;
-    S.cash -= c; S.spentEquip += c; S.owned[g.id] = n + k;
+    const before = genMult(g.id);
+    S.cash -= c; S.spentEquip += c; S.owned[g.id] = n + k; buzz();
     const stored = FP[g.id] ? syncLayout() : (sceneDirty = true, 0);
-    logMsg("Bought " + k + " × " + g.name + " for " + money(c) + "." + (stored ? " " + stored + " went to storage (no floor space)." : ""));
+    logMsg("Bought " + k + " level" + (k > 1 ? "s" : "") + " of " + g.name + " for " + money(c) + ".");
+    if (genMult(g.id) > before) { notify("Milestone: " + g.name + " ×" + genMult(g.id), "Level " + S.owned[g.id] + " reached. " + g.name + " now earns " + (genMult(g.id) / before) + "× as much.", "Nice"); buzz("big"); }
     if (stored) notify("No floor space", stored + " went into storage. They still earn dues. Tap Rearrange on the gym floor to make room.");
     checkWarm();
   }
@@ -1959,7 +2064,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     const missing = [];
     if (h.gear && !S.gear[h.gear]) missing.push(GEAR.find(x => x.id === h.gear).name);
     if (h.cert && !S.certs[h.cert]) missing.push(CERT_BY_ID[h.cert].name);
-    if (h.phys && S.physique < h.phys) missing.push("physique " + h.phys + " (Home tab)");
+    if (h.phys && S.physique < h.phys) missing.push("physique " + h.phys + " (Life tab)");
     const b = E("button", "act"); b.type = "button";
     b.innerHTML = '<span class="plate" style="background:var(' + h.color + ')"><i></i></span><span><div class="nm"></div><div class="nt"></div></span><span class="chip"><span class="pay"></span><small class="en"></small></span>';
     b.querySelector(".nm").textContent = h.name;
@@ -1973,6 +2078,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   }
   function tabHustle() {
     const f = document.createDocumentFragment();
+    if (S.dead) f.append(deadBanner());
     f.append(sec("Hustles", "Each one takes a day and costs energy", () => Math.floor(S.energy) + "/" + maxEnergy() + " energy"));
     const l = E("div", "list"); HUSTLES.forEach(h => l.append(hustleBlock(h))); f.append(l);
     f.append(sec("Gear", "Unlocks and boosts your hustles"));
@@ -1986,60 +2092,6 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     return f;
   }
 
-  // ---- SUPPLY ROOM ----
-  function tabSupply() {
-    ensureGoods();
-    const f = document.createDocumentFragment();
-    const idx = E("div", "card");
-    const ig = E("div", "idx");
-    const left = E("div"); left.append(E("div", "k", "Supply price index"));
-    left.append(T(E("div", "big num"), () => marketIndex().toFixed(2)));
-    const ich = T(E("div", "num"), () => { const d = marketIndex() - marketIndex(true); return (d >= 0 ? "▲ +" : "▼ ") + d.toFixed(2) + " today"; });
-    on(() => { ich.className = "num " + (marketIndex() >= marketIndex(true) ? "up-c" : "down-c"); });
-    left.append(ich);
-    const sp = chartSVG("spark", 130, 44);
-    on(() => { const n = S.goods[GOODS[0].id].hist.length; const series = []; for (let i = 0; i < n; i++) { let s = 0; GOODS.forEach(g => { const h = S.goods[g.id].hist; s += (h[i] ?? h[h.length - 1]) / g.base; }); series.push(s / GOODS.length * 100); } drawChart(sp, series); });
-    ig.append(left, sp); idx.append(ig); f.append(idx);
-    const tiles = E("div", "tiles");
-    const t1 = E("div", "tile"); t1.append(E("span", "k", "Storage"), T(E("span", "num"), () => storeUsed() + "/" + S.store));
-    const t2 = E("div", "tile"); t2.append(E("span", "k", "Stock value"), T(E("span", "num up-c"), () => money(goodsValue())));
-    tiles.append(t1, t2); f.append(tiles);
-    const stocked = GOODS.filter(g => g.tier <= tierIndex());
-    f.append(sec("Supply room", "Prices change every day. Buying and selling is free.", stocked.length + " stocked"));
-    const list = E("div", "list");
-    stocked.forEach(g => {
-      const q = S.goods[g.id];
-      const c = E("div", "good");
-      const h = E("div", "good-h");
-      const l = E("div"); l.append(E("div", "nm", g.name)); l.append(T(E("div", "muted num"), () => "Own " + q.own + (q.own ? " · avg " + money(q.cost / q.own) : "")));
-      const r = E("div"); r.style.textAlign = "right";
-      r.append(T(E("div", "num"), () => money(q.price)));
-      const ch = T(E("div", "num"), () => { const d = q.price - prevOf(q.hist); return (d >= 0 ? "▲ " : "▼ ") + money(Math.abs(d)); });
-      on(() => { ch.className = "num " + (q.price >= prevOf(q.hist) ? "up-c" : "down-c"); });
-      r.append(ch); h.append(l, r); c.append(h);
-      const spk = chartSVG("spark", 300, 44); on(() => drawChart(spk, q.hist)); c.append(spk);
-      const qrow = E("div", "qty"); const inp = E("input"); inp.type = "range"; inp.min = 1; inp.value = 1; inp.id = "qty-" + g.id; inp.setAttribute("aria-label", g.name + " quantity");
-      const qv = E("span", "num"); qv.style.textAlign = "right";
-      const maxBuy = () => Math.max(0, Math.min(Math.floor(Math.max(0, S.cash) / q.price), S.store - storeUsed()));
-      on(() => { const mx = Math.max(1, maxBuy(), q.own); if (+inp.max !== mx) inp.max = mx; if (+inp.value > mx) inp.value = mx; qv.textContent = inp.value; });
-      inp.addEventListener("input", () => refresh());
-      qrow.append(E("span", "k", "Qty"), inp, qv); c.append(qrow);
-      const two = E("div", "two");
-      two.append(
-        B(() => "Sell " + Math.min(+inp.value, q.own), "r", () => { const n = Math.min(+inp.value, q.own); if (!n) return; const avg = q.cost / q.own; q.own -= n; q.cost -= avg * n; S.cash += n * q.price; logMsg("Sold " + n + " " + g.name.toLowerCase() + " for " + money(n * q.price) + "."); }, () => q.own < 1),
-        B(() => "Buy " + inp.value, "g", () => { const n = +inp.value; const cost = n * q.price; if (cost > S.cash || storeUsed() + n > S.store) return; S.cash -= cost; q.own += n; q.cost += cost; logMsg("Bought " + n + " " + g.name.toLowerCase() + " for " + money(cost) + "."); }, () => +inp.value * q.price > S.cash || storeUsed() + +inp.value > S.store)
-      );
-      c.append(two); list.append(c);
-    });
-    f.append(list);
-    if (S.shelves < SHELVES.length) {
-      const sh = SHELVES[S.shelves];
-      f.append(sec("Storage", "More room for stock"));
-      f.append(row({ name: sh.name, note: "+" + sh.add + " storage", price: money(sh.cost), btns: [B("Buy", "y", () => { if (S.cash < sh.cost) return; S.cash -= sh.cost; S.store += sh.add; S.shelves++; logMsg("Added " + sh.name.toLowerCase() + "."); }, () => S.cash < sh.cost)] }));
-    }
-    return f;
-  }
-
   // ---- CERTS ----
   function certState(c) {
     if (S.certs[c.id]) return "done";
@@ -2047,16 +2099,19 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     if (c.req.every(r => S.certs[r])) return "open";
     return "lock";
   }
+  const STUDENT_FEE = 0.18;
   function enroll(c, loan) {
     if (S.study || S.certs[c.id]) return;
-    if (loan) { S.loans.push(makeLoan("Student", c.cost, STUDENT_APR, 5)); logMsg("Took a student loan for " + c.name + "."); }
-    else { if (S.cash < c.cost) return; S.cash -= c.cost; }
-    S.study = { id: c.id, left: c.days, total: c.days };
-    logMsg("Enrolled in " + c.name + ". " + c.days + " days to go.");
+    const cost = certCost(c);
+    if (loan) { S.loans.push(makeLoan("Student", cost, STUDENT_FEE, 5 * 365)); logMsg("Took a student loan for " + c.name + "."); }
+    else { if (S.cash < cost) return; S.cash -= cost; }
+    S.study = { id: c.id, left: certDays(c), total: certDays(c) };
+    logMsg("Enrolled in " + c.name + ". " + certDays(c) + " days to go.");
     finSel = "";
   }
   function tabCerts() {
     const f = document.createDocumentFragment();
+    if (S.dead) f.append(deadBanner());
     if (S.study) {
       const c = CERT_BY_ID[S.study.id];
       const card = E("div", "card");
@@ -2068,27 +2123,27 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
       f.append(card);
     }
     if (finSel && !S.study) {
-      const c = CERT_BY_ID[finSel];
-      const total = c.cost * (1 + STUDENT_APR * 5 * 0.55), daily = total / (5 * 365);
+      const c = CERT_BY_ID[finSel], cost = certCost(c);
+      const total = cost * (1 + STUDENT_FEE), daily = total / (5 * 365);
       const card = E("div", "card fin");
-      card.innerHTML = '<div class="sec" style="margin:0"><div><span class="k">Enroll · student loan option</span><h2 style="font-size:24px;margin-top:4px"></h2></div><span class="meta" style="color:var(--down)">' + (STUDENT_APR * 100).toFixed(1) + '% APR · 5 yr</span></div>';
+      card.innerHTML = '<div class="sec" style="margin:0"><div><span class="k">Enroll · student loan option</span><h2 style="font-size:24px;margin-top:4px"></h2></div><span class="meta" style="color:var(--down)">18% fee · 5 yr</span></div>';
       card.querySelector("h2").textContent = c.name;
       const dl = E("dl");
-      dl.innerHTML = "<dt>Tuition</dt><dd>" + money(c.cost) + "</dd><dt>Loan interest</dt><dd>+" + money(total - c.cost) + '</dd><dt class="tot">Repay with a loan</dt><dd class="tot">' + money(total) + "</dd><dt>Daily payment</dt><dd>" + money(daily) + "/day</dd><dt>Study time</dt><dd>" + c.days + " days</dd>";
+      dl.innerHTML = "<dt>Tuition</dt><dd>" + money(cost) + "</dd><dt>Loan fee</dt><dd>+" + money(total - cost) + '</dd><dt class="tot">Repay with a loan</dt><dd class="tot">' + money(total) + "</dd><dt>Daily payment</dt><dd>" + money(daily) + "/day</dd><dt>Study time</dt><dd>" + certDays(c) + " days</dd>";
       card.append(dl);
       const btns = E("div", "two");
-      btns.append(B("Pay " + money(c.cost), "y", () => enroll(c, false), () => S.cash < c.cost), B("Take the loan", "b", () => enroll(c, true)));
+      btns.append(B("Pay " + money(cost), "y", () => enroll(c, false), () => S.cash < cost), B("Take the loan", "b", () => enroll(c, true)));
       card.append(btns, B("Cancel", "", () => { finSel = ""; }));
       f.append(card);
     }
-    f.append(sec("Certifications", "Each one adds life and unlocks something", Object.keys(S.certs).length + "/" + CERTS.length + " earned"));
+    f.append(sec("Certifications", "Each one adds life and unlocks something" + (cm("cert", 1) < 1 ? ". Half price in " + city().name + "." : ""), Object.keys(S.certs).length + "/" + CERTS.length + " earned"));
     const list = E("div", "list");
     CERTS.forEach(c => {
       const st = certState(c);
       const tg = mkTag({ done: "Done", study: "Studying", open: "Open", lock: "Locked" }[st], st);
-      const note = c.perk + " · +" + lifeTxt(c.life) + " life · " + c.days + " days" + (st === "lock" ? " · needs " + c.req.map(r => CERT_BY_ID[r].name).join(", ") : "");
+      const note = c.perk + " · +" + lifeTxt(c.life) + " life · " + certDays(c) + " days" + (st === "lock" ? " · needs " + c.req.map(r => CERT_BY_ID[r].name).join(", ") : "");
       list.append(row({
-        name: c.name, tag: tg, note, price: money(c.cost), cls: st === "lock" ? "dim" : st === "done" ? "cur" : "",
+        name: c.name, tag: tg, note, price: money(certCost(c)), cls: st === "lock" ? "dim" : st === "done" ? "cur" : "",
         btns: st === "open" ? [B("Enroll", "b", () => { finSel = c.id; window.scrollTo({ top: 0 }); }, () => !!S.study)] : []
       }));
     });
@@ -2096,81 +2151,25 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     return f;
   }
 
-  // ---- BANK ----
-  function tabBank() {
+  // ---- LIFE ----
+  function tabLife() {
     const f = document.createDocumentFragment();
-    const cc = E("div", "card credit");
-    cc.innerHTML = '<svg viewBox="0 0 100 100" aria-hidden="true"><circle cx="50" cy="50" r="42" fill="none" stroke="var(--panel-2)" stroke-width="10"/><circle class="arc" cx="50" cy="50" r="42" fill="none" stroke-width="10" stroke-linecap="round" transform="rotate(-90 50 50)" stroke-dasharray="264"/><text class="sc" x="50" y="54" text-anchor="middle" font-size="24" font-weight="700" fill="var(--chalk)" font-family="JetBrains Mono, monospace"></text><text x="50" y="70" text-anchor="middle" font-size="8.5" fill="var(--muted)" letter-spacing="1.5">CREDIT</text></svg><div><div class="k">Credit score</div><div class="lvl"></div><div class="muted" style="font-size:13px">Pay loans on time to raise it. Dropping below $0 cash hurts it.</div></div>';
-    on(() => {
-      const s = Math.round(S.credit), frac = (s - 300) / 550;
-      const col = s < 580 ? "var(--down)" : s < 670 ? "var(--orange)" : s < 740 ? "var(--yellow)" : "var(--up)";
-      const arc = cc.querySelector(".arc"); arc.setAttribute("stroke", col); arc.setAttribute("stroke-dashoffset", String(264 * (1 - frac)));
-      cc.querySelector(".sc").textContent = s; const lv = cc.querySelector(".lvl"); lv.textContent = creditLabel(s); lv.style.color = col;
-    });
-    f.append(cc);
-    const nw = E("div", "card");
-    nw.append(E("div", "k", "Net worth · last 60 days"));
-    nw.append(T(E("div", "big num"), () => money(netWorth())));
-    const tch = T(E("div", "num"), () => { const h = S.nwHist; if (h.length < 2) return "Tracking starts tomorrow"; const d = netWorth() - h[0]; return (d >= 0 ? "▲ +" : "▼ ") + money(Math.abs(d)) + " in " + h.length + " days"; });
-    on(() => { const h = S.nwHist; tch.className = "num " + (h.length < 2 || netWorth() >= h[0] ? "up-c" : "down-c"); });
-    nw.append(tch);
-    const ch = chartSVG("nw-chart", 600, 120); const lbl = E("div", "muted num"); lbl.style.fontSize = "11.5px";
-    on(() => drawChart(ch, S.nwHist.length ? S.nwHist : [netWorth()], money, lbl)); nw.append(ch, lbl);
-    f.append(nw);
-    f.append(sec("Financials", "Where your money sits"));
-    const fl = E("div", "card fin-list");
-    const sign = v => v > 0.004 ? "up-c" : v < -0.004 ? "down-c" : "muted";
-    const line = (label, fn) => { const d = E("div"); d.append(E("span", null, label)); const v = T(E("span", "num"), () => money(fn())); on(() => { v.className = "num " + sign(fn()); }); d.append(v); return d; };
-    fl.append(line("Cash", () => S.cash), line("Savings", () => S.savings), line("IRON 500 fund", fundValue), line("Supply stock", goodsValue), line("Equipment (resale)", equipValue), line("Loans", () => -loanTotal()), line("Net worth", netWorth));
-    f.append(fl);
-    f.append(sec("Accounts", "Savings pay 4% a year"));
-    const al = E("div", "list");
-    if (!S.bankOpen) al.append(row({ name: "Open a bank account", note: "Needs $250 cash. Keeps your money safe from theft.", price: "Free", btns: [B("Open", "y", () => { if (S.cash < 250) return; S.bankOpen = true; S.credit = Math.min(850, S.credit + 20); logMsg("Opened a bank account."); checkWarm(); }, () => S.cash < 250)] }));
-    else {
-      al.append(row({ name: "Savings", note: "4% a year, paid daily", price: () => money(S.savings), btns: [
-        B("+ Half", "g", () => { const a = Math.max(0, S.cash) / 2; S.cash -= a; S.savings += a; }, () => S.cash <= 0),
-        B("+ All", "g", () => { const a = Math.max(0, S.cash); S.cash -= a; S.savings += a; }, () => S.cash <= 0),
-        B("Take out", "r", () => { S.cash += S.savings; S.savings = 0; }, () => S.savings <= 0)] }));
-      const fc = E("div", "good");
-      const fh = E("div", "good-h"); const fl2 = E("div"); fl2.append(E("div", "nm", "IRON 500 Index Fund")); fl2.append(T(E("div", "muted num"), () => S.fund.units ? "Own " + S.fund.units.toFixed(3) + " units · " + money(fundValue()) : "Tracks fitness company stocks"));
-      const fr = E("div"); fr.style.textAlign = "right"; fr.append(T(E("div", "num"), () => money(S.fund.price)));
-      const fd = T(E("div", "num"), () => { const d = (S.fund.price / prevOf(S.fund.hist) - 1) * 100; return (d >= 0 ? "▲ " : "▼ ") + Math.abs(d).toFixed(2) + "%"; });
-      on(() => { fd.className = "num " + (S.fund.price >= prevOf(S.fund.hist) ? "up-c" : "down-c"); });
-      fr.append(fd); fh.append(fl2, fr); fc.append(fh);
-      const fsp = chartSVG("spark", 300, 44); on(() => drawChart(fsp, S.fund.hist)); fc.append(fsp);
-      const buyF = p => { const a = Math.max(0, S.cash) * p; if (a <= 0) return; S.cash -= a; S.fund.units += a / S.fund.price; logMsg("Invested " + money(a) + " in IRON 500."); };
-      const sellF = p => { const u = S.fund.units * p; if (u <= 0) return; S.fund.units -= u; S.cash += u * S.fund.price; logMsg("Sold " + money(u * S.fund.price) + " of IRON 500."); };
-      const bb = E("div", "btns"); bb.append(B("Buy 10%", "g", () => buyF(0.1), () => S.cash <= 0), B("Buy 50%", "g", () => buyF(0.5), () => S.cash <= 0), B("Sell half", "r", () => sellF(0.5), () => S.fund.units <= 0), B("Sell all", "r", () => sellF(1), () => S.fund.units <= 0));
-      fc.append(bb); al.append(fc);
-    }
-    f.append(al);
-    f.append(sec("Loans", "Business loans run 3 years. Better credit, lower rate.", () => (bizApr() * 100).toFixed(1) + "% APR"));
-    const ll = E("div", "list");
-    S.loans.forEach(l => ll.append(row({ name: l.kind + " loan", note: () => money(l.pay) + "/day · " + (l.apr * 100).toFixed(1) + "% APR", price: () => money(l.bal), btns: [B("Pay off", "r", () => { if (S.cash < l.bal) return; S.cash -= l.bal; S.loans = S.loans.filter(x => x !== l); S.credit = Math.min(850, S.credit + 10); logMsg("Paid off a " + l.kind.toLowerCase() + " loan."); }, () => S.cash < l.bal)] })));
-    const borrow = p => { const a = Math.floor(bizLimit() * p); if (a < 50) return; S.loans.push(makeLoan("Business", a, bizApr(), 3)); S.cash += a; logMsg("Borrowed " + money(a) + "."); };
-    ll.append(row({ name: "Business loan", note: () => bizLimit() >= 50 ? "You can borrow up to " + money(bizLimit()) : "Build credit or net worth to qualify", btns: [B("25%", "g", () => borrow(0.25), () => bizLimit() < 200), B("Max", "g", () => borrow(1), () => bizLimit() < 50)] }));
-    f.append(ll);
-    return f;
-  }
-
-  // ---- HOME ----
-  function tabHome() {
-    const f = document.createDocumentFragment();
+    if (S.dead) f.append(deadBanner());
     const cur = E("div", "card");
-    cur.append(E("div", "k", "Living in"));
+    cur.append(E("div", "k", "Living in " + city().name));
     const nm = E("div", "bigname"); nm.textContent = home().name; cur.append(nm);
     cur.append(T(E("div", "num"), () => "Lifespan " + ydays(lifespanDays()) + " from day one · " + ydays(daysLeft()) + " left"));
-    cur.append(T(E("div", "muted"), () => "Base " + BASE_DAYS + "d · home +" + home().life + "d · meals +" + food().life + "d · certs +" + certLife() + "d · physique +" + Math.round(S.physique * 1.5) + "d · extras " + (S.bonusDays >= 0 ? "+" : "") + S.bonusDays + "d"));
+    cur.append(T(E("div", "muted"), () => "Base " + BASE_DAYS + "d" + (lv("genes") ? " · genes +" + 20 * lv("genes") + "d" : "") + (cm("life", 0) ? " · " + city().name + " +" + cm("life", 0) + "d" : "") + " · home +" + home().life + "d · meals +" + food().life + "d · certs +" + certLife() + "d · physique +" + Math.round(S.physique * 1.5) + "d · extras " + (S.bonusDays >= 0 ? "+" : "") + S.bonusDays + "d"));
     f.append(cur);
 
     f.append(sec("Housing", "Better housing, longer life, more energy", HOMES.length + " levels"));
     const hl = E("div", "list");
     HOMES.forEach((h, i) => {
       const isCur = S.home === h.id, owned = S.homesOwned[h.id], prevOk = i === 0 || S.homesOwned[HOMES[i - 1].id];
-      const note = (h.life ? "+" + lifeTxt(h.life) + " life" : "No life bonus") + " · " + h.max + " max energy" + (h.burn ? " · −" + money(h.burn) + "/day" : "");
+      const note = (h.life ? "+" + lifeTxt(h.life) + " life" : "No life bonus") + " · " + h.max + " max energy" + (h.burn ? " · −" + money(h.burn * cityCost()) + "/day" : "");
       const btn = isCur ? B("Home", "", () => {}, () => true)
         : owned ? B("Move back", "", () => { S.home = h.id; logMsg("Moved into " + h.name + "."); })
-        : prevOk ? B("Move in", "y", () => { if (S.cash < h.cost) return; S.cash -= h.cost; S.homesOwned[h.id] = true; S.home = h.id; logMsg("Moved into " + h.name + "."); checkWarm(); }, () => S.cash < h.cost)
+        : prevOk ? B("Move in", "y", () => { if (S.cash < h.cost) return; S.cash -= h.cost; S.homesOwned[h.id] = true; S.home = h.id; logMsg("Moved into " + h.name + "."); buzz(); checkWarm(); }, () => S.cash < h.cost)
         : B("Locked", "", () => {}, () => true);
       hl.append(row({ name: h.name, tag: isCur ? mkTag("Current", "cur") : null, note, price: h.cost ? money(h.cost) : "Free", small: h.cost ? "move-in" : null, cls: isCur ? "cur" : (!owned && !prevOk ? "dim" : ""), btns: [btn] }));
     });
@@ -2180,7 +2179,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     const fl = E("div", "list");
     FOODS.forEach(x => {
       const isCur = S.food === x.id;
-      fl.append(row({ name: x.name, tag: isCur ? mkTag("Current", "cur") : null, note: "+" + x.regen + " energy/day" + (x.life ? " · +" + lifeTxt(x.life) + " life" : ""), price: money(x.burn), small: "per day", cls: isCur ? "cur" : "",
+      fl.append(row({ name: x.name, tag: isCur ? mkTag("Current", "cur") : null, note: "+" + x.regen + " energy/day" + (x.life ? " · +" + lifeTxt(x.life) + " life" : ""), price: money(x.burn * cityCost()), small: "per day", cls: isCur ? "cur" : "",
         btns: [isCur ? B("Eating", "", () => {}, () => true) : B("Switch", "y", () => { S.food = x.id; logMsg("Switched to " + x.name.toLowerCase() + "."); })] }));
     });
     f.append(fl);
@@ -2189,7 +2188,7 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     const sl = E("div", "list");
     const cdOk = (id, days) => S.cd[id] == null || S.day - S.cd[id] >= days;
     const train = E("button", "btn y", "Lift"); train.type = "button"; train.addEventListener("click", () => doTrain());
-    on(() => { train.disabled = S.energy < 20 || S.physique >= 100; });
+    on(() => { train.disabled = S.dead || S.energy < 20 || S.physique >= 100; });
     sl.append(row({ name: "Train yourself", note: "1 day · −20 energy · +1 physique · each point adds 1.5 days of life", price: "Free", btns: [train] }));
     const care = (id, name, note, cost, days, fx) => sl.append(row({ name, note: () => cdOk(id, days) ? note : note + " · ready in " + (days - (S.day - S.cd[id])) + "d", price: money(cost),
       btns: [B("Book", "y", () => { if (S.cash < cost || !cdOk(id, days)) return; S.cash -= cost; S.cd[id] = S.day; fx(); logMsg(name + " booked."); }, () => S.cash < cost || !cdOk(id, days))] }));
@@ -2199,18 +2198,111 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     care("vac", "Two-week vacation", "+60 days life · once a year", 40000, 365, () => { S.bonusDays += 60; });
     f.append(sl);
 
-    f.append(sec("Legacy", "Carries over when a life ends"));
-    f.append(row({ name: S.legacy + " ★ · life #" + S.lives, note: "Each star adds 10% to everything you earn. Stars come from your best net worth in a life. Restart from the ↻ button up top.", btns: [] }));
+    f.append(sec("Money", "Keep cash safe, borrow when you must"));
+    const ml = E("div", "list");
+    if (!S.bankOpen) ml.append(row({ name: "Open a bank account", note: "Needs $250 cash. Protects you from theft and pays 4% a year on savings.", price: "Free", btns: [B("Open", "y", () => { if (S.cash < 250) return; S.bankOpen = true; logMsg("Opened a bank account."); }, () => S.cash < 250)] }));
+    else ml.append(row({ name: "Savings", note: () => "4% a year, paid daily · " + money(interestToday()) + "/day now", price: () => money(S.savings), btns: [
+      B("+ Half", "g", () => { const a = Math.max(0, S.cash) / 2; S.cash -= a; S.savings += a; }, () => S.cash <= 0),
+      B("+ All", "g", () => { const a = Math.max(0, S.cash); S.cash -= a; S.savings += a; }, () => S.cash <= 0),
+      B("Take out", "r", () => { S.cash += S.savings; S.savings = 0; }, () => S.savings <= 0)] }));
+    S.loans.forEach(l => ml.append(row({ name: l.kind + " loan", note: () => money(l.pay) + "/day until paid", price: () => money(l.bal), small: "left to pay",
+      btns: [B("Pay off", "r", () => { if (S.cash < l.bal) return; S.cash -= l.bal; S.loans = S.loans.filter(x => x !== l); logMsg("Paid off a " + l.kind.toLowerCase() + " loan."); }, () => S.cash < l.bal)] })));
+    const borrow = p => { const a = Math.floor(emergencyLimit() * p); if (a < 20) return; S.loans.push(makeLoan("Emergency", a, 0.25, 90)); S.cash += a; logMsg("Borrowed " + money(a) + " (emergency loan)."); };
+    ml.append(row({ name: "Emergency loan", note: () => "25% fee, repaid over 90 days. You can borrow up to " + money(emergencyLimit()) + ".", btns: [B("Half", "g", () => borrow(0.5), () => emergencyLimit() < 40), B("Max", "g", () => borrow(1), () => emergencyLimit() < 20)] }));
+    f.append(ml);
+    return f;
+  }
 
-    f.append(sec("Settings & backups", "Your game saves after every action"));
-    const st = E("div", "list");
-    st.append(row({ name: "Haptics", note: "A small tap you can feel on each action. iPhone with iOS 18 or later.", btns: [B(() => S.haptics ? "On" : "Off", "", () => { S.haptics = !S.haptics; buzz(); })] }));
-    st.append(row({ name: "Backup code", note: "Copy this somewhere safe. Paste it back in to restore this exact game, even on another phone.", btns: [B("Show code", "y", showExport)] }));
-    st.append(row({ name: "Load a backup code", note: "Replaces your current game with the one in the code.", btns: [B("Paste code", "", showImport)] }));
-    const bak = readBackup();
-    st.append(row({ name: "Automatic backup", note: bak ? "Saved on day " + bak.day + (bak.dead ? " (after this life ended)" : "") + ". Made every 10 days." : "Made every 10 days. None yet.",
-      btns: [B("Restore", "r", () => { const b = readBackup(); if (!b) return; S = Object.assign(fresh(), b); ensureGoods(); syncLayout(); resetScene(); lastTier = -1; logMsg("Restored the automatic backup from day " + S.day + "."); buildTab(); }, () => !bak)] }));
-    f.append(st);
+  // ---- MAP ----
+  // a simplified outline of the lower 48, projected to an 800 x 470 box
+  const US = [[-124.7,48.4],[-124.1,46.2],[-124.2,42.0],[-123.8,39.8],[-122.4,37.8],[-120.6,34.6],[-117.1,32.5],[-114.8,32.5],[-111.0,31.3],[-108.2,31.3],[-106.5,31.8],[-104.5,29.6],[-103.0,29.0],[-101.4,29.8],[-99.5,27.5],[-97.4,25.9],[-97.4,27.8],[-95.0,29.3],[-93.8,29.7],[-91.0,29.2],[-89.4,29.0],[-89.6,30.2],[-88.0,30.4],[-85.4,29.7],[-84.0,30.1],[-82.7,28.0],[-81.8,26.1],[-80.4,25.2],[-80.0,26.8],[-80.6,28.5],[-81.4,30.7],[-79.2,33.2],[-77.0,34.6],[-75.5,35.2],[-76.0,37.0],[-75.1,38.5],[-74.0,40.5],[-72.0,41.0],[-70.0,41.6],[-70.6,42.6],[-70.2,43.7],[-68.0,44.4],[-67.0,44.8],[-67.8,47.1],[-69.2,47.4],[-70.9,45.2],[-74.7,45.0],[-76.5,44.1],[-79.2,43.4],[-82.5,41.9],[-82.4,43.0],[-83.5,45.8],[-84.6,46.5],[-88.0,48.0],[-95.2,49.0],[-123.0,49.0]];
+  const proj = (lon, lat) => [((lon + 126) * 13.6).toFixed(1), ((50 - lat) * 17.6 + 6).toFixed(1)];
+  function cityOpen(c) { return c.need <= S.platesEarned; }
+  function tabMap() {
+    const f = document.createDocumentFragment();
+    const head = E("div", "card");
+    head.innerHTML = "<div class='k'>Your chain</div><div class='bigname'>" + S.chain.length + " gym" + (S.chain.length === 1 ? "" : "s") + " · " + CITIES.filter(cityOpen).length + "/" + CITIES.length + " cities open</div><div class='muted' style='font-size:13px'>Every life is a new gym. When a life ends, that gym stays on the map and pays you royalties every day. Earn Golden Plates to open new cities.</div>";
+    if (S.dead) { const p = E("p", "gold-c"); p.style.cssText = "margin:4px 0 0;font-weight:700"; p.textContent = "Tap a city to open your next gym."; head.append(p); }
+    f.append(head);
+    const card = E("div", "card map-card");
+    const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+    svg.setAttribute("viewBox", "0 0 800 470"); svg.setAttribute("class", "usmap"); svg.setAttribute("role", "img"); svg.setAttribute("aria-label", "Map of your gyms across the United States");
+    let html = "<defs><radialGradient id='glow'><stop offset='0' stop-color='rgba(235,187,36,.55)'/><stop offset='1' stop-color='rgba(235,187,36,0)'/></radialGradient></defs>";
+    for (let lon = -120; lon <= -70; lon += 10) { const [x] = proj(lon, 40); html += "<line x1='" + x + "' y1='0' x2='" + x + "' y2='470' class='grat'/>"; }
+    for (let lat = 25; lat <= 50; lat += 5) { const [, y] = proj(-100, lat); html += "<line x1='0' y1='" + y + "' x2='800' y2='" + y + "' class='grat'/>"; }
+    html += "<path class='land' d='M" + US.map(p => proj(p[0], p[1]).join(" ")).join(" L") + " Z'/>";
+    // routes between your gyms, in the order you opened them
+    const route = S.chain.map(g => CITY_BY_ID[g.city]).concat(S.dead ? [] : [city()]);
+    for (let i = 1; i < route.length; i++) { const a = proj(route[i - 1].lon, route[i - 1].lat), b = proj(route[i].lon, route[i].lat); if (a.join() !== b.join()) html += "<line class='route' x1='" + a[0] + "' y1='" + a[1] + "' x2='" + b[0] + "' y2='" + b[1] + "'/>"; }
+    CITIES.forEach(c => {
+      const [x, y] = proj(c.lon, c.lat), open = cityOpen(c), here = !S.dead && S.city === c.id;
+      const gyms = S.chain.filter(g => g.city === c.id).length;
+      const cls = here ? "pin here" : gyms ? "pin chain" : open ? "pin open" : "pin locked";
+      html += "<g class='" + cls + "' data-city='" + c.id + "' tabindex='0' role='button' aria-label='" + c.name + "'>";
+      if (here) html += "<circle r='26' cx='" + x + "' cy='" + y + "' fill='url(#glow)'><animate attributeName='r' values='18;30;18' dur='2.4s' repeatCount='indefinite'/></circle>";
+      html += "<circle class='hit' r='26' cx='" + x + "' cy='" + y + "'/><circle class='dot' r='" + (here ? 12 : 10) + "' cx='" + x + "' cy='" + y + "'/>";
+      if (gyms) html += "<text class='cnt' x='" + x + "' y='" + (+y + 4.5) + "'>" + gyms + "</text>";
+      const right = c.lon < -100 || c.id === "chicago" ? 1 : -1;
+      html += "<text class='lbl' x='" + (+x + right * 16) + "' y='" + (+y + 6) + "' text-anchor='" + (right > 0 ? "start" : "end") + "'>" + c.name + (open ? "" : " · " + c.need) + "</text></g>";
+    });
+    svg.innerHTML = html;
+    svg.addEventListener("click", e => { const g = e.target.closest("[data-city]"); if (g) citySheet(g.dataset.city); });
+    svg.addEventListener("keydown", e => { if (e.key === "Enter") { const g = e.target.closest("[data-city]"); if (g) citySheet(g.dataset.city); } });
+    card.append(svg);
+    card.append(E("div", "map-key", "<span><i class='k1'></i>You are here</span><span><i class='k2'></i>Your gyms</span><span><i class='k3'></i>Open</span><span><i class='k4'></i>Locked · plates needed</span>"));
+    f.append(card);
+    f.append(sec("Cities", S.dead ? "Pick where your next life starts" : "Where you can open your next gym", E("span", "meta", S.platesEarned + " plates earned" + plateIcon)));
+    const list = E("div", "list");
+    CITIES.forEach(c => {
+      const open = cityOpen(c), here = !S.dead && S.city === c.id, rec = S.hof[c.id];
+      list.append(row({
+        name: c.name + ", " + c.st, tag: here ? mkTag("Here", "cur") : rec ? mkTag(rec.lives + " gym" + (rec.lives > 1 ? "s" : ""), "done") : !open ? mkTag(c.need + " plates", "lock") : null,
+        note: c.trait + (rec ? " Best run: " + rec.bestDays + " days, " + money(rec.bestNet) + "." : ""),
+        cls: here ? "cur" : open ? "" : "dim",
+        btns: S.dead && open ? [B("Open here", "y", () => newLife(c.id), null, true)] : []
+      }));
+    });
+    f.append(list);
+    return f;
+  }
+  function citySheet(id) {
+    const c = CITY_BY_ID[id], open = cityOpen(c), rec = S.hof[id];
+    const gyms = S.chain.filter(g => g.city === id);
+    let text = c.trait;
+    if (rec) text += " You've run " + rec.lives + " gym" + (rec.lives > 1 ? "s" : "") + " here. Best: " + rec.bestDays + " days, net worth " + money(rec.bestNet) + ". Royalties: " + money(gyms.reduce((a, g) => a + royaltyOf(g), 0)) + "/day.";
+    if (!open) text += " Opens at " + c.need + " Golden Plates earned (you have " + S.platesEarned + ").";
+    if (!S.dead && S.city === id) text += " Your current gym is here.";
+    const btns = S.dead && open ? [["Open a gym here", () => newLife(id)], ["Not yet", () => {}]] : [["Close", () => {}]];
+    openModal(c.name + ", " + c.st, text, btns);
+  }
+
+  // ---- LEGACY ----
+  function tabLegacy() {
+    const f = document.createDocumentFragment();
+    const hero = E("div", "card legacy-hero");
+    on(() => {
+      const h = "<div class='plate-big' aria-hidden='true'><i></i></div><div><div class='k'>Golden Plates</div><div class='big gold-c'>" + S.plates + "</div><div class='muted' style='font-size:13px'>" +
+        (S.dead ? "Spend them, then pick your next city on the Map." : "This life would bank about <b class='gold-c'>" + platesFor() + "</b> more if it ended today. Survive longer, grow bigger, earn certs and beat rivals to earn more.") + "</div></div>";
+      if (hero._h !== h) { hero._h = h; hero.innerHTML = h; }
+    });
+    f.append(hero);
+    f.append(sec("Legacy upgrades", "Permanent. They apply to every life from now on."));
+    const list = E("div", "list");
+    LEGACY.forEach(u => {
+      const lvl = () => lv(u.id), maxed = () => lvl() >= u.max, cost = () => u.cost(lvl());
+      list.append(row({
+        name: u.name, tag: null, note: () => u.desc + " · Lv " + lvl() + "/" + u.max,
+        price: () => maxed() ? "Maxed" : cost() + " plates",
+        btns: [B("Buy", "y", () => { if (maxed() || S.plates < cost()) return; S.plates -= cost(); S.lu[u.id] = lvl() + 1; logMsg("Legacy upgrade: " + u.name + " Lv " + lvl() + "."); buzz(); }, () => maxed() || S.plates < cost(), true)]
+      }));
+    });
+    f.append(list);
+    if (S.chain.length) {
+      f.append(sec("Your chain", "Every gym you've run, still paying royalties", () => money(royalties()) + "/day"));
+      const cl = E("div", "list");
+      S.chain.slice().reverse().forEach(g => cl.append(row({ name: "Life #" + g.life + " · " + CITY_BY_ID[g.city].name, note: g.days + " days · reached " + g.tier + " · best net worth " + money(g.bestNet), price: money(royaltyOf(g)), small: "per day" })));
+      f.append(cl);
+    }
     return f;
   }
 
@@ -2218,24 +2310,30 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
   let lastTier = -1;
   function refresh() {
     const dl = daysLeft();
-    const hl = el("hLeft"); hl.textContent = ydays(dl); hl.style.color = dl < 30 ? "var(--down)" : dl < 120 ? "var(--orange)" : "var(--up)";
+    const hl = el("hLeft"); hl.textContent = S.dead ? "—" : ydays(dl); hl.style.color = dl < 30 ? "var(--down)" : dl < 120 ? "var(--orange)" : "var(--up)";
     el("hDay").textContent = S.day;
+    el("hCity").textContent = city().name;
     el("hAge").textContent = ydays(ageDays());
     const hc = el("hCash"); hc.textContent = money(S.cash); hc.classList.toggle("neg", S.cash < 0);
     el("hEn").textContent = Math.floor(S.energy) + "/" + maxEnergy();
     el("hEnBar").style.width = Math.min(100, S.energy / maxEnergy() * 100) + "%";
-    el("hIn").textContent = money(income() + interestToday());
+    el("hIn").textContent = money(income() + royalties() + interestToday());
     el("hOut").textContent = money(burn());
-    document.querySelectorAll("#focusRow button").forEach(b => b.setAttribute("aria-pressed", String(b.dataset.f === S.focus)));
-    el("focusDesc").textContent = focus().name + ": " + focus().desc;
     el("hTick").textContent = S.log[0] ? S.log[0].m : "Welcome to " + S.name + ".";
     el("gymName").textContent = S.name;
     const cb = el("coachBtn");
     cb.disabled = S.dead || S.energy < COACH_EN;
-    el("coachSub").textContent = S.energy < COACH_EN ? "Too tired. Rest first." : "+" + money(coachToday()) + " · −" + COACH_EN + " energy · 1 day";
+    cb.classList.toggle("packed", S.packed > 0);
+    el("coachTitle").textContent = S.packed > 0 ? "Packed house ×2" : "Coach clients";
+    el("coachSub").textContent = S.dead ? "This life is over" : S.energy < COACH_EN ? "Too tired. Rest first." : "+" + money(coachToday()) + " · −" + COACH_EN + " energy · 1 day";
+    el("hypeBar").style.width = (S.packed > 0 ? S.packed / 5 * 100 : S.hype) + "%";
+    el("hypeLbl").textContent = S.packed > 0 ? S.packed + "d left" : "hype " + Math.floor(S.hype) + "%";
     el("restBtn").disabled = S.dead;
+    document.querySelector(".dock").hidden = S.dead;
+    document.querySelectorAll("#focusRow button").forEach(b => { b.setAttribute("aria-pressed", String(b.dataset.f === S.focus)); b.disabled = S.dead; });
+    el("focusDesc").textContent = focus().name + ": " + focus().desc;
     const ti = tierIndex();
-    if (ti !== lastTier) { if (lastTier !== -1 && ti > lastTier) { logMsg("Your gym is now a " + TIERS[ti].name + "."); notify("New level: " + TIERS[ti].name, "Your gym has earned " + money(TIERS[ti].at) + " in total. The place gets a makeover and new supplies show up in the supply room."); } lastTier = ti; }
+    if (ti !== lastTier) { if (lastTier !== -1 && ti > lastTier && !S.dead) { logMsg("Your gym is now a " + TIERS[ti].name + "."); notify("New level: " + TIERS[ti].name, "Your gym has earned " + money(TIERS[ti].at) + " in total. The place gets a makeover, and this life will bank more Golden Plates."); buzz("big"); } lastTier = ti; }
     if (tabKey() !== curKey) { buildTab(); return; }
     U.forEach(f => f());
   }
@@ -2296,34 +2394,55 @@ nav.tabs button[aria-selected="true"]::before { content: ""; position: absolute;
     inp.addEventListener("keydown", e => { if (e.key === "Enter") { saveName(); closeModal(); refresh(); save(); } });
   }
 
+  function settingsMenu() {
+    const wrap = E("div"); wrap.style.cssText = "display:grid;gap:8px";
+    const mk = (label, cls, fn) => { const b = E("button", "btn " + cls); b.type = "button"; b.textContent = label; b.addEventListener("click", fn); return b; };
+    const hap = mk("Haptics: " + (S.haptics ? "On" : "Off"), "", () => { S.haptics = !S.haptics; hap.textContent = "Haptics: " + (S.haptics ? "On" : "Off"); buzz(); save(); });
+    wrap.append(
+      mk("Rename gym", "", () => { closeModal(); renameGym(); }),
+      hap,
+      mk("Show backup code", "", () => { closeModal(); showExport(); }),
+      mk("Load a backup code", "", () => { closeModal(); showImport(); })
+    );
+    const bak = readBackup();
+    wrap.append(mk(bak ? "Restore auto-backup from day " + bak.day : "No auto-backup yet", "r", () => {
+      const b = readBackup(); if (!b) return;
+      closeModal(); S = migrate(b); syncLayout(); resetScene(); lastTier = -1; buildTab(); save();
+      notify("Backup restored", "You're back on day " + S.day + ".");
+    }));
+    wrap.append(E("p", "muted", "Your game saves after every action, with an automatic backup every 10 days. Haptics need an iPhone on iOS 18 or later."));
+    openModal("Settings", wrap, [["Done", () => {}]]);
+  }
+
   // ======================= BOOT =======================
   function start(data) {
     readColors();
     const fromHot = data && data.state;
-    const loaded = fromHot ? Object.assign(fresh(), data.state) : load();
+    const loaded = fromHot ? migrate(data.state) : load();
     if (loaded) S = loaded;
-    else logMsg("You open " + S.name + " with $25, a couch in the back office and about 200 days to make it.");
-    ensureGoods(); syncLayout();
+    else logMsg("You open " + S.name + " in " + city().name + " with $25, a couch in the back office and about 200 days to make it.");
+    syncLayout();
     try { const t = localStorage.getItem(SAVE_KEY + ":tab"); if (t && TABS.some(x => x[0] === t)) tab = t; } catch (e) {}
-    buildTabBar(); setTab(tab);
-    if (S.dead) die();
-    else if (restoredFromDay != null) notify("Save restored", "Your latest save was damaged, so the game loaded the automatic backup from day " + restoredFromDay + ".");
     FOCUS.forEach(fc => {
       const b = E("button", null, fc.name); b.type = "button"; b.dataset.f = fc.id;
-      b.addEventListener("click", () => { S.focus = fc.id; buzz(); refresh(); save(); });
+      b.addEventListener("click", () => { if (S.dead) return; S.focus = fc.id; buzz(); refresh(); save(); });
       el("focusRow").append(b);
     });
+    buildTabBar(); setTab(tab);
+    if (S.dead) die(S.deathReason);
+    else if (restoredFromDay != null) notify("Save restored", "Your latest save was damaged, so the game loaded the automatic backup from day " + restoredFromDay + ".");
 
     el("coachBtn").addEventListener("click", doCoach);
     el("restBtn").addEventListener("click", doRest);
     el("logBtn").addEventListener("click", showLog);
     el("gymName").addEventListener("click", renameGym);
     el("restartBtn").addEventListener("click", restartMenu);
+    el("settingsBtn").addEventListener("click", settingsMenu);
     document.addEventListener("visibilitychange", () => { if (document.hidden) save(); });
     window.addEventListener("pagehide", save);
 
     buildFixtures(); sceneDirty = false;
-    for (let i = 0, n = Math.min(memberTarget(), 8); i < n; i++) { const p = spawn("member"); p.x = rnd(120, 640); p.y = rnd(180, 380); p.act = "walk"; }
+    for (let i = 0, n = Math.min(memberTarget(), 8); i < n; i++) { const p = spawn("member"); p.x = rnd(120, 640); p.y = rnd(180, 380); p.act = "walk"; p.alpha = 1; }
     requestAnimationFrame(frame);
 
     if (window.claude && window.claude.hot && window.claude.hot.snapshot) window.claude.hot.snapshot(() => ({ state: S }));
