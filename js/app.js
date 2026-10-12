@@ -3,6 +3,7 @@ const App = (() => {
   const tabs = [
     { id: 'gym', title: 'Gym', icon: Icons.tabGym, screen: GymScreen },
     { id: 'map', title: 'Map', icon: Icons.tabMap, screen: MapScreen },
+    { id: 'classes', title: 'Classes', icon: Icons.tabClasses, screen: ClassesScreen },
     { id: 'upgrades', title: 'Upgrades', icon: Icons.tabUpgrades, screen: UpgradesScreen },
     { id: 'staff', title: 'Staff', icon: Icons.tabStaff, screen: StaffScreen },
     { id: 'prestige', title: 'Prestige', icon: Icons.tabPrestige, screen: PrestigeScreen },
@@ -80,9 +81,23 @@ const App = (() => {
       GymScreen.update();
     },
     golden: () => {
+      const at = Floor.goldenPoint();
       const r = G.catchGoldenCustomer();
-      if (r) GymScreen.spawnGoldenParticle(`+${Fmt.short(r.reps)}${r.protein ? ' 💎' : ''} ✨`);
+      if (r && at) Floor.puff(`+${Fmt.short(r.reps)}${r.protein ? ' 💎' : ''} ✨`, at.x, at.y, 'gold');
     },
+    'floor-tile': (el) => GymScreen.scrollToStation(el.dataset.id),
+    'log-workout': (el) => {
+      const protein = G.logWorkout(el.dataset.focus);
+      if (protein) {
+        const f = G.focus(el.dataset.focus);
+        Toast.show({ emoji: '💪', title: `${G.streak}-day streak!`, subtitle: `+${protein} Protein · ${f.name} stations x${CFG.workout.focusMultiplier} today`, celebrate: true });
+      }
+    },
+    'unlock-slot': (el) => {
+      if (G.unlockSlot(el.dataset.id) && CFG.stations.some((st) => G.level(st) > 0)) openClassPicker(el.dataset.id);
+    },
+    'pick-class': (el) => openClassPicker(el.dataset.id),
+    'pick-focus': (el) => MapScreen.pickFocus(el.dataset.id),
     'coin-upgrade': (el) => {
       const u = CFG.coinUpgrades.find((x) => x.id === el.dataset.id);
       if (u && G.buyCoinUpgrade(u)) Toast.show({ emoji: u.emoji, title: u.name, subtitle: G.upgradeEffectText(u) });
@@ -104,7 +119,7 @@ const App = (() => {
     'open-city': (el) => MapScreen.openCity(G.city(el.dataset.id)),
     'open-gym': (el) => {
       const [c, l] = el.dataset.id.split(':');
-      G.openGym(G.city(c), G.location(l));
+      G.openGym(G.city(c), G.location(l), MapScreen.pickedFocus || G.city(c).trend);
     },
   };
 
@@ -117,6 +132,7 @@ const App = (() => {
   // ───────── Boot ─────────
   function boot() {
     applyAppearance();
+    G.ensureTasks(); // replaces tasks from older builds before anything renders
     matchMedia('(prefers-color-scheme: dark)').addEventListener('change', applyAppearance);
     renderTabBar();
     showTab('gym');
@@ -130,8 +146,8 @@ const App = (() => {
     });
     G.on('structure', () => currentScreen().onStructure?.());
     G.on('season', () => GymScreen.renderSeason());
-    G.on('golden', () => GymScreen.renderGolden());
-    G.on('autotap', (v) => { if (current === 'gym') GymScreen.autoTapParticle(v); });
+    G.on('golden', () => Floor.renderGolden());
+    G.on('workout', () => { if (current === 'gym') { GymScreen.renderWorkout(); Floor.refresh(); GymScreen.update(); } });
     G.on('milestone', (m) => Toast.show(m));
     G.on('welcome', (report) => Sheets.welcome(report));
 

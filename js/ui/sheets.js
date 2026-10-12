@@ -228,7 +228,7 @@ const Sheets = (() => {
         <div class="welcome-amount gold-text">+<span class="num">${Fmt.whole(plates)}</span>${Icons.plates(36)}</div>
         <div class="keep-grid">
           <div class="card keep"><p class="tiny upper muted">You keep</p><ul>
-            <li>Golden Plates & upgrades</li><li>Protein & Protein upgrades</li><li>Your map chain (${G.gymCount} gym${G.gymCount === 1 ? '' : 's'})</li><li>Season progress & tasks</li></ul></div>
+            <li>Golden Plates & upgrades</li><li>Protein & Protein upgrades</li><li>Your map chain (${G.gymCount} gym${G.gymCount === 1 ? '' : 's'})</li><li>Class schedule, streak & season</li></ul></div>
           <div class="card keep reset"><p class="tiny upper muted">Starts over</p><ul>
             <li>Reps → ${Fmt.whole(G.franchiseStartReps)}</li><li>Stations</li><li>Trainers</li><li>Coin upgrades</li></ul></div>
         </div>
@@ -255,7 +255,9 @@ const Sheets = (() => {
       <div class="card records">
         ${item('🪙', 'Lifetime Reps', Fmt.whole(s.lifetimeReps))}
         ${item('📈', 'Best income', Fmt.rate(s.bestIncome))}
-        ${item('👆', 'Total taps', Fmt.whole(st.taps))}
+        ${item('💪', 'Real-life workouts logged', Fmt.whole(st.checkins))}
+        ${item('🔥', 'Best workout streak', `${s.workouts.best} days`)}
+        ${item('🗓️', 'Classes scheduled', Fmt.whole(st.classes))}
         ${item('🏋️', 'Station levels bought', Fmt.whole(st.levels))}
         ${item('🤩', 'Golden members welcomed', Fmt.whole(st.golden))}
         ${item('🧑‍🏫', 'Trainers hired', Fmt.whole(st.trainers))}
@@ -270,7 +272,7 @@ const Sheets = (() => {
       ['Reps', [['+1K', () => G.debug.addReps(1e3)], ['+1M', () => G.debug.addReps(1e6)], ['+1B', () => G.debug.addReps(1e9)], ['+1T', () => G.debug.addReps(1e12)]]],
       ['Currencies', [['+100 Protein', () => G.debug.addProtein(100)], ['+10 Plates', () => G.debug.addPlates(10)]]],
       ['Time', [['Skip 1h', () => G.debug.skip(3600)], ['Skip 1d', () => G.debug.skip(86400)], ['Offline 3h', () => { Sheet.close(); setTimeout(() => G.debug.simulateOffline(3), 350); }]]],
-      ['Events', [['Golden member', () => G.debug.goldenCustomerNow()], ['+20 season pts', () => G.debug.seasonPoints(20)], ['Complete tasks', () => G.debug.completeTasks()]]],
+      ['Events', [['Golden member', () => G.debug.goldenCustomerNow()], ['+20 season pts', () => G.debug.seasonPoints(20)], ['Complete tasks', () => G.debug.completeTasks()], ['New workout day', () => G.debug.newWorkoutDay()]]],
     ];
     const actions = [];
     const body = Sheet.open(`
@@ -294,9 +296,9 @@ const Sheets = (() => {
   // ───────── First-launch onboarding ─────────
   function onboarding(done) {
     const cards = [
-      { emoji: '🏋️', title: 'Welcome to your Home Gym', text: 'A garage, a few dumbbells and a big dream. Tap the barbell to lift and earn Reps.' },
-      { emoji: '🌿', title: 'Build calm, steady income', text: 'Buy stations that earn while you rest. Hire trainers, collect upgrades, finish tasks for Protein.' },
-      { emoji: '✨', title: 'Grow into an empire', text: 'Open gyms across the map, then franchise for Golden Plates and permanent bonuses.' },
+      { emoji: '🏋️', title: 'Welcome to your Home Gym', text: 'A garage, a few dumbbells and a big dream. Open stations and watch members fill your floor.' },
+      { emoji: '🗓️', title: 'Run it on real time', text: 'Schedule classes into your actual day. Log your own workouts to build a streak that boosts the gym.' },
+      { emoji: '✨', title: 'Grow into an empire', text: 'Open on-trend gyms across the map, then franchise for Golden Plates and permanent bonuses.' },
     ];
     const el = document.createElement('div');
     el.className = 'onboarding';

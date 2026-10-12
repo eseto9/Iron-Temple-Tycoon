@@ -59,24 +59,11 @@ const Icons = {
   tabGym: () => `<svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><rect x="1.5" y="8" width="3" height="8" rx="1.2"/><rect x="4.5" y="5.5" width="3.5" height="13" rx="1.4"/><rect x="8" y="10.8" width="8" height="2.4" rx="1.2"/><rect x="16" y="5.5" width="3.5" height="13" rx="1.4"/><rect x="19.5" y="8" width="3" height="8" rx="1.2"/></svg>`,
   tabMap: () => `<svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7zm0 9.6A2.6 2.6 0 1 1 12 6.4a2.6 2.6 0 0 1 0 5.2z"/></svg>`,
   tabUpgrades: () => `<svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm4.3 9.7a1 1 0 0 1-1.4 0L13 9.8V17a1 1 0 1 1-2 0V9.8l-1.9 1.9a1 1 0 1 1-1.4-1.4l3.6-3.6a1 1 0 0 1 1.4 0l3.6 3.6a1 1 0 0 1 0 1.4z"/></svg>`,
+  tabClasses: () => `<svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M7 2a1 1 0 0 1 1 1v1h8V3a1 1 0 1 1 2 0v1h.5A2.5 2.5 0 0 1 21 6.5v12a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 18.5v-12A2.5 2.5 0 0 1 5.5 4H6V3a1 1 0 0 1 1-1zm12 8H5v8.5c0 .3.2.5.5.5h13c.3 0 .5-.2.5-.5zM8 12.5h3v3H8z"/></svg>`,
   tabStaff: () => `<svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="9" cy="8" r="3.6"/><path d="M2 19.2C2 15.9 5.1 13.5 9 13.5s7 2.4 7 5.7c0 .7-.5 1.3-1.2 1.3H3.2c-.7 0-1.2-.6-1.2-1.3z"/><circle cx="17" cy="9" r="2.8" opacity=".6"/><path d="M17.5 13.6c2.6.3 4.5 2 4.5 4.4 0 .6-.4 1-1 1h-3.3c.1-2-.6-3.9-2.1-5.2.6-.2 1.2-.2 1.9-.2z" opacity=".6"/></svg>`,
   tabPrestige: () => `<svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.5l2.9 6 6.6.8-4.9 4.5 1.3 6.5L12 17.1l-5.9 3.2 1.3-6.5-4.9-4.5 6.6-.8z"/></svg>`,
   tabShop: () => `<svg class="ico" width="22" height="22" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6 7V6.5a6 6 0 0 1 12 0V7h1.3c.9 0 1.6.7 1.7 1.6l.9 11a2.2 2.2 0 0 1-2.2 2.4H4.3a2.2 2.2 0 0 1-2.2-2.4l.9-11C3.1 7.7 3.8 7 4.7 7zm2.2 0h7.6v-.5a3.8 3.8 0 0 0-7.6 0z"/></svg>`,
 };
-
-/** Barbell for the tap button. */
-const DUMBBELL_SVG = `
-  <svg class="dumbbell" viewBox="0 0 200 100" aria-hidden="true">
-    <rect x="6" y="44" width="188" height="12" rx="6" fill="url(#bar)"/>
-    <rect x="22" y="14" width="20" height="72" rx="8" fill="url(#plate)"/>
-    <rect x="42" y="24" width="14" height="52" rx="6" fill="url(#plate2)"/>
-    <rect x="56" y="38" width="7" height="24" rx="3" fill="#D8B96A"/>
-    <rect x="158" y="14" width="20" height="72" rx="8" fill="url(#plate)"/>
-    <rect x="144" y="24" width="14" height="52" rx="6" fill="url(#plate2)"/>
-    <rect x="137" y="38" width="7" height="24" rx="3" fill="#D8B96A"/>
-    <rect x="26" y="20" width="4" height="60" rx="2" fill="#fff" opacity=".12"/>
-    <rect x="162" y="20" width="4" height="60" rx="2" fill="#fff" opacity=".12"/>
-  </svg>`;
 
 const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
 
@@ -166,7 +153,7 @@ const Sheet = (() => {
     current = { root, onClose };
     enableSwipeToClose(root.querySelector('.sheet'));
     onMount?.(root.querySelector('.sheet-body'));
-    requestAnimationFrame(() => requestAnimationFrame(() => root.classList.add('open')));
+    setTimeout(() => root.classList.add('open'), 20);
     return root.querySelector('.sheet-body');
   }
 

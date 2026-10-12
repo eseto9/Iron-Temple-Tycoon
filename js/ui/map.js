@@ -5,6 +5,7 @@ const MapScreen = (() => {
   let map = null;
   let cluster = null;
   const markers = {};
+  let pickedFocus = null; // focus chosen in the open city sheet
 
   const tagClass = { Steady: 'tag-steady', Busy: 'tag-busy', Prime: 'tag-prime' };
 
@@ -16,7 +17,7 @@ const MapScreen = (() => {
     const n = G.gymsIn(city.id);
     const state = n === 0 ? '' : n === CFG.locations.length ? 'full' : 'owned';
     return `<div class="city-pin ${state}" aria-label="${esc(city.name)}">
-      <span class="pin-dot"></span>${n ? `<span class="pin-count">${n}</span>` : ''}
+      <span class="pin-trend">${G.focus(city.trend).emoji}</span>${n ? `<span class="pin-count">${n}</span>` : ''}
     </div>`;
   }
 
@@ -81,25 +82,42 @@ const MapScreen = (() => {
 
   function citySheetHtml(city) {
     const n = G.gymsIn(city.id);
+    const trend = G.focus(city.trend);
+    const pick = pickedFocus || city.trend;
+    const pf = G.focus(pick);
     return `
       <div class="city-sheet" data-city-sheet="${city.id}">
         <div class="sheet-head">
           <div><h2>${esc(city.name)}</h2><p class="muted small">${esc(city.region)}</p></div>
           ${UI.pill('reps', Fmt.whole(G.s.reps))}
         </div>
-        <div class="row gap-8"><span class="chip chip-sage">Tier ${city.tier} · ${n}/${CFG.locations.length} gyms open</span></div>
+        <div class="row gap-8 wrap">
+          <span class="chip chip-sage">Tier ${city.tier} · ${n}/${CFG.locations.length} gyms open</span>
+          <span class="chip trend-chip">📈 Loves ${trend.emoji} ${trend.name}</span>
+        </div>
+        ${n < CFG.locations.length ? `
+          <div class="focus-pick">
+            <p class="small"><strong>Gym focus</strong> <span class="muted">· matching the trend pays x${+(CFG.trendMultiplier * G.effectProduct('trend')).toFixed(2)}, and every ${pf.name} gym lifts your home ${pf.name} stations +${Math.round(CFG.focusBonusPerGym * 100)}%</span></p>
+            <div class="focus-grid four">${CFG.focuses.map((f) => `
+              <button class="focus-btn ${f.id === pick ? 'on' : ''}" data-action="pick-focus" data-id="${f.id}" style="--tint:${f.tint}" aria-pressed="${f.id === pick}">
+                <span>${f.emoji}</span>${f.name}${f.id === city.trend ? '<i class="trend-dot" title="Trending here"></i>' : ''}
+              </button>`).join('')}</div>
+          </div>` : ''}
         <div class="list">
           ${CFG.locations.map((loc) => {
-            const open = G.hasGym(city.id, loc.id);
+            const gym = G.gymAt(city.id, loc.id);
+            const focusId = gym ? gym.focus : pick;
+            const f = G.focus(focusId);
             const cost = G.gymCost(city, loc);
+            const onTrend = focusId === city.trend;
             return `
-              <article class="card upg-row ${open ? 'owned' : ''}">
+              <article class="card upg-row ${gym ? 'owned' : ''}">
                 ${UI.badge(loc.emoji, loc.tag === 'Prime' ? '#FBEFC9' : loc.tag === 'Busy' ? '#E4DDF8' : '#EADFD5', 48)}
                 <div class="grow">
-                  <div class="row gap-6"><h3>${loc.name}</h3><span class="loc-tag ${tagClass[loc.tag]}">${loc.tag}</span></div>
-                  <p class="small income-text num">+${Fmt.rate(G.gymIncome(city, loc))}</p>
+                  <div class="row gap-6 wrap"><h3>${loc.name}</h3><span class="loc-tag ${tagClass[loc.tag]}">${loc.tag}</span></div>
+                  <p class="small income-text num">+${Fmt.rate(G.gymIncome(city, loc, focusId))}${f ? ` <span class="muted">· ${f.emoji} ${f.name}${onTrend ? ' 📈' : ''}</span>` : ''}</p>
                 </div>
-                ${open ? `<span class="owned-chip">${Icons.check(14)} Open</span>`
+                ${gym ? `<span class="owned-chip">${Icons.check(14)} Open</span>`
                   : UI.priceButton({ action: 'open-gym', id: `${city.id}:${loc.id}`, cost: Fmt.short(cost), icon: Icons.reps(15), label: 'OPEN', extra: `data-need="reps:${cost}"` })}
               </article>`;
           }).join('')}
@@ -111,6 +129,7 @@ const MapScreen = (() => {
 
   function openCity(city) {
     FX.haptic('select');
+    pickedFocus = city.trend;
     Sheet.open(citySheetHtml(city));
     syncAffordability(Sheet.body);
   }
@@ -131,6 +150,14 @@ const MapScreen = (() => {
   return {
     render,
     openCity,
+    get pickedFocus() { return pickedFocus; },
+    pickFocus(id) {
+      pickedFocus = id;
+      FX.haptic('select');
+      const body = Sheet.body;
+      const cityId = body?.querySelector('[data-city-sheet]')?.dataset.citySheet;
+      if (cityId) { body.innerHTML = citySheetHtml(G.city(cityId)); syncAffordability(body); }
+    },
     update() { if (root) UI.syncPills(root); },
     onStructure: refresh,
     unmount() {

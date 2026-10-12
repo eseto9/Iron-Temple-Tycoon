@@ -4,15 +4,15 @@ const G = (() => {
   const listeners = {};
   const SEASON = CFG.season;
   const DAY = 86400e3;
-  const STATS = ['taps', 'levels', 'golden', 'reps', 'upgrades', 'trainers', 'seasonPts', 'gyms', 'franchises'];
+  const STATS = ['levels', 'golden', 'reps', 'upgrades', 'trainers', 'seasonPts', 'gyms', 'franchises', 'checkins', 'classes'];
 
-  function newStats() {
-    return Object.fromEntries(STATS.map((k) => [k, 0]));
-  }
+  const newStats = () => Object.fromEntries(STATS.map((k) => [k, 0]));
+  /** Whole-day number for a local calendar date (DST-safe). */
+  const dayNum = (d = new Date()) => Math.round(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / DAY);
 
   function newSave(now = Date.now()) {
     return {
-      version: 2,
+      version: 3,
       reps: CFG.startingReps,
       lifetimeReps: 0,
       runReps: 0, // Reps earned since the last franchise; drives Golden Plates
@@ -24,7 +24,9 @@ const G = (() => {
       coinUpgrades: [],
       proteinUpgrades: [],
       goldenUpgradeLevels: {},
-      gyms: [], // "cityId:locationId"
+      gyms: [], // "cityId:locationId:focusId"
+      schedule: { unlocked: [], classes: {} }, // classes: slotId → stationId
+      workouts: { lastDay: null, streak: 0, best: 0, days: [], focus: null },
       seasonEndsAt: now + SEASON.lengthDays * DAY,
       seasonRackLevel: 0,
       seasonClaimed: [],
@@ -49,6 +51,8 @@ const G = (() => {
         ...parsed,
         settings: { ...fresh.settings, ...(parsed.settings || {}) },
         stats: { ...fresh.stats, ...(parsed.stats || {}) },
+        schedule: { ...fresh.schedule, ...(parsed.schedule || {}) },
+        workouts: { ...fresh.workouts, ...(parsed.workouts || {}) },
       };
     } catch {
       return fresh;
@@ -66,7 +70,8 @@ const G = (() => {
     lastTick: Date.now(),
     lastSave: Date.now(),
     lastTaskCheck: 0,
-    autoTapCarry: 0,
+    lastSlotId: null,
+    offlineMode: false, // classes don't run while you're away
     loopId: null,
 
     on(event, fn) { (listeners[event] ||= []).push(fn); },
@@ -105,10 +110,93 @@ const G = (() => {
       const e = u.effect;
       if (e.kind === 'station') return `${CFG.stations.find((s) => s.id === e.station).name} income x${e.value}`;
       if (e.kind === 'global') return `All station income x${e.value}`;
-      if (e.kind === 'tap') return `Tap payout x${e.value}`;
       if (e.kind === 'milestone') return `Every milestone bonus x${e.value}`;
       if (e.kind === 'golden') return `Golden members pay x${e.value}`;
+      if (e.kind === 'class') return `Class bonuses x${e.value}`;
       return u.detail || '';
+    },
+
+    // ───────── Focus, classes, workouts ─────────
+    focus(id) { return CFG.focuses.find((f) => f.id === id); },
+    /** Home stations get +5% per map gym that shares their focus. */
+    focusGymCount(focusId) { return this.s.gyms.filter((g) => g.split(':')[2] === focusId).length; },
+    focusMult(focusId) { return 1 + CFG.focusBonusPerGym * this.focusGymCount(focusId); },
+
+    slotAt(date = new Date(this.now)) {
+      const h = date.getHours();
+      return CFG.timeSlots.find((t) => (t.start < t.end ? h >= t.start && h < t.end : h >= t.start || h < t.end));
+    },
+    get currentSlot() { return this.slotAt(); },
+    /** Seconds until the current slot ends. */
+    get slotSecondsLeft() {
+      const d = new Date(this.now);
+      const end = new Date(d);
+      end.setHours(this.currentSlot.end, 0, 0, 0);
+      if (end <= d) end.setDate(end.getDate() + 1);
+      return (end - d) / 1000;
+    },
+    slotUnlocked(slotId) { return has(this.s.schedule.unlocked, slotId); },
+    get nextSlotCost() { return CFG.slotUnlockCosts[this.s.schedule.unlocked.length] ?? Infinity; },
+    unlockSlot(slotId) {
+      if (this.slotUnlocked(slotId) || !this.spend(this.nextSlotCost)) return false;
+      this.s.schedule.unlocked.push(slotId);
+      FX.haptic('purchase');
+      FX.sound('buy');
+      this.emit('structure');
+      return true;
+    },
+    classSlotOf(stationId) { return Object.keys(this.s.schedule.classes).find((k) => this.s.schedule.classes[k] === stationId); },
+    setClass(slotId, stationId) {
+      if (!this.slotUnlocked(slotId)) return false;
+      const sched = this.s.schedule.classes;
+      // Each class runs once per day: moving it clears its old slot.
+      const old = stationId && this.classSlotOf(stationId);
+      if (old) delete sched[old];
+      if (stationId) { sched[slotId] = stationId; this.s.stats.classes++; } else delete sched[slotId];
+      FX.haptic('select');
+      this.emit('structure');
+      return true;
+    },
+    classMultBase(slot) {
+      const base = slot.peak ? CFG.peakClassMultiplier : CFG.classMultiplier;
+      return 1 + (base - 1) * this.effectProduct('class') * (1 + CFG.primeTimePerLevel * this.golden('primeTime'));
+    },
+    /** The class running right now, if any: { slot, station, mult }. */
+    get liveClass() {
+      const slot = this.currentSlot;
+      const stationId = this.slotUnlocked(slot.id) && this.s.schedule.classes[slot.id];
+      if (!stationId || this.level(this.station(stationId)) <= 0) return null;
+      return { slot, station: this.station(stationId), mult: this.classMultBase(slot) };
+    },
+
+    get todayNum() { return dayNum(new Date(this.now)); },
+    get workedOutToday() { return this.s.workouts.lastDay === this.todayNum; },
+    get todayWorkoutFocus() { return this.workedOutToday ? this.s.workouts.focus : null; },
+    /** Streak counts while the last workout was within the rest-day grace. */
+    get streakAlive() {
+      const w = this.s.workouts;
+      return w.lastDay != null && this.todayNum - w.lastDay <= 1 + CFG.workout.restDayGrace;
+    },
+    get streak() { return this.streakAlive ? this.s.workouts.streak : 0; },
+    get streakMult() {
+      const w = CFG.workout;
+      return 1 + w.streakBonusPerDay * Math.min(this.streak, w.streakBonusMaxDays) * this.effectProduct('streak');
+    },
+    logWorkout(focusId) {
+      if (this.workedOutToday || !this.focus(focusId)) return 0;
+      const w = this.s.workouts;
+      w.streak = this.streakAlive ? w.streak + 1 : 1;
+      w.best = Math.max(w.best, w.streak);
+      w.lastDay = this.todayNum;
+      w.focus = focusId;
+      w.days = [...w.days.filter((d) => this.todayNum - d < 28), this.todayNum];
+      const protein = CFG.workout.proteinBase + Math.min(w.streak, 7);
+      this.s.protein += protein;
+      this.s.stats.checkins++;
+      FX.haptic('milestone');
+      FX.sound('milestone');
+      this.emit('workout');
+      return protein;
     },
 
     // ───────── Economy ─────────
@@ -125,12 +213,23 @@ const G = (() => {
       for (const u of CFG.proteinUpgrades) if (u.effect.kind === 'global' && has(this.s.proteinUpgrades, u.id)) m *= u.effect.value;
       return m;
     },
-    /** Applies to station income: Home Gym × Signature Pump × coin & protein "global" upgrades. */
-    get globalMult() { return this.homeGymIncomeMult * this.pumpMult * this.effectProduct('global'); },
+    /** Applies to station income: Home Gym × Signature Pump × upgrades × workout streak. */
+    get globalMult() { return this.homeGymIncomeMult * this.pumpMult * this.effectProduct('global') * this.streakMult; },
     get milestoneFactor() { return CFG.milestoneMultiplier * this.effectProduct('milestone'); },
+    /** Station-specific multipliers, broken out so the UI can explain them. */
+    stationBoosts(st) {
+      const live = this.offlineMode ? null : this.liveClass;
+      return {
+        trainer: has(this.s.trainers, st.id) ? 2 : 1,
+        upgrades: this.effectProduct('station', (e) => e.station === st.id),
+        focus: st.focus ? this.focusMult(st.focus) : 1,
+        class: live && live.station.id === st.id ? live.mult : 1,
+        workout: st.focus && st.focus === this.todayWorkoutFocus ? CFG.workout.focusMultiplier : 1,
+      };
+    },
     stationMult(st) {
-      const trainer = has(this.s.trainers, st.id) ? 2 : 1;
-      return trainer * this.effectProduct('station', (e) => e.station === st.id);
+      const b = this.stationBoosts(st);
+      return b.trainer * b.upgrades * b.focus * b.class * b.workout;
     },
     /** Income of one station before global multipliers. */
     stationRaw(st) {
@@ -145,31 +244,33 @@ const G = (() => {
       return st.baseIncome * Math.pow(this.milestoneFactor, milestoneCount(lvl)) * this.stationMult(st) * this.globalMult;
     },
     get stationIncomeTotal() { return this.allStations.reduce((sum, st) => sum + this.stationRaw(st), 0) * this.globalMult; },
+    get totalLevels() { return CFG.stations.reduce((n, st) => n + this.level(st), 0) + this.s.seasonRackLevel; },
 
-    // Map chain income: kept across franchises; boosted by Signature Pump and Protein upgrades.
+    // Map chain income: kept across franchises.
     city(id) { return CFG.cities.find((c) => c.id === id); },
     location(id) { return CFG.locations.find((l) => l.id === id); },
     gymCost(city, loc) { return CFG.mapBaseCost * Math.pow(CFG.mapCostGrowth, city.tier - 1) * loc.costMult; },
-    gymBaseIncome(city, loc) { return CFG.mapBaseIncome * Math.pow(CFG.mapIncomeGrowth, city.tier - 1) * loc.incomeMult; },
-    gymIncome(city, loc) { return this.gymBaseIncome(city, loc) * this.pumpMult * this.proteinGlobalMult; },
-    hasGym(cityId, locId) { return has(this.s.gyms, `${cityId}:${locId}`); },
+    trendMult(city, focusId) { return focusId === city.trend ? CFG.trendMultiplier * this.effectProduct('trend') : 1; },
+    gymIncome(city, loc, focusId) {
+      return CFG.mapBaseIncome * Math.pow(CFG.mapIncomeGrowth, city.tier - 1) * loc.incomeMult
+        * this.trendMult(city, focusId) * this.pumpMult * this.proteinGlobalMult;
+    },
+    gymAt(cityId, locId) {
+      const g = this.s.gyms.find((x) => x.startsWith(`${cityId}:${locId}`));
+      return g ? { focus: g.split(':')[2] || null } : null;
+    },
+    hasGym(cityId, locId) { return !!this.gymAt(cityId, locId); },
     gymsIn(cityId) { return this.s.gyms.filter((g) => g.startsWith(cityId + ':')).length; },
     get gymCount() { return this.s.gyms.length; },
     get cityCount() { return new Set(this.s.gyms.map((g) => g.split(':')[0])).size; },
     get chainIncome() {
       return this.s.gyms.reduce((sum, g) => {
-        const [c, l] = g.split(':');
-        return sum + this.gymIncome(this.city(c), this.location(l));
+        const [c, l, f] = g.split(':');
+        return sum + this.gymIncome(this.city(c), this.location(l), f);
       }, 0);
     },
 
     get incomePerSec() { return this.stationIncomeTotal + this.chainIncome; },
-    get autoTapsPerSec() { return this.effectSum('autoTap'); },
-    get tapValue() {
-      const hands = 1 + CFG.strongHandsPerLevel * this.golden('strongHands');
-      const v = CFG.baseTapPower * hands * this.effectProduct('tap') + this.incomePerSec * CFG.tapIncomeShare;
-      return v < 1000 ? Math.max(1, Math.round(v)) : v; // whole Reps per tap reads cleaner
-    },
     get offlineRate() {
       return CFG.baseOfflineRate * (1 + CFG.nightShiftPerLevel * this.golden('nightShift')) * this.effectProduct('offlineRate');
     },
@@ -227,7 +328,7 @@ const G = (() => {
 
       const gained = milestoneCount(after) - milestoneCount(before);
       if (before === 0 && !st.seasonal) {
-        this.emit('milestone', { emoji: st.emoji, title: `${st.name} is open!`, subtitle: 'New station earning Reps', celebrate: false });
+        this.emit('milestone', { emoji: st.emoji, title: `${st.name} is open!`, subtitle: 'New station on your gym floor', celebrate: false });
         this.emit('structure');
       } else if (gained > 0) {
         const protein = gained * CFG.milestoneProtein;
@@ -243,17 +344,6 @@ const G = (() => {
       if (st.seasonal) this.emit('season');
       this.emit('purchase', st);
       return true;
-    },
-
-    tap(auto = false) {
-      const v = this.tapValue;
-      this.earn(v);
-      if (!auto) {
-        this.s.stats.taps++;
-        FX.haptic('tap');
-        FX.sound('tap');
-      }
-      return v;
     },
 
     // Coin & Protein upgrades
@@ -283,9 +373,10 @@ const G = (() => {
     },
 
     // Staff
+    trainerCost(st) { return st.trainerCost * this.homeGymCostMult; },
     hireTrainer(st) {
       if (has(this.s.trainers, st.id) || this.level(st) <= 0) return false;
-      if (!this.spend(st.trainerCost * this.homeGymCostMult)) return false;
+      if (!this.spend(this.trainerCost(st))) return false;
       this.s.trainers.push(st.id);
       this.s.stats.trainers++;
       FX.haptic('milestone');
@@ -293,15 +384,21 @@ const G = (() => {
       this.emit('structure');
       return true;
     },
-    trainerCost(st) { return st.trainerCost * this.homeGymCostMult; },
 
     // Map
-    openGym(city, loc) {
-      if (this.hasGym(city.id, loc.id) || !this.spend(this.gymCost(city, loc))) return false;
-      this.s.gyms.push(`${city.id}:${loc.id}`);
+    openGym(city, loc, focusId) {
+      if (this.hasGym(city.id, loc.id) || !this.focus(focusId) || !this.spend(this.gymCost(city, loc))) return false;
+      this.s.gyms.push(`${city.id}:${loc.id}:${focusId}`);
       this.s.stats.gyms++;
       FX.haptic('milestone');
-      this.emit('milestone', { emoji: loc.emoji, title: `${city.name} ${loc.name} is open!`, subtitle: `+${Fmt.rate(this.gymIncome(city, loc))} for your chain, forever`, celebrate: true });
+      const f = this.focus(focusId);
+      const trend = focusId === city.trend ? ' · on trend!' : '';
+      this.emit('milestone', {
+        emoji: loc.emoji,
+        title: `${f.emoji} ${city.name} ${loc.name} is open!`,
+        subtitle: `+${Fmt.rate(this.gymIncome(city, loc, focusId))}${trend} · home ${f.name} +${Math.round(CFG.focusBonusPerGym * 100)}%`,
+        celebrate: true,
+      });
       this.emit('structure');
       return true;
     },
@@ -421,16 +518,17 @@ const G = (() => {
     ensureTasks(force = false) {
       const day = this.dayKey(), week = this.weekKey();
       const t = (this.s.tasks ||= {});
+      const valid = (p) => p && p.list.every((x) => this.taskDef(x.id));
       let changed = false;
-      if (force || !t.daily || t.daily.key !== day) {
-        // Deterministic daily pick: always "tap", plus a shuffle seeded by the date.
+      if (force || !valid(t.daily) || t.daily.key !== day) {
+        // Deterministic daily pick: always the first task, plus a shuffle seeded by the date.
         let seed = [...day].reduce((a, c) => (a * 31 + c.charCodeAt(0)) >>> 0, 7);
         const rand = () => ((seed = (seed * 1664525 + 1013904223) >>> 0) / 2 ** 32);
         const rest = CFG.dailyTasks.slice(1).sort(() => rand() - 0.5);
         t.daily = this.rollTasks([CFG.dailyTasks[0], ...rest.slice(0, CFG.dailyTaskCount - 1)], day);
         changed = true;
       }
-      if (force || !t.weekly || t.weekly.key !== week) {
+      if (force || !valid(t.weekly) || t.weekly.key !== week) {
         t.weekly = this.rollTasks(CFG.weeklyTasks, week);
         changed = true;
       }
@@ -439,13 +537,14 @@ const G = (() => {
     taskDef(id) { return CFG.dailyTasks.find((d) => d.id === id) || CFG.weeklyTasks.find((d) => d.id === id); },
     taskProgress(period, task) {
       const def = this.taskDef(task.id);
-      return Math.max(0, this.s.stats[def.metric] - (period.base[def.metric] || 0));
+      if (!def) return 0;
+      return Math.max(0, (this.s.stats[def.metric] || 0) - (period.base[def.metric] || 0));
     },
     get tasksClaimable() {
       const t = this.s.tasks;
-      if (!t) return 0;
+      if (!t?.daily) return 0;
       let n = 0;
-      for (const p of [t.daily, t.weekly]) for (const task of p.list) if (!has(p.claimed, task.id) && this.taskProgress(p, task) >= task.target) n++;
+      for (const p of [t.daily, t.weekly]) for (const task of p.list) if (this.taskDef(task.id) && !has(p.claimed, task.id) && this.taskProgress(p, task) >= task.target) n++;
       return n;
     },
     claimTask(periodName, id) {
@@ -462,7 +561,7 @@ const G = (() => {
     },
 
     // ───────── Offline & loop ─────────
-    /** Credits time away. Returns a report for the Welcome Back sheet, or null. */
+    /** Credits time away (without class bonuses). Returns a report for the Welcome Back sheet, or null. */
     applyOfflineProgress() {
       const now = Date.now();
       const awaySec = (now - this.s.lastActiveAt) / 1000;
@@ -471,7 +570,9 @@ const G = (() => {
       this.now = now;
       if (!(awaySec > 1)) return null;
       const countedSec = Math.min(awaySec, this.offlineCapSec);
+      this.offlineMode = true;
       const earned = this.incomePerSec * countedSec * this.offlineRate;
+      this.offlineMode = false;
       if (earned <= 0) return null;
       this.earn(earned);
       this.save();
@@ -489,13 +590,14 @@ const G = (() => {
       if (income > 0) this.earn(income * dt);
       if (income > this.s.bestIncome) this.s.bestIncome = income;
 
-      const autoTaps = this.autoTapsPerSec;
-      if (autoTaps > 0) {
-        this.autoTapCarry += autoTaps * dt;
-        while (this.autoTapCarry >= 1) {
-          this.autoTapCarry -= 1;
-          this.emit('autotap', this.tap(true));
+      const slot = this.currentSlot.id;
+      if (slot !== this.lastSlotId) {
+        if (this.lastSlotId) {
+          const live = this.liveClass;
+          if (live) this.emit('milestone', { emoji: '🎵', title: `${CFG.classes[live.station.id]} is starting`, subtitle: `${live.slot.name} · ${live.station.name} x${+live.mult.toFixed(1)}` });
         }
+        this.lastSlotId = slot;
+        this.emit('structure');
       }
 
       this.rolloverSeasonIfNeeded();
@@ -506,7 +608,7 @@ const G = (() => {
         this.scheduleGoldenCustomer();
         this.emit('golden');
       } else if (!this.goldenCustomer && t >= this.nextGoldenCustomerAt) {
-        this.goldenCustomer = { id: t, expiresAt: t + CFG.goldenCustomer.lifetimeSec * 1000, side: Math.random() < 0.5 ? -1 : 1 };
+        this.goldenCustomer = { id: t, expiresAt: t + CFG.goldenCustomer.lifetimeSec * 1000 };
         this.emit('golden');
       }
 
@@ -542,15 +644,27 @@ const G = (() => {
         for (const p of [G.s.tasks.daily, G.s.tasks.weekly]) p.base = Object.fromEntries(Object.keys(G.s.stats).map((k) => [k, -1e18]));
         G.emit('tasks');
       },
+      /** Pretend the last workout was yesterday so you can log again. */
+      newWorkoutDay() { if (G.s.workouts.lastDay != null) G.s.workouts.lastDay = G.todayNum - 1; G.emit('workout'); },
     },
   };
 
-  // Saves from the first build stored Protein upgrades under another name and had a premium track.
-  if (G.s.premiumUpgrades && !G.s.proteinUpgrades?.length) G.s.proteinUpgrades = [];
-  delete G.s.premiumUpgrades;
-  if (!Array.isArray(G.s.seasonClaimed)) G.s.seasonClaimed = G.s.seasonClaimedFree || [];
-  ['seasonClaimedFree', 'seasonClaimedPremium', 'hasSeasonPremium', 'freeRushEndsAt', 'freeRushReadyAt', 'preWorkoutEndsAt', 'restBoostEndsAt', 'totalTaps']
+  // Clean up fields from earlier builds.
+  ['premiumUpgrades', 'seasonClaimedFree', 'seasonClaimedPremium', 'hasSeasonPremium', 'freeRushEndsAt', 'freeRushReadyAt', 'preWorkoutEndsAt', 'restBoostEndsAt', 'totalTaps']
     .forEach((k) => delete G.s[k]);
+  if (!Array.isArray(G.s.seasonClaimed)) G.s.seasonClaimed = [];
+
+  // Tapping was removed in v1.1: refund what was spent on tap upgrades.
+  const removedProtein = { sharpEye: 15, autoTap: 45, turboAutoTap: 220 };
+  for (const [id, cost] of Object.entries(removedProtein)) {
+    if (G.s.proteinUpgrades.includes(id)) G.s.protein += cost;
+  }
+  G.s.proteinUpgrades = G.s.proteinUpgrades.filter((id) => !(id in removedProtein));
+  G.s.coinUpgrades = G.s.coinUpgrades.filter((id) => id !== 'goldGrip');
+  const hands = G.s.goldenUpgradeLevels.strongHands || 0;
+  for (let i = 0; i < hands; i++) G.s.goldenPlates += Math.ceil(Math.pow(1.4, i));
+  delete G.s.goldenUpgradeLevels.strongHands;
+  if (G.s.stats.taps != null) delete G.s.stats.taps;
 
   return G;
 })();

@@ -20,15 +20,9 @@ const GymScreen = (() => {
         <div class="rate-line">${Icons.cash(20)}<span class="num" data-k="rate">0/s</span></div>
       </section>
 
-      <section class="tap-zone">
-        <div class="particles" data-k="particles" aria-hidden="true"></div>
-        <div class="tap-halo" aria-hidden="true"></div>
-        <button class="tap-btn" data-k="tapBtn" aria-label="Lift. Earns Reps per tap">
-          <span class="tap-face" data-k="tapFace">${DUMBBELL_SVG}</span>
-        </button>
-        <div class="golden-slot" data-k="golden"></div>
-      </section>
-      <p class="tap-caption">Tap to lift <span class="num" data-k="tapValue">+1</span><span class="auto-chip" data-k="autoChip" hidden>🤖 Auto-Tap on</span></p>
+      <section class="card floor-card" data-k="floorHost"></section>
+
+      <section class="card workout-card" data-k="workout"></section>
 
       <button class="card season-card" data-action="open-season" aria-label="Open season pass">
         <div class="row gap-14">
@@ -60,12 +54,46 @@ const GymScreen = (() => {
 
     k = {};
     root.querySelectorAll('[data-k]').forEach((el) => (k[el.dataset.k] = el));
-    bindTap();
+    Floor.render(k.floorHost);
+    renderWorkout();
     renderStations();
     renderSeason();
-    renderGolden();
     syncSeg();
     update();
+  }
+
+  // ───────── Real-life workout check-in ─────────
+  function renderWorkout() {
+    if (!root) return;
+    const w = G.s.workouts;
+    const done = G.workedOutToday;
+    const f = done && G.focus(w.focus);
+    const streak = G.streak;
+    const bonus = Math.round((G.streakMult - 1) * 100);
+    const today = G.todayNum;
+    const dots = Array.from({ length: 7 }, (_, i) => {
+      const d = today - 6 + i;
+      const label = 'SMTWTFS'[new Date((d) * 864e5).getUTCDay()];
+      return `<span class="wk-dot ${w.days.includes(d) ? 'on' : ''} ${d === today ? 'today' : ''}"><i></i>${label}</span>`;
+    }).join('');
+    k.workout.innerHTML = `
+      <div class="row gap-14">
+        ${UI.badge('💪', '#DCEBDF', 48)}
+        <div class="grow">
+          <h3>Real-life workout</h3>
+          <p class="small muted">${done ? `Logged ${f.name.toLowerCase()} today · ${f.name} stations x${CFG.workout.focusMultiplier} until midnight` : 'Did you move today? Log it honestly for Protein and a streak bonus.'}</p>
+        </div>
+      </div>
+      <div class="streak-row">
+        <span class="streak-chip ${streak ? 'on' : ''}">🔥 ${streak}-day streak${bonus ? ` · +${bonus}% income` : ''}</span>
+        <div class="wk-dots" aria-label="Workouts this week">${dots}</div>
+      </div>
+      ${done
+        ? `<p class="logged-note">${Icons.check(14)} Nice work. Rest days are welcome: your streak survives one between workouts.</p>`
+        : `<div class="focus-grid">${CFG.focuses.map((x) => `
+            <button class="focus-btn" data-action="log-workout" data-focus="${x.id}" style="--tint:${x.tint}">
+              <span>${x.emoji}</span>${x.name}
+            </button>`).join('')}</div>`}`;
   }
 
   // ───────── Stations ─────────
@@ -131,8 +159,9 @@ const GymScreen = (() => {
       const lvl = G.level(st);
       const q = G.quote(st);
       const income = lvl > 0 ? G.stationIncome(st) : G.stationIncomePerLevel(st);
-      const trainer = G.s.trainers.includes(st.id) ? ' · 🧑‍🏫 x2' : '';
-      UI.setText(refs.meta, lvl > 0 ? `Lv ${lvl} · ${Fmt.rate(income)}${trainer}` : `+${Fmt.rate(income)} per level`);
+      const b = G.stationBoosts(st);
+      const tags = (b.class > 1 ? ' · 🎵' : '') + (b.workout > 1 ? ' · 💪' : '') + (b.trainer > 1 ? ' · 🧑‍🏫' : '');
+      UI.setText(refs.meta, lvl > 0 ? `Lv ${lvl} · ${Fmt.rate(income)}${tags}` : `+${Fmt.rate(income)} per level`);
       const prev = previousMilestone(lvl), next = nextMilestone(lvl);
       UI.setStyle(refs.msBar, 'width', `${((lvl - prev) / (next - prev)) * 100}%`);
       UI.setText(refs.ms, `x${+G.milestoneFactor.toFixed(2)} at ${next}`);
@@ -170,59 +199,6 @@ const GymScreen = (() => {
     UI.setText(k.seasonDays, `${G.seasonDaysLeft}d left`);
   }
 
-  // ───────── Golden member ─────────
-  function renderGolden() {
-    if (!root) return;
-    const gc = G.goldenCustomer;
-    if (!gc) { k.golden.innerHTML = ''; return; }
-    k.golden.innerHTML = `
-      <button class="golden-customer ${gc.side < 0 ? 'left' : 'right'}" data-action="golden" aria-label="Golden member arrived. Tap for bonus Reps">
-        <span class="gc-face">🤩</span><span class="gc-label">Golden member!</span>
-      </button>`;
-  }
-
-  // ───────── Tapping ─────────
-  function bindTap() {
-    const btn = k.tapBtn;
-    const doTap = (x, y) => {
-      const v = G.tap();
-      spawnParticle(`+${Fmt.short(v)}`, x, y);
-      squish();
-      update();
-    };
-    btn.addEventListener('pointerdown', (e) => {
-      if (e.button !== 0) return;
-      const r = k.particles.getBoundingClientRect();
-      doTap(e.clientX - r.left, e.clientY - r.top);
-    });
-    // Keyboard / screen reader activation (no pointer)
-    btn.addEventListener('click', (e) => {
-      if (e.detail === 0) doTap(k.particles.clientWidth / 2, k.particles.clientHeight / 2);
-    });
-  }
-
-  function squish() {
-    if (FX.reduceMotion) return;
-    const face = k.tapFace;
-    face.classList.remove('squish');
-    void face.offsetWidth;
-    face.classList.add('squish');
-  }
-
-  function spawnParticle(text, x, y, extra = '') {
-    if (FX.reduceMotion || !root) return;
-    const layer = k.particles;
-    if (layer.childElementCount > 24) layer.firstElementChild.remove();
-    const p = document.createElement('span');
-    p.className = 'particle ' + extra;
-    p.textContent = text;
-    p.style.left = `${x + (Math.random() - 0.5) * 30}px`;
-    p.style.top = `${y - 10}px`;
-    p.style.setProperty('--drift', `${(Math.random() - 0.5) * 50}px`);
-    layer.appendChild(p);
-    p.addEventListener('animationend', () => p.remove());
-  }
-
   // ───────── Buy amount ─────────
   function syncSeg() {
     if (!root) return;
@@ -237,8 +213,7 @@ const GymScreen = (() => {
     if (!root) return;
     UI.setText(k.reps, Fmt.whole(G.s.reps));
     UI.setText(k.rate, Fmt.rate(G.incomePerSec));
-    UI.setText(k.tapValue, `+${Fmt.short(G.tapValue)}`);
-    k.autoChip.hidden = G.autoTapsPerSec <= 0;
+    Floor.update();
     UI.syncPills(root);
     k.tasksDot.hidden = G.tasksClaimable === 0;
     UI.setText(k.seasonDays, `${G.seasonDaysLeft}d left`);
@@ -249,18 +224,16 @@ const GymScreen = (() => {
     render,
     update,
     renderSeason,
-    renderGolden,
+    renderWorkout,
     syncSeg,
     bump,
-    onStructure() { renderStations(); renderSeason(); if (k.homeGym) k.homeGym.innerHTML = UI.homeGymCard(); },
-    autoTapParticle(v) {
-      if (!root || document.hidden) return;
-      const layer = k.particles;
-      spawnParticle(`+${Fmt.short(v)}`, layer.clientWidth / 2 + (Math.random() - 0.5) * 90, layer.clientHeight * 0.45, 'auto');
+    onStructure() { if (!root) return; renderStations(); renderSeason(); renderWorkout(); Floor.refresh(); if (k.homeGym) k.homeGym.innerHTML = UI.homeGymCard(); },
+    scrollToStation(id) {
+      const row = rows.find((r) => r.st.id === id);
+      if (!row) return;
+      row.el.scrollIntoView({ behavior: FX.reduceMotion ? 'auto' : 'smooth', block: 'center' });
+      bump(row.st);
     },
-    spawnGoldenParticle(text) {
-      if (root) spawnParticle(text, k.particles.clientWidth / 2, k.particles.clientHeight * 0.3, 'gold');
-    },
-    unmount() { root = null; rows = []; },
+    unmount() { Floor.unmount(); root = null; rows = []; },
   };
 })();
