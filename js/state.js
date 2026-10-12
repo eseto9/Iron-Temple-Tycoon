@@ -4,7 +4,7 @@ const G = (() => {
   const listeners = {};
   const SEASON = CFG.season;
   const DAY = 86400e3;
-  const STATS = ['levels', 'golden', 'reps', 'upgrades', 'trainers', 'seasonPts', 'gyms', 'franchises', 'checkins', 'classes'];
+  const STATS = ['levels', 'golden', 'reps', 'upgrades', 'trainers', 'seasonPts', 'gyms', 'franchises', 'classes'];
 
   const newStats = () => Object.fromEntries(STATS.map((k) => [k, 0]));
   /** Whole-day number for a local calendar date (DST-safe). */
@@ -26,7 +26,6 @@ const G = (() => {
       goldenUpgradeLevels: {},
       gyms: [], // "cityId:locationId:focusId"
       schedule: { unlocked: [], classes: {} }, // classes: slotId → stationId
-      workouts: { lastDay: null, streak: 0, best: 0, days: [], focus: null },
       seasonEndsAt: now + SEASON.lengthDays * DAY,
       seasonRackLevel: 0,
       seasonClaimed: [],
@@ -52,7 +51,6 @@ const G = (() => {
         settings: { ...fresh.settings, ...(parsed.settings || {}) },
         stats: { ...fresh.stats, ...(parsed.stats || {}) },
         schedule: { ...fresh.schedule, ...(parsed.schedule || {}) },
-        workouts: { ...fresh.workouts, ...(parsed.workouts || {}) },
       };
     } catch {
       return fresh;
@@ -116,7 +114,7 @@ const G = (() => {
       return u.detail || '';
     },
 
-    // ───────── Focus, classes, workouts ─────────
+    // ───────── Focus and classes ─────────
     focus(id) { return CFG.focuses.find((f) => f.id === id); },
     /** Home stations get +5% per map gym that shares their focus. */
     focusGymCount(focusId) { return this.s.gyms.filter((g) => g.split(':')[2] === focusId).length; },
@@ -169,35 +167,6 @@ const G = (() => {
       return { slot, station: this.station(stationId), mult: this.classMultBase(slot) };
     },
 
-    get todayNum() { return dayNum(new Date(this.now)); },
-    get workedOutToday() { return this.s.workouts.lastDay === this.todayNum; },
-    get todayWorkoutFocus() { return this.workedOutToday ? this.s.workouts.focus : null; },
-    /** Streak counts while the last workout was within the rest-day grace. */
-    get streakAlive() {
-      const w = this.s.workouts;
-      return w.lastDay != null && this.todayNum - w.lastDay <= 1 + CFG.workout.restDayGrace;
-    },
-    get streak() { return this.streakAlive ? this.s.workouts.streak : 0; },
-    get streakMult() {
-      const w = CFG.workout;
-      return 1 + w.streakBonusPerDay * Math.min(this.streak, w.streakBonusMaxDays) * this.effectProduct('streak');
-    },
-    logWorkout(focusId) {
-      if (this.workedOutToday || !this.focus(focusId)) return 0;
-      const w = this.s.workouts;
-      w.streak = this.streakAlive ? w.streak + 1 : 1;
-      w.best = Math.max(w.best, w.streak);
-      w.lastDay = this.todayNum;
-      w.focus = focusId;
-      w.days = [...w.days.filter((d) => this.todayNum - d < 28), this.todayNum];
-      const protein = CFG.workout.proteinBase + Math.min(w.streak, 7);
-      this.s.protein += protein;
-      this.s.stats.checkins++;
-      FX.haptic('milestone');
-      FX.sound('milestone');
-      this.emit('workout');
-      return protein;
-    },
 
     // ───────── Economy ─────────
     get allStations() { return [SEASON.station, ...CFG.stations]; },
@@ -213,8 +182,8 @@ const G = (() => {
       for (const u of CFG.proteinUpgrades) if (u.effect.kind === 'global' && has(this.s.proteinUpgrades, u.id)) m *= u.effect.value;
       return m;
     },
-    /** Applies to station income: Home Gym × Signature Pump × upgrades × workout streak. */
-    get globalMult() { return this.homeGymIncomeMult * this.pumpMult * this.effectProduct('global') * this.streakMult; },
+    /** Applies to station income: Home Gym × Signature Pump × upgrades. */
+    get globalMult() { return this.homeGymIncomeMult * this.pumpMult * this.effectProduct('global'); },
     get milestoneFactor() { return CFG.milestoneMultiplier * this.effectProduct('milestone'); },
     /** Station-specific multipliers, broken out so the UI can explain them. */
     stationBoosts(st) {
@@ -224,12 +193,11 @@ const G = (() => {
         upgrades: this.effectProduct('station', (e) => e.station === st.id),
         focus: st.focus ? this.focusMult(st.focus) : 1,
         class: live && live.station.id === st.id ? live.mult : 1,
-        workout: st.focus && st.focus === this.todayWorkoutFocus ? CFG.workout.focusMultiplier : 1,
       };
     },
     stationMult(st) {
       const b = this.stationBoosts(st);
-      return b.trainer * b.upgrades * b.focus * b.class * b.workout;
+      return b.trainer * b.upgrades * b.focus * b.class;
     },
     /** Income of one station before global multipliers. */
     stationRaw(st) {
@@ -644,18 +612,17 @@ const G = (() => {
         for (const p of [G.s.tasks.daily, G.s.tasks.weekly]) p.base = Object.fromEntries(Object.keys(G.s.stats).map((k) => [k, -1e18]));
         G.emit('tasks');
       },
-      /** Pretend the last workout was yesterday so you can log again. */
-      newWorkoutDay() { if (G.s.workouts.lastDay != null) G.s.workouts.lastDay = G.todayNum - 1; G.emit('workout'); },
     },
   };
 
   // Clean up fields from earlier builds.
-  ['premiumUpgrades', 'seasonClaimedFree', 'seasonClaimedPremium', 'hasSeasonPremium', 'freeRushEndsAt', 'freeRushReadyAt', 'preWorkoutEndsAt', 'restBoostEndsAt', 'totalTaps']
+  ['premiumUpgrades', 'seasonClaimedFree', 'seasonClaimedPremium', 'hasSeasonPremium', 'freeRushEndsAt', 'freeRushReadyAt', 'preWorkoutEndsAt', 'restBoostEndsAt', 'totalTaps', 'workouts']
     .forEach((k) => delete G.s[k]);
   if (!Array.isArray(G.s.seasonClaimed)) G.s.seasonClaimed = [];
 
   // Tapping was removed in v1.1: refund what was spent on tap upgrades.
-  const removedProtein = { sharpEye: 15, autoTap: 45, turboAutoTap: 220 };
+  // v1.2 removed real-life workouts: Habit Coach is refunded too.
+  const removedProtein = { sharpEye: 15, autoTap: 45, turboAutoTap: 220, habitCoach: 45 };
   for (const [id, cost] of Object.entries(removedProtein)) {
     if (G.s.proteinUpgrades.includes(id)) G.s.protein += cost;
   }
@@ -664,7 +631,8 @@ const G = (() => {
   const hands = G.s.goldenUpgradeLevels.strongHands || 0;
   for (let i = 0; i < hands; i++) G.s.goldenPlates += Math.ceil(Math.pow(1.4, i));
   delete G.s.goldenUpgradeLevels.strongHands;
-  if (G.s.stats.taps != null) delete G.s.stats.taps;
+  delete G.s.stats.taps;
+  delete G.s.stats.checkins;
 
   return G;
 })();

@@ -22,7 +22,6 @@ const GymScreen = (() => {
 
       <section class="card floor-card" data-k="floorHost"></section>
 
-      <section class="card workout-card" data-k="workout"></section>
 
       <button class="card season-card" data-action="open-season" aria-label="Open season pass">
         <div class="row gap-14">
@@ -55,45 +54,10 @@ const GymScreen = (() => {
     k = {};
     root.querySelectorAll('[data-k]').forEach((el) => (k[el.dataset.k] = el));
     Floor.render(k.floorHost);
-    renderWorkout();
     renderStations();
     renderSeason();
     syncSeg();
     update();
-  }
-
-  // ───────── Real-life workout check-in ─────────
-  function renderWorkout() {
-    if (!root) return;
-    const w = G.s.workouts;
-    const done = G.workedOutToday;
-    const f = done && G.focus(w.focus);
-    const streak = G.streak;
-    const bonus = Math.round((G.streakMult - 1) * 100);
-    const today = G.todayNum;
-    const dots = Array.from({ length: 7 }, (_, i) => {
-      const d = today - 6 + i;
-      const label = 'SMTWTFS'[new Date((d) * 864e5).getUTCDay()];
-      return `<span class="wk-dot ${w.days.includes(d) ? 'on' : ''} ${d === today ? 'today' : ''}"><i></i>${label}</span>`;
-    }).join('');
-    k.workout.innerHTML = `
-      <div class="row gap-14">
-        ${UI.badge('💪', '#DCEBDF', 48)}
-        <div class="grow">
-          <h3>Real-life workout</h3>
-          <p class="small muted">${done ? `Logged ${f.name.toLowerCase()} today · ${f.name} stations x${CFG.workout.focusMultiplier} until midnight` : 'Did you move today? Log it honestly for Protein and a streak bonus.'}</p>
-        </div>
-      </div>
-      <div class="streak-row">
-        <span class="streak-chip ${streak ? 'on' : ''}">🔥 ${streak}-day streak${bonus ? ` · +${bonus}% income` : ''}</span>
-        <div class="wk-dots" aria-label="Workouts this week">${dots}</div>
-      </div>
-      ${done
-        ? `<p class="logged-note">${Icons.check(14)} Nice work. Rest days are welcome: your streak survives one between workouts.</p>`
-        : `<div class="focus-grid">${CFG.focuses.map((x) => `
-            <button class="focus-btn" data-action="log-workout" data-focus="${x.id}" style="--tint:${x.tint}">
-              <span>${x.emoji}</span>${x.name}
-            </button>`).join('')}</div>`}`;
   }
 
   // ───────── Stations ─────────
@@ -160,7 +124,7 @@ const GymScreen = (() => {
       const q = G.quote(st);
       const income = lvl > 0 ? G.stationIncome(st) : G.stationIncomePerLevel(st);
       const b = G.stationBoosts(st);
-      const tags = (b.class > 1 ? ' · 🎵' : '') + (b.workout > 1 ? ' · 💪' : '') + (b.trainer > 1 ? ' · 🧑‍🏫' : '');
+      const tags = (b.class > 1 ? ' · 🎵' : '') + (b.trainer > 1 ? ' · 🧑‍🏫' : '');
       UI.setText(refs.meta, lvl > 0 ? `Lv ${lvl} · ${Fmt.rate(income)}${tags}` : `+${Fmt.rate(income)} per level`);
       const prev = previousMilestone(lvl), next = nextMilestone(lvl);
       UI.setStyle(refs.msBar, 'width', `${((lvl - prev) / (next - prev)) * 100}%`);
@@ -224,10 +188,9 @@ const GymScreen = (() => {
     render,
     update,
     renderSeason,
-    renderWorkout,
     syncSeg,
     bump,
-    onStructure() { if (!root) return; renderStations(); renderSeason(); renderWorkout(); Floor.refresh(); if (k.homeGym) k.homeGym.innerHTML = UI.homeGymCard(); },
+    onStructure() { if (!root) return; renderStations(); renderSeason(); Floor.refresh(); if (k.homeGym) k.homeGym.innerHTML = UI.homeGymCard(); },
     scrollToStation(id) {
       const row = rows.find((r) => r.st.id === id);
       if (!row) return;

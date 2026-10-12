@@ -80,19 +80,7 @@ const App = (() => {
       GymScreen.syncSeg();
       GymScreen.update();
     },
-    golden: () => {
-      const at = Floor.goldenPoint();
-      const r = G.catchGoldenCustomer();
-      if (r && at) Floor.puff(`+${Fmt.short(r.reps)}${r.protein ? ' 💎' : ''} ✨`, at.x, at.y, 'gold');
-    },
     'floor-tile': (el) => GymScreen.scrollToStation(el.dataset.id),
-    'log-workout': (el) => {
-      const protein = G.logWorkout(el.dataset.focus);
-      if (protein) {
-        const f = G.focus(el.dataset.focus);
-        Toast.show({ emoji: '💪', title: `${G.streak}-day streak!`, subtitle: `+${protein} Protein · ${f.name} stations x${CFG.workout.focusMultiplier} today`, celebrate: true });
-      }
-    },
     'unlock-slot': (el) => {
       if (G.unlockSlot(el.dataset.id) && CFG.stations.some((st) => G.level(st) > 0)) openClassPicker(el.dataset.id);
     },
@@ -147,7 +135,7 @@ const App = (() => {
     G.on('structure', () => currentScreen().onStructure?.());
     G.on('season', () => GymScreen.renderSeason());
     G.on('golden', () => Floor.renderGolden());
-    G.on('workout', () => { if (current === 'gym') { GymScreen.renderWorkout(); Floor.refresh(); GymScreen.update(); } });
+    G.on('purchase', () => { if (current === 'gym') Floor.refresh(); });
     G.on('milestone', (m) => Toast.show(m));
     G.on('welcome', (report) => Sheets.welcome(report));
 

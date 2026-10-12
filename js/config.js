@@ -1,7 +1,7 @@
 /* GameConfig: every tunable number in the game lives here.
    Change values, reload, play. See README → "Tuning the economy". */
 const CFG = {
-  version: '1.1',
+  version: '1.2',
 
   // Starting state
   startingReps: 500,
@@ -67,16 +67,6 @@ const CFG = {
     saunaPlunge: 'Contrast Therapy', crossfitBox: 'WOD Hour', olympicPlatform: 'Barbell Club',
   },
 
-  /* ───────── Real-life workouts: one honest check-in per day ─────────
-     Streak survives one rest day between workouts. */
-  workout: {
-    focusMultiplier: 2,        // stations of the logged focus, until midnight
-    streakBonusPerDay: 0.05,   // global income per streak day…
-    streakBonusMaxDays: 10,    // …capped here
-    proteinBase: 3,            // Protein per check-in = base + min(streak, 7)
-    restDayGrace: 1,
-  },
-
   // Gym floor
   floor: { minMembers: 2, maxMembers: 14, classCrowd: 3 },
 
@@ -122,7 +112,7 @@ const CFG = {
     { id: 'peakPlanner',    name: 'Peak Planner',      emoji: '🗓️', cost: 15,  detail: 'Class bonuses x1.5',                    effect: { kind: 'class', value: 1.5 } },
     { id: 'diamondRegister',name: 'Diamond Register',  emoji: '💎', cost: 25,  detail: 'All income x1.5',                       effect: { kind: 'global', value: 1.5 } },
     { id: 'goldenBell',     name: 'Golden Bell',       emoji: '🛎️', cost: 35,  detail: 'Golden members visit twice as often',   effect: { kind: 'goldenRate', value: 2 } },
-    { id: 'habitCoach',     name: 'Habit Coach',       emoji: '📓', cost: 45,  detail: 'Workout streak bonus x2',               effect: { kind: 'streak', value: 2 } },
+    { id: 'memberReferrals',name: 'Member Referrals',  emoji: '🤝', cost: 45,  detail: 'All income x1.25',                      effect: { kind: 'global', value: 1.25 } },
     { id: 'recoverySuite',  name: 'Recovery Suite',    emoji: '🛁', cost: 60,  detail: '+4h offline cap',                       effect: { kind: 'offlineCap', value: 4 } },
     { id: 'ironWill',       name: 'Iron Will',         emoji: '🔥', cost: 120, detail: 'All income x2',                         effect: { kind: 'global', value: 2 } },
     { id: 'restfulNights',  name: 'Restful Nights',    emoji: '🌙', cost: 150, detail: 'Offline earnings rate x1.5',            effect: { kind: 'offlineRate', value: 1.5 } },
@@ -210,7 +200,6 @@ const CFG = {
      metric: which lifetime stat to count. target: number, or 'income' = minutes of income at roll time. */
   dailyTaskCount: 4,
   dailyTasks: [
-    { id: 'checkin',  metric: 'checkins', target: 1,   reward: 6,  label: () => 'Log a real-life workout', emoji: '💪' },
     { id: 'class',    metric: 'classes',  target: 2,   reward: 5,  label: (n) => `Schedule ${n} classes`, emoji: '🗓️' },
     { id: 'levels',   metric: 'levels',   target: 25,  reward: 5,  label: (n) => `Buy ${n} station levels`, emoji: '🏋️' },
     { id: 'golden',   metric: 'golden',   target: 2,   reward: 6,  label: (n) => `Welcome ${n} golden members`, emoji: '🤩' },
@@ -221,7 +210,6 @@ const CFG = {
     { id: 'gym',      metric: 'gyms',     target: 1,   reward: 10, label: () => 'Open a new gym', emoji: '🗺️' },
   ],
   weeklyTasks: [
-    { id: 'wCheckins', metric: 'checkins', target: 4,    reward: 35, label: (n) => `Log ${n} real-life workouts`, emoji: '💪' },
     { id: 'wLevels',   metric: 'levels',   target: 300,  reward: 25, label: (n) => `Buy ${n} station levels`, emoji: '🏋️' },
     { id: 'wGolden',   metric: 'golden',   target: 15,   reward: 30, label: (n) => `Welcome ${n} golden members`, emoji: '🤩' },
     { id: 'wTrainers', metric: 'trainers', target: 5,    reward: 25, label: (n) => `Hire ${n} trainers`, emoji: '🧑‍🏫' },

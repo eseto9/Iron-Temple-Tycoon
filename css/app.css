@@ -606,73 +606,18 @@ body.on-map { overflow: hidden; }
 .city-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .city-card { display: flex; flex-direction: column; gap: 2px; padding: 14px; }
 
-/* ═════════ v1.1: gym floor, workouts, classes, trends ═════════ */
+/* ═════════ v1.1+: gym floor, classes, trends ═════════ */
 
-/* Gym floor */
-.floor-card { padding: 12px; }
-.floor { position: relative; }
-.floor-grid {
-  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;
-  padding: 10px; border-radius: 22px;
-  background:
-    repeating-linear-gradient(90deg, transparent 0 38px, color-mix(in srgb, var(--hairline) 55%, transparent) 38px 39px),
-    repeating-linear-gradient(0deg, transparent 0 38px, color-mix(in srgb, var(--hairline) 55%, transparent) 38px 39px),
-    var(--card-inset);
+/* Living gym floor (canvas) */
+.floor-card { padding: 10px; }
+.floor-stage { position: relative; border-radius: 20px; overflow: hidden; box-shadow: inset 0 0 0 1px var(--hairline); }
+.floor-canvas { display: block; width: 100%; touch-action: manipulation; cursor: pointer; }
+.floor-golden-hint {
+  position: absolute; left: 0; right: 0; top: 8px; margin: 0 auto; width: max-content;
+  padding: 5px 12px; border-radius: 999px; white-space: nowrap;
+  background: rgba(255, 255, 255, .92); color: #A77D06; font-size: 12px; font-weight: 900;
+  box-shadow: var(--shadow); pointer-events: none; animation: chip-pulse 1.4s ease-in-out infinite;
 }
-.tile {
-  position: relative; aspect-ratio: 1.12;
-  display: grid; place-items: center;
-  border-radius: 16px;
-  background: color-mix(in srgb, var(--tint, #EEE) var(--badge-mix), var(--card));
-  box-shadow: 0 3px 8px rgba(43, 33, 27, .08);
-  transition: transform .35s var(--spring), opacity .3s, box-shadow .3s;
-}
-.tile:active { transform: scale(.94); }
-.tile-emoji { font-size: clamp(20px, 7vw, 28px); line-height: 1; }
-.tile-lvl { position: absolute; right: 5px; bottom: 4px; font-size: 10px; font-weight: 900; color: var(--text2); }
-.tile-badge { position: absolute; left: 4px; top: 2px; font-size: 13px; }
-.tile.available { background: var(--card); opacity: .7; outline: 2px dashed color-mix(in srgb, var(--sage1) 45%, transparent); outline-offset: -4px; box-shadow: none; }
-.tile.available .tile-emoji { filter: grayscale(.4); opacity: .7; }
-.tile.locked { background: transparent; box-shadow: none; outline: 2px dashed var(--hairline); outline-offset: -4px; }
-.tile.locked .tile-emoji { opacity: 0; }
-.tile.seasonal.open { box-shadow: 0 0 0 2px var(--clay), 0 3px 8px rgba(43, 33, 27, .08); }
-.tile.live { box-shadow: 0 0 0 3px var(--sage1), 0 0 18px color-mix(in srgb, var(--sage1) 45%, transparent); animation: live-glow 2s ease-in-out infinite; }
-@keyframes live-glow { 50% { box-shadow: 0 0 0 3px var(--sage1), 0 0 28px color-mix(in srgb, var(--sage1) 65%, transparent); } }
-.tile.boosted.open { box-shadow: 0 0 0 2px color-mix(in srgb, var(--lav2) 70%, transparent), 0 3px 8px rgba(43, 33, 27, .08); }
-.tile.decor { background: transparent; box-shadow: none; }
-.tile.decor .tile-emoji { font-size: clamp(18px, 6vw, 24px); opacity: .85; }
-
-.floor-people, .floor-fx, .floor-golden { position: absolute; inset: 0; pointer-events: none; }
-.member {
-  position: absolute; left: 0; top: 0;
-  margin: -13px 0 0 -10px;
-  font-size: 20px; line-height: 1;
-  filter: drop-shadow(0 2px 2px rgba(43, 33, 27, .25));
-  transition: transform 2.4s cubic-bezier(.45, .05, .35, 1);
-  will-change: transform;
-}
-.floor-puff {
-  position: absolute; transform: translate(-50%, -50%);
-  font-size: 12px; font-weight: 900; color: var(--income);
-  text-shadow: 0 1px 0 var(--card);
-  white-space: nowrap;
-  animation: puff 1.3s var(--ease) forwards;
-}
-.floor-puff.big { font-size: 20px; }
-.floor-puff.gold { color: #C99A10; animation-duration: 1.8s; }
-@keyframes puff {
-  0% { opacity: 0; transform: translate(-50%, -20%) scale(.8); }
-  20% { opacity: 1; transform: translate(-50%, -80%) scale(1); }
-  100% { opacity: 0; transform: translate(-50%, -260%); }
-}
-.golden-member {
-  pointer-events: auto; position: absolute;
-  transform: translate(-50%, -60%);
-  display: flex; flex-direction: column; align-items: center; gap: 2px;
-  min-width: 56px; min-height: 56px; z-index: 2;
-  animation: gc-in .5s var(--spring), gm-bob 1.6s ease-in-out .5s infinite;
-}
-@keyframes gm-bob { 50% { transform: translate(-50%, -75%); } }
 .floor-bar { display: flex; align-items: center; gap: 8px; padding: 10px 4px 2px; }
 .floor-count { flex: 1; font-size: 13px; font-weight: 800; color: var(--text2); }
 .floor-class {
@@ -681,17 +626,6 @@ body.on-map { overflow: hidden; }
   font-size: 12px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 62%;
 }
 .floor-class.on { background: color-mix(in srgb, var(--sage1) 16%, transparent); color: var(--sage2); }
-
-/* Workout check-in */
-.workout-card { display: flex; flex-direction: column; gap: 12px; }
-.streak-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap; }
-.streak-chip { padding: 6px 12px; border-radius: 999px; background: var(--card-inset); color: var(--text2); font-size: 13px; font-weight: 800; }
-.streak-chip.on { background: color-mix(in srgb, var(--clay) 15%, transparent); color: var(--clay); }
-.wk-dots { display: flex; gap: 6px; }
-.wk-dot { display: flex; flex-direction: column; align-items: center; gap: 3px; font-size: 10px; font-weight: 800; color: var(--text2); }
-.wk-dot i { width: 14px; height: 14px; border-radius: 50%; background: var(--track); }
-.wk-dot.on i { background: var(--sage1); }
-.wk-dot.today i { box-shadow: 0 0 0 2px var(--card), 0 0 0 4px color-mix(in srgb, var(--sage1) 50%, transparent); }
 .focus-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
 .focus-grid.four { grid-template-columns: repeat(4, 1fr); }
 .focus-btn {
@@ -707,7 +641,6 @@ body.on-map { overflow: hidden; }
 .focus-grid.four .focus-btn { flex-direction: column; gap: 2px; font-size: 11px; min-height: 58px; }
 .focus-btn.on { box-shadow: 0 0 0 2.5px var(--sage1); }
 .trend-dot { position: absolute; top: 5px; right: 6px; width: 8px; height: 8px; border-radius: 50%; background: var(--clay); }
-.logged-note { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; color: var(--sage2); }
 .focus-pick { display: flex; flex-direction: column; gap: 8px; }
 .trend-chip { background: color-mix(in srgb, var(--clay) 13%, transparent); color: var(--clay); }
 
