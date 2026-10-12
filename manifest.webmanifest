@@ -1,0 +1,16 @@
+{
+  "name": "Iron Empire",
+  "short_name": "Iron Empire",
+  "description": "A calm, premium gym idle tycoon.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#F5EFE6",
+  "theme_color": "#F5EFE6",
+  "icons": [
+    { "src": "icons/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icons/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icons/icon-1024.png", "sizes": "1024x1024", "type": "image/png", "purpose": "any maskable" }
+  ]
+}
